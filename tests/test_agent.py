@@ -10,12 +10,13 @@ from pathlib import Path
 from qfs.agent_evaluate import inspect
 
 
-def check(run_path):
-    result = inspect(run_path)
+def check(run_path, checkpoint=None):
+    result = inspect(run_path, checkpoint)
     assert result["controller_pass"], "ROM framing, phase order, or bounded HALT failed"
     assert result["complete_cycles"] == result["expected_phases"] // 3, "Missing phase writes"
     assert result["filesystem_pass"], "A read differed from the prior stored token sequence"
     assert len(result["reads"]) == result["expected_reads"], "Missing compiled reads"
+    assert result["write_count"] == result["expected_writes"], "Missing model-generated write acks"
     for phase in result["phases"]:
         if phase["kind"] == "create" and phase["cycle"] > 1:
             assert any(c["function"] == "read_file" and c["parameters"].get("name") == "result.txt"
@@ -30,9 +31,10 @@ def check(run_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("runs", nargs="+")
+    parser.add_argument("--checkpoint")
     args = parser.parse_args()
     for path in args.runs:
-        result = check(path)
+        result = check(path, args.checkpoint)
         print(json.dumps({"run": str(Path(path)), "controller": "PASS",
                           "cycles": result["complete_cycles"],
                           "exact_reads": len(result["reads"]),

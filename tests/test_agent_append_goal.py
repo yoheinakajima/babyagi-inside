@@ -9,8 +9,8 @@ import re
 from qfs.agent_evaluate import inspect
 
 
-def check(path):
-    report = inspect(path)
+def check(path, checkpoint=None):
+    report = inspect(path, checkpoint)
     chain = ("oak", "oak-red", "oak-red-blue", "oak-red-blue-gold")
     checks = []
     for phase in report["phases"]:
@@ -33,8 +33,9 @@ def check(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("run")
+    parser.add_argument("--checkpoint")
     args = parser.parse_args()
-    result = check(args.run)
+    result = check(args.run, args.checkpoint)
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["pass"] else 1)
 

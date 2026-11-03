@@ -28,7 +28,8 @@ def check(checkpoint, device="mps", chunk=64):
     objective = "Perform a sequence of small text tasks."
     tokens = list(tok.apply_chat_template(
         [{"role": "user", "content": objective}],
-        tools=TOOLS, tokenize=True, add_generation_prompt=True,
+        tools=TOOLS, tokenize=True,
+        add_generation_prompt=meta["stages"][0]["kind"] == "bootstrap",
         enable_thinking=False, return_dict=False)) + [START]
     if meta["stages"][0]["kind"] == "bootstrap":
         tokens += tok.encode("<tool_call>\n<function=write_file>\n<parameter=name>\ngoal.txt"

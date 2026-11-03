@@ -10,9 +10,9 @@ from qfs.agent import START, KINDS
 from qfs.bridge import parse_call
 
 
-def inspect(run_path):
+def inspect(run_path, checkpoint_override=None):
     record = json.loads(Path(run_path).read_text())
-    checkpoint = Path(record["checkpoint"])
+    checkpoint = Path(checkpoint_override or record["checkpoint"])
     meta = json.loads((checkpoint / "agent.json").read_text())
     tok = AutoTokenizer.from_pretrained(checkpoint)
     tokens = record["tokens"]
@@ -77,9 +77,11 @@ def inspect(run_path):
                       "exact": expected == all_tokens[pos + 1:stop]})
     result = {
         "objective": record["objective"], "seed": record["seed"],
-        "halted": record["halted"], "token_count": len(tokens),
+        "halted": bool(tokens and tokens[-1] == meta["halt"]), "token_count": len(tokens),
         "seconds": record["seconds"], "expected_phases": meta["cycles"] * 3,
         "expected_reads": sum(s["op"] == "read" for s in meta["stages"]),
+        "write_count": len(writes),
+        "expected_writes": sum(s["op"] == "write" for s in meta["stages"]),
         "phases": phases,
         "stages": stages,
         "reads": reads,
@@ -88,7 +90,8 @@ def inspect(run_path):
                                    for p in phases if p["cycle"] == c)
                                and sum(p["cycle"] == c for p in phases) == 3
                                for c in range(1, meta["cycles"] + 1)),
-        "controller_pass": (record["halted"] and len(stages) == len(meta["rom"])
+        "controller_pass": (record["halted"] and bool(tokens and tokens[-1] == meta["halt"])
+                            and len(stages) == len(meta["rom"])
                             and [s["stage"] for s in stages] == list(range(len(meta["rom"])))
                             and all(s["rom_exact"] and s["response_completed"] for s in stages)),
         "latest_files": {tok.decode(list(name)): {"version": version, "text": tok.decode(body)}
@@ -101,8 +104,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("run")
     parser.add_argument("--output")
+    parser.add_argument("--checkpoint", help="Use a rebuilt checkpoint when moving an archived trace")
     args = parser.parse_args()
-    result = inspect(args.run)
+    result = inspect(args.run, args.checkpoint)
     text = json.dumps(result, indent=2)
     if args.output:
         Path(args.output).write_text(text + "\n")

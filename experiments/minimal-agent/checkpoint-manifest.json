@@ -1,0 +1,42 @@
+{
+  "checkpoint": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-poc/build/babyagi-0.8b-io",
+  "total_weight_bytes": 5555622792,
+  "weights": [
+    {
+      "file": "model-00001-of-00005.safetensors",
+      "bytes": 1573060752,
+      "sha256": "0812ab9b3faa5715d61531bf690c40b531ea26c1bce105fe6f3d3d95006fbd03"
+    },
+    {
+      "file": "model-00002-of-00005.safetensors",
+      "bytes": 995688768,
+      "sha256": "32f1d37da136bd252434d196a2eb42824705b0c42a8dc4a8c134d7d74b5acad0"
+    },
+    {
+      "file": "model-00003-of-00005.safetensors",
+      "bytes": 995638944,
+      "sha256": "18e5c4d8fd55b612b9befc7c7eb9a743fe7f57f1e163a5e0db25980b869e1bd5"
+    },
+    {
+      "file": "model-00004-of-00005.safetensors",
+      "bytes": 995639000,
+      "sha256": "9831d1f814f5db673844f0bcc353926ac57d619f8bcb412708b02645c176d58e"
+    },
+    {
+      "file": "model-00005-of-00005.safetensors",
+      "bytes": 995595328,
+      "sha256": "595f1eff59787a305c40e633b53865d78fba5b35a967daa3e254f6dc2e7d073b"
+    }
+  ],
+  "source_model": "Qwen/Qwen3.5-0.8B",
+  "source_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "upstream_qwenfs": "fe3f5c0dbebe5c827781e98ad839aecebcce32fa",
+  "architecture": {
+    "layers": 32,
+    "filesystem_prefix_layers": 8,
+    "hidden_size": 3072,
+    "compiled_microstates": 17,
+    "cycles": 3
+  },
+  "license": "Apache-2.0 for modified Qwen weights; MIT for qwenFS code"
+}

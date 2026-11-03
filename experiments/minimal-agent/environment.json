@@ -1,0 +1,11 @@
+{
+  "platform": "macOS-15.5-arm64-arm-64bit",
+  "python": "3.11.15",
+  "torch": "2.15.0",
+  "transformers": "5.22.1",
+  "device": "mps",
+  "dtype": "bfloat16",
+  "upstream": "fe3f5c0dbebe5c827781e98ad839aecebcce32fa",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "base_revision": "2fc06364715b967f1860aea9cf38778875588b17"
+}

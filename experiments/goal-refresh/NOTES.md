@@ -9,5 +9,6 @@ The live run was deliberately stopped after the first creation/prioritization
 failure: it copied the objective and phase instructions into task entries,
 then copied multiple entries instead of selecting one. This is a partial,
 failed behavioral experiment, not a successful three-cycle trace. The raw log
-and compiled ROM are retained. The source at this Git commit implements the
-experimental variant; the following commit restores the smaller 17-state core.
+and compiled ROM are retained. The experimental source is recorded at local commit `1508fc4`. The primary
+implementation retains the smaller 17-state controller. Apply
+`source-variant.patch` to the primary source to rebuild this variant.

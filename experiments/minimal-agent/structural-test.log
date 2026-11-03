@@ -1,0 +1,2 @@
+W1103 14:26:21.024000 11855 .venv/lib/python3.11/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+{"run": "experiments/minimal-agent/raw-trace.json", "controller": "PASS", "cycles": 3, "exact_reads": 8, "tokens": 2287}
