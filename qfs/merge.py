@@ -1,8 +1,8 @@
 """Merge the filesystem into a stock Qwen3.5 checkpoint.
 
-The FS layers (qfs.circuit) go in front of Qwen's 24, the residual is widened from
-2048 to 3072 (Qwen's matrices are zero-padded; its decoder and final norm gains are scaled by
-sqrt(2048/3072), so its text computation is unchanged up to bf16 rounding of those gains), and
+The FS layers (qfs.circuit) go in front of Qwen's 24, the residual is widened to
+3072 (Qwen's matrices are zero-padded; its decoder and final norm gains are scaled by
+sqrt(source_width/3072), so its text computation is unchanged up to bf16 rounding of those gains), and
 the FS tokens are appended to the vocabulary. The FS exit clears every FS dim except the output
 code, which it leaves EPS-sized in the id dims: Qwen's layers barely see it, and the final norm
 scales it up so that a forced token (an ack, a read-back) wins over Qwen's own prediction. Where
@@ -26,7 +26,6 @@ from qfs import circuit as F
 
 PREFIX = "model.language_model."
 FS_LAYERS = F.LAYERS
-WIDE = math.sqrt(2048 / F.H)        # Qwen's norm gains on the wide residual
 ALIAS = 0.25                        # ack tokens' Qwen part: a quarter of the newline's
 
 
@@ -72,7 +71,7 @@ def base_model(src):
 def merge(src, xs, gain):
     tc = text_config(src)
     n0, d0 = tc["num_hidden_layers"], tc["hidden_size"]
-    assert d0 == F.OFF, d0
+    assert d0 <= F.OFF, d0
     tc.update(hidden_size=F.H, num_hidden_layers=len(FS_LAYERS) + n0, vocab_size=F.VOCAB,
               layer_types=FS_LAYERS + tc["layer_types"])
     tc.pop("full_attention_interval", None)
@@ -87,7 +86,7 @@ def merge(src, xs, gain):
             p = params[k2]
             if norm_re.search(k2):                 # decoder and final norms see the wide residual
                 p.fill_(-1)
-                p[:d0] = ((1 + t.float()) * WIDE - 1).to(p.dtype)
+                p[:d0] = ((1 + t.float()) * math.sqrt(d0 / F.H) - 1).to(p.dtype)
             elif p.shape == t.shape:
                 p.copy_(t)
             else:

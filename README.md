@@ -1,5 +1,7 @@
 # qwenFS: Qwen keeps its own files
 
+Local research extension: [compiled BabyAGI proof of concept](docs/compiled-babyagi.md).
+
 **qwenFS is an experimental model: Qwen3.5-2B with a filesystem compiled and inserted directly
 into its weights.** It is not a plugin, a tool server or a database behind an API. The
 filesystem is 8 transformer layers in front of Qwen's own 24, and none of their weights are

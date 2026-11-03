@@ -1,0 +1,48 @@
+W1103 14:13:20.938000 41682 .venv/lib/python3.11/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/426 [00:00<?, ?it/s]Loading weights:  90%|█████████ | 385/426 [00:00<00:00, 3849.11it/s]Loading weights: 100%|██████████| 426/426 [00:00<00:00, 4196.79it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+checked 64/2703 tokens
+checked 128/2703 tokens
+checked 192/2703 tokens
+checked 256/2703 tokens
+checked 320/2703 tokens
+checked 384/2703 tokens
+checked 448/2703 tokens
+checked 512/2703 tokens
+checked 576/2703 tokens
+checked 640/2703 tokens
+checked 704/2703 tokens
+checked 768/2703 tokens
+checked 832/2703 tokens
+checked 896/2703 tokens
+checked 960/2703 tokens
+checked 1024/2703 tokens
+checked 1088/2703 tokens
+checked 1152/2703 tokens
+checked 1216/2703 tokens
+checked 1280/2703 tokens
+checked 1344/2703 tokens
+checked 1408/2703 tokens
+checked 1472/2703 tokens
+checked 1536/2703 tokens
+checked 1600/2703 tokens
+checked 1664/2703 tokens
+checked 1728/2703 tokens
+checked 1792/2703 tokens
+checked 1856/2703 tokens
+checked 1920/2703 tokens
+checked 1984/2703 tokens
+checked 2048/2703 tokens
+checked 2112/2703 tokens
+checked 2176/2703 tokens
+checked 2240/2703 tokens
+checked 2304/2703 tokens
+checked 2368/2703 tokens
+checked 2432/2703 tokens
+checked 2496/2703 tokens
+checked 2560/2703 tokens
+checked 2624/2703 tokens
+checked 2688/2703 tokens
+checked 2703/2703 tokens
+{"forced_tokens_correct": 1707, "forced_tokens_total": 1707, "failures": [], "pass": true}
