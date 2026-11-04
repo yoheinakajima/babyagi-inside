@@ -527,19 +527,19 @@ while ids[-1] != HALT:
       <div class="s-num">§06 results</div>
       <div>
         <h2>It runs as built</h2>
-        <p>Ten live traces on the compiled checkpoint, two to eight cycles, Apple M5 (MPS, bf16). The four add-first traces were chosen by a preregistered rule; the other six were chosen afterwards for diagnosis.</p>
+        <p>A frozen 32-item live evaluation on the compiled checkpoints: four task families, two to eight cycles, Apple M5 (MPS, bf16), greedy decoding.</p>
       </div>
     </div>
     <div class="s-body">
       <div class="tiles">
-        <div class="tile"><div class="n">10/10</div><div class="l">live traces completed every phase and halted</div></div>
+        <div class="tile"><div class="n">32/32</div><div class="l">runs ran every phase in order and halted (432/432 phases)</div></div>
         <div class="tile"><div class="n">1,716</div><div class="l">of 1,716 forced tokens matched the reference</div></div>
-        <div class="tile"><div class="n">8/8</div><div class="l">arithmetic chains solved, up to 8 cycles</div></div>
-        <div class="tile"><div class="n">41%</div><div class="l">of a five-cycle run written by Qwen, mostly thinking</div></div>
+        <div class="tile"><div class="n">8/8</div><div class="l">arithmetic chains solved; 0/24 in other task families</div></div>
+        <div class="tile"><div class="n">30/32</div><div class="l">runs with every file read exact; two hit a parser bug inherited from qwenFS</div></div>
       </div>
       <div class="table-box">
         <table>
-          <thead><tr><th>Trace</th><th>Cycles</th><th>Loop</th><th>Task</th><th>Results</th></tr></thead>
+          <caption class="small" style="caption-side:top;text-align:left;margin:0 0 10px">Ten of the 32 runs, inspected before the full evaluation</caption><thead><tr><th>Trace</th><th>Cycles</th><th>Loop</th><th>Task</th><th>Results</th></tr></thead>
           <tbody>
             <tr><td>arithmetic-add-2</td><td class="num">2</td><td>ran</td><td>pass</td><td class="num">9, 18</td></tr>
             <tr><td>arithmetic-add-3</td><td class="num">3</td><td>ran</td><td>pass</td><td class="num">11, 22, 19</td></tr>
@@ -554,7 +554,7 @@ while ids[-1] != HALT:
           </tbody>
         </table>
       </div>
-      <p class="small">With the loop inactive, the merged checkpoint closely matches stock Qwen on the tested prefixes (top-1 4/4, KL ≤ 0.002). A full 32-item compiled evaluation is in progress.</p>
+      <p class="small">Across all 32 runs the loop solved 8 chains, plain Qwen 5, every one of them arithmetic. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode and appended text to a stored file; the controller still ran every phase and halted. With the loop inactive, the merged checkpoint matches stock Qwen on 4/4 test prefixes (maximum KL 0.0019).</p>
     </div>
   </div>
 </section>
