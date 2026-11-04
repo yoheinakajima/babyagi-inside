@@ -9,6 +9,10 @@ arithmetic chain exactly inside the widened Qwen3.5-2B checkpoint.
 These are pilot and positive-trace results. They do not replace the complete
 144-step curve or establish broad agent capability.
 
+The complete curve is now reported separately in
+`docs/babyagi-v3-full-budget-results.md`; its estimates supersede the pilot
+accuracy table for all capability discussion.
+
 ## Frozen inputs
 
 - Suite: `benchmarks/babyagi-v3.json`
@@ -134,7 +138,6 @@ Evidence:
 
 ## Next gate
 
-Run the complete 144-step curve without changing the frozen suite, prompts,
-budgets, scorer, or selection rule. Then compare plain chat, the host ledger
-loop, and compiled checkpoints on the supported chain lengths. Do not use the
-pilot accuracy as the final paper estimate.
+The complete 144-step curve is finished. Next compare plain chat, the host
+ledger loop, and compiled checkpoints on the supported chain lengths. Do not
+use the pilot accuracy as the final paper estimate.
