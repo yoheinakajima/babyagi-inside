@@ -493,7 +493,7 @@ while ids[-1] != HALT:
       <div class="s-num">§05 a revealing failure</div>
       <div>
         <h2>A wrong plan, executed faithfully</h2>
-        <p>On two eight-cycle structured tasks, the loop did everything it was built to do. The plan Qwen wrote was wrong, and the loop carried it out for eight cycles. Because orchestration is fixed, the failure is visible at the point where it happens.</p>
+        <p>On two eight-cycle structured tasks, the loop did everything it was built to do. The plan Qwen wrote was wrong, and Qwen then executed every step of it correctly. Because orchestration is fixed, the failure is visible at the point where it happens.</p>
       </div>
     </div>
     <div class="s-body">
@@ -505,6 +505,7 @@ while ids[-1] != HALT:
             <li><span class="mark ok">✓</span>Every file write and exact read-back</li>
             <li><span class="mark ok">✓</span>Eight cycles, then HALT</li>
             <li><span class="mark ok">✓</span>Every token accounted to its owner</li>
+            <li><span class="mark ok">✓</span>Every result correctly executed Qwen's own task (8/8)</li>
           </ul>
         </div>
         <div class="card">
@@ -554,7 +555,6 @@ while ids[-1] != HALT:
           </tbody>
         </table>
       </div>
-      <p class="small">Every result correctly executed Qwen's own task (8/8) in both structured traces, but none matched the benchmark because Qwen wrote the wrong ledger.</p>
       <p class="small">Across all 32 runs the loop solved 8 chains, plain Qwen 5, every one of them arithmetic. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode and appended text to a stored file; the controller still ran every phase and halted. With the loop inactive, the merged checkpoint matches stock Qwen on 4/4 test prefixes (maximum KL 0.0019).</p>
     </div>
   </div>
@@ -606,7 +606,6 @@ while ids[-1] != HALT:
   author = {Nakajima, Yohei},
   title  = {BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights},
   year   = {2026},
-  doi    = {[ZENODO DOI]},
   url    = {https://babyagi.yohei.me}
 }</pre>
     </div>
