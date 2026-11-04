@@ -1,0 +1,487 @@
+{
+  "schema_version": 1,
+  "harness": "native-semantic-simulator",
+  "compiled_controller_executed": false,
+  "objective": "Begin with the exact text small moon. First replace its space with an underscore; next uppercase the letters; then prefix ID:; finally append #7. Apply exactly one transformation per task in order, carrying the result forward exactly.",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 0.9,
+    "seed": 0,
+    "mode": "greedy",
+    "sampled_rng_equivalence": "exact"
+  },
+  "stages_expected": 19,
+  "stages_attempted": 19,
+  "stages_completed": 19,
+  "stopped": null,
+  "phases": [
+    {
+      "stage": 0,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 255,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "FIRST TASK:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.9836390418931842
+    },
+    {
+      "stage": 1,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 13,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify small moon"
+      },
+      "model_text": " Verify small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6573320832103491
+    },
+    {
+      "stage": 2,
+      "cycle": 1,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 27.5,
+          "17": 23.875
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "FIRST TASK:  small moon",
+      "model_text": "1",
+      "seconds": 0.18633779045194387
+    },
+    {
+      "stage": 3,
+      "cycle": 1,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6732199573889375
+    },
+    {
+      "stage": 4,
+      "cycle": 2,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "forced_prefix_tokens": 25,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 0,
+      "decision": null,
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "result.txt"
+      },
+      "read_found": true,
+      "read_text": "Output:  small moon",
+      "model_text": "",
+      "seconds": 1.2958422303199768e-05
+    },
+    {
+      "stage": 5,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 237,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "TASK 1:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6772344997152686
+    },
+    {
+      "stage": 6,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 13,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify small moon"
+      },
+      "model_text": " Verify small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6669874163344502
+    },
+    {
+      "stage": 7,
+      "cycle": 2,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 28.375,
+          "17": 25.25
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "TASK 1:  small moon",
+      "model_text": "1",
+      "seconds": 0.19058641698211432
+    },
+    {
+      "stage": 8,
+      "cycle": 2,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6842321250587702
+    },
+    {
+      "stage": 9,
+      "cycle": 3,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "forced_prefix_tokens": 25,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 0,
+      "decision": null,
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "result.txt"
+      },
+      "read_found": true,
+      "read_text": "Output:  small moon",
+      "model_text": "",
+      "seconds": 1.3167038559913635e-05
+    },
+    {
+      "stage": 10,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 237,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "TASK 1:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6875181663781404
+    },
+    {
+      "stage": 11,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 13,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify small moon"
+      },
+      "model_text": " Verify small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6807818757370114
+    },
+    {
+      "stage": 12,
+      "cycle": 3,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 29.625,
+          "17": 21.875
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "TASK 1:  small moon",
+      "model_text": "1",
+      "seconds": 0.19450233411043882
+    },
+    {
+      "stage": 13,
+      "cycle": 3,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.6984848324209452
+    },
+    {
+      "stage": 14,
+      "cycle": 4,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "forced_prefix_tokens": 25,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 0,
+      "decision": null,
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "result.txt"
+      },
+      "read_found": true,
+      "read_text": "Output:  small moon",
+      "model_text": "",
+      "seconds": 1.2833625078201294e-05
+    },
+    {
+      "stage": 15,
+      "cycle": 4,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 237,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "TASK 1:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7446047905832529
+    },
+    {
+      "stage": 16,
+      "cycle": 4,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 13,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify small moon"
+      },
+      "model_text": " Verify small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7132462905719876
+    },
+    {
+      "stage": 17,
+      "cycle": 4,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 30.125,
+          "17": 20.5
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "TASK 1:  small moon",
+      "model_text": "1",
+      "seconds": 0.20264220796525478
+    },
+    {
+      "stage": 18,
+      "cycle": 4,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 12,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  small moon"
+      },
+      "model_text": " small moon\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7156360000371933
+    }
+  ],
+  "latest_files": {
+    "task1.txt": "TASK 1:  small moon",
+    "task2.txt": "TASK 2:  Verify small moon",
+    "result.txt": "Output:  small moon"
+  },
+  "token_provenance": {
+    "objective_prefill": 821,
+    "forced_rom": 3329,
+    "forced_visible_responses": 433,
+    "model_free": 148,
+    "model_typed_choices": 4
+  },
+  "forward_seconds": 2.0424099657684565,
+  "wall_seconds": 9.358033958822489,
+  "limitations": [
+    "host advances phases and simulates visible filesystem responses",
+    "only compiled traces validate controller, qwenFS, and HALT"
+  ],
+  "base": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-m5/models/Qwen3.5-2B",
+  "cycles": 4,
+  "protocol": "babyagi_typed",
+  "device": "mps",
+  "benchmark_id": "babyagi-heldout-v1",
+  "item_id": "literal-small-moon-4"
+}

@@ -25,7 +25,9 @@ START = PHASE0
 KINDS = ("create", "prioritize", "execute")
 PROTOCOLS = (
     "baseline", "literal", "generative", "babyagi", "babyagi_kshot", "babyagi_json",
+    "babyagi_typed",
 )
+CHOICE_GAIN = 65536.0
 
 
 def phase_prompts(cycle, cycles, protocol):
@@ -40,6 +42,56 @@ def phase_prompts(cycle, cycles, protocol):
             "Write only its description. Do not perform it yet.",
             "EXECUTE: Perform the selected task just read. Write its actual result, "
             "not a promise or a plan. State input and output when applicable.",
+        )
+    elif protocol == "babyagi_typed":
+        shared = (
+            f"Cycle {cycle}/{cycles}. Follow the objective in the first user message literally. "
+            "Treat its exact words, strings, symbols, numbers, order, and requested format as "
+            "requirements. Do not reinterpret its subject as a business, brand, or fictional "
+            "project. Do not invent external actions or facts. "
+        )
+        if cycle == 1:
+            create1 = (
+                "INITIAL TASK — Create the first task. Convert the actual objective into exactly "
+                "one first executable task. For an ordered objective, combine its initial state "
+                "with only its earliest operation. For an open goal, choose one concrete action "
+                "that produces part of the requested deliverable. Valid one-task shapes using "
+                "fake values are `Append -hot to elm`, `Double 4`, and `Draft the launch note "
+                "headline`. They show brevity and format only; never copy their content. The file "
+                "already begins `FIRST TASK: `. Add the actual task in the same short one-line "
+                "shape, at most 12 words, then close the tool call. Do not add a list, explanation, "
+                "or answer."
+            )
+        else:
+            create1 = (
+                "CREATE TASK 1. The previous result was just read; its Output is the current state. "
+                "Write exactly one concrete executable task: the earliest explicit operation not "
+                "yet reflected in that state. For a transformation, name the complete current "
+                "value and only the next requested change. For an open goal, name one action that "
+                "adds to the deliverable. Preserve the original objective's exact values; do not "
+                "invent a value or action. The file already begins `TASK 1: `. Complete that one "
+                "line in at most 12 words, then "
+                "close the tool call. Do not execute the task."
+            )
+        create2 = (
+            "CREATE TASK 2. Task 1 was just generated. Write a verification task that checks Task "
+            "1's result without performing another objective operation. Do not introduce any new "
+            "literal, calculation, transformation, or deliverable content. The file already begins "
+            "`TASK 2: `. Complete that one line in at most 12 words, then close the tool call. Do "
+            "not repeat, explain, or execute Task 1."
+        )
+        instructions = (
+            create1,
+            create2,
+            "PRIORITIZE: Choose the candidate that should be executed now. Select Task 1 or Task 2. "
+            "The selected file will be read automatically; emit only its single-digit ID.",
+            "EXECUTE: The selected task was just read and is the sole instruction for this phase. "
+            "Ignore every other candidate and every later operation in the objective. Do not copy "
+            "the task. Perform its one named action and stop. For a text transformation, use the complete value "
+            "named in the task and apply only its requested change. For text creation, write the "
+            "requested text itself, not a claim that it was written. The file already begins "
+            "`Output: `. Complete that one line with only the actual completed result, then close "
+            "the tool call. Do not repeat the task description or add an explanation."
         )
     elif protocol in ("literal", "generative", "babyagi", "babyagi_kshot", "babyagi_json"):
         shared = (
@@ -200,6 +252,62 @@ def program(tok, cycles=3, protocol="baseline"):
     stages = []
     for cycle in range(1, cycles + 1):
         shared, instructions = phase_prompts(cycle, cycles, protocol)
+        if protocol == "babyagi_typed":
+            create1, create2, prioritize, execute = instructions
+            if cycle > 1:
+                read = ("<tool_call>\n<function=read_file>\n<parameter=name>\nresult.txt"
+                        "\n</parameter>\n</function>\n</tool_call>")
+                stages.append({"cycle": cycle, "kind": "create", "op": "read",
+                               "file": "result.txt",
+                               "rom": tok.encode(read, add_special_tokens=False)})
+
+            for candidate, instruction in enumerate((create1, create2), 1):
+                prefix = "<|im_end|>" if stages else ""
+                frame = ("\n<|im_start|>user\n" + shared + instruction
+                         + " Keep it under 30 words. Finish by closing the tool call."
+                         + "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
+                filename = f"task{candidate}.txt"
+                text_prefix = ("FIRST TASK: " if candidate == 1 and cycle == 1 else
+                               f"TASK {candidate}: ")
+                write = ("<tool_call>\n<function=write_file>\n<parameter=name>\n" + filename
+                         + "\n</parameter>\n<parameter=text>\n" + text_prefix)
+                stages.append({"cycle": cycle, "kind": "create", "candidate": candidate,
+                               "op": "write", "file": filename, "text_prefix": text_prefix,
+                               "rom": tok.encode(prefix + frame + write,
+                                                 add_special_tokens=False)})
+
+            choices = [tok.encode(value, add_special_tokens=False) for value in ("1", "2")]
+            if any(len(choice) != 1 for choice in choices):
+                raise ValueError("typed choices 1 and 2 must each be one tokenizer token")
+            prefix = "<|im_end|>" if stages else ""
+            frame = ("\n<|im_start|>user\n" + shared + prioritize
+                     + "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
+            read_prefix = ("<tool_call>\n<function=read_file>\n<parameter=name>\ntask")
+            stages.append({
+                "cycle": cycle, "kind": "prioritize", "op": "read",
+                "file": "task{1|2}.txt", "selected_files": ["task1.txt", "task2.txt"],
+                "rom": tok.encode(prefix + frame + read_prefix, add_special_tokens=False),
+                "decision": {
+                    "mode": "typed_file_choice",
+                    "allowed_token_ids": [choice[0] for choice in choices],
+                    "allowed_text": ["1", "2"], "token_count": 1, "owner": "model",
+                },
+                "rom_suffix": tok.encode(
+                    ".txt\n</parameter>\n</function>\n</tool_call>",
+                    add_special_tokens=False),
+            })
+
+            prefix = "<|im_end|>" if stages else ""
+            frame = ("\n<|im_start|>user\n" + shared + execute
+                     + " Keep it under 60 words. Finish by closing the tool call."
+                     + "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
+            write = ("<tool_call>\n<function=write_file>\n<parameter=name>\nresult.txt"
+                     "\n</parameter>\n<parameter=text>\nOutput: ")
+            stages.append({"cycle": cycle, "kind": "execute", "op": "write",
+                           "file": "result.txt", "text_prefix": "Output: ",
+                           "rom": tok.encode(prefix + frame + write,
+                                             add_special_tokens=False)})
+            continue
         if protocol == "babyagi_json":
             write_names = ("tasks.json", "choice.txt", "tasks.json")
             read_names = ("tasks.json" if cycle > 1 else None, "tasks.json", "choice.txt")
@@ -221,8 +329,10 @@ def program(tok, cycles=3, protocol="baseline"):
                 stages.append({"cycle": cycle, "kind": kind, "op": "read", "file": "result.txt",
                                "rom": tok.encode(read, add_special_tokens=False)})
             prefix = "<|im_end|>" if stages else ""
-            frame = ("\n<|im_start|>user\n" + shared + instruction +
-                     " Keep it under 60 words. Finish by closing the tool call."
+            finish = (" Keep it under 60 words." if
+                      protocol == "babyagi_typed" and kind == "prioritize" else
+                      " Keep it under 60 words. Finish by closing the tool call.")
+            frame = ("\n<|im_start|>user\n" + shared + instruction + finish +
                      "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
             if protocol == "babyagi_json":
                 text_prefix = "T1" if kind == "prioritize" else "{"
@@ -231,9 +341,10 @@ def program(tok, cycles=3, protocol="baseline"):
                                and cycle == 1 and kind == "create" else "")
             write = ("<tool_call>\n<function=write_file>\n<parameter=name>\n" + filename +
                      "\n</parameter>\n<parameter=text>\n" + text_prefix)
-            stages.append({"cycle": cycle, "kind": kind, "op": "write", "file": filename,
-                           "text_prefix": text_prefix,
-                           "rom": tok.encode(prefix + frame + write, add_special_tokens=False)})
+            stage = {"cycle": cycle, "kind": kind, "op": "write", "file": filename,
+                     "text_prefix": text_prefix,
+                     "rom": tok.encode(prefix + frame + write, add_special_tokens=False)}
+            stages.append(stage)
     phase_budget = HALT - PHASE0
     if len(stages) > phase_budget:
         raise ValueError(
@@ -244,23 +355,28 @@ def program(tok, cycles=3, protocol="baseline"):
 
 class Layout:
     """Controller scratch, disjoint from native Qwen and qwenFS dimensions."""
-    def __init__(self, prompts, start=1024, stop=F.OFF):
-        self.prompts = prompts
+    def __init__(self, stages, start=1024, stop=F.OFF):
+        self.stages = stages
+        normalized = [stage if isinstance(stage, dict) else {"rom": stage} for stage in stages]
+        spans = [len(stage["rom"]) + int("decision" in stage)
+                 + len(stage.get("rom_suffix", [])) for stage in normalized]
         d = F.Dims(start)
         self.anchor = d.take()
-        self.phase_in = d.take(len(prompts))
-        self.phase = d.take(len(prompts))
+        self.phase_in = d.take(len(stages))
+        self.phase = d.take(len(stages))
         self.counter = d.take()
-        self.offset = d.take(max(map(len, prompts)) + 1)
+        self.offset = d.take(max(spans) + 1)
+        self.choice_mask = d.take() if any("decision" in stage for stage in normalized) else None
         self.dims = list(range(start, d.n))
         if d.n > stop:
             raise ValueError(f"agent scratch needs {d.n - start} dims in [{start}, {stop})")
 
 
-def compile_into(model, prompts, xs, native_width=1024, scratch_start=1024,
+def compile_into(model, stages, xs, native_width=1024, scratch_start=1024,
                  scratch_stop=F.OFF):
     """Install the agent by changing weights only, before serialization."""
-    a = Layout(prompts, scratch_start, scratch_stop)
+    stages = [stage if isinstance(stage, dict) else {"rom": stage} for stage in stages]
+    a = Layout(stages, scratch_start, scratch_stop)
     layers = model.model.layers
     E = model.model.embed_tokens.weight
     norm_scale = M.ballast_scale(model.config.hidden_size)
@@ -268,11 +384,20 @@ def compile_into(model, prompts, xs, native_width=1024, scratch_start=1024,
         for layer in layers[:len(F.LAYERS)]:
             for norm in (layer.input_layernorm, layer.post_attention_layernorm):
                 norm.weight[a.dims] = norm_scale - 1
-        for i in range(len(prompts)):
+        for i in range(len(stages)):
             E[PHASE0 + i, a.anchor] = 1
             E[PHASE0 + i, a.phase_in[i]] = 1
         # Control symbols look like a newline to the pretrained language stack.
         E[PHASE0:HALT + 1, :native_width] = 0.25 * E[F.NL, :native_width]
+        decisions = [stage["decision"] for stage in stages if "decision" in stage]
+        if decisions:
+            allowed_sets = {tuple(decision["allowed_token_ids"]) for decision in decisions}
+            if len(allowed_sets) != 1:
+                raise ValueError("one compiled checkpoint currently supports one typed-choice set")
+            allowed = next(iter(allowed_sets))
+            E[:, a.choice_mask] = 0
+            E[list(allowed), a.choice_mask] = 1
+            model.model.norm.weight[a.choice_mask] = CHOICE_GAIN - 1
 
         delta = F.Delta(layers[0].linear_attn)
         delta.register(2, {a.anchor: 1.0},
@@ -315,18 +440,27 @@ def compile_into(model, prompts, xs, native_width=1024, scratch_start=1024,
         # The regular exit clears FS scratch and converts OUTC into token bits.
         # Add the ROM's output code to those same token bits; ROM and filesystem
         # response intervals are disjoint. No logits are edited by the decoder.
-        for i, prompt in enumerate(prompts):
+        for i, stage in enumerate(stages):
+            prompt = stage["rom"]
             for n, token in enumerate(prompt):
                 exit_mlp.all_of([a.phase[i], a.offset[n]],
                                 {d: F.EPS * c for d, c in zip(F.IDC, F.code(token))})
-            nxt = PHASE0 + i + 1 if i + 1 < len(prompts) else HALT
+            span = len(prompt)
+            if "decision" in stage:
+                exit_mlp.all_of([a.phase[i], a.offset[span]], {a.choice_mask: F.EPS})
+                span += 1
+                for n, token in enumerate(stage.get("rom_suffix", []), start=span):
+                    exit_mlp.all_of([a.phase[i], a.offset[n]],
+                                    {d: F.EPS * c for d, c in zip(F.IDC, F.code(token))})
+                span += len(stage.get("rom_suffix", []))
+            nxt = PHASE0 + i + 1 if i + 1 < len(stages) else HALT
             # A qwenFS response finishes by opening an empty assistant turn.
             # Its final NL2 follows THINKEND, after the whole ROM. At this
             # position the FS circuit has released output control. Advance
             # immediately, without asking Qwen to choose another operation.
             exit_mlp.all_of([a.phase[i], F.FL["NL2"], F.LAG1["THINKEND"]],
                             {d: F.EPS * c for d, c in zip(F.IDC, F.code(nxt))},
-                            nots=a.offset[:len(prompt)])
+                            nots=a.offset[:span])
         for d in a.dims:
             exit_mlp.unit({F.ONE: F.K}, {d: -1 / F.K}, {d: 1.0})
         for p in layers[7].mlp.parameters():
@@ -353,7 +487,7 @@ def build(src, dst, cycles=3, device="mps", protocol="baseline"):
         raise ValueError(f"No verified agent layout for native width {native_width}")
     xs = F.calibrate(device)
     model = M.merge(src, xs, 4096.0, target_hidden=target_hidden)
-    layout = compile_into(model, prompts, xs, native_width, scratch_start, scratch_stop)
+    layout = compile_into(model, stages, xs, native_width, scratch_start, scratch_stop)
     model.config.bos_token_id = START
     model.config.eos_token_id = HALT
     model.generation_config.bos_token_id = START
@@ -367,6 +501,7 @@ def build(src, dst, cycles=3, device="mps", protocol="baseline"):
         "start": START, "halt": HALT,
         "native_hidden": native_width, "merged_hidden": target_hidden,
         "scratch": [layout.dims[0], layout.dims[-1] + 1],
+        "choice_mask_dim": layout.choice_mask, "choice_gain": CHOICE_GAIN,
         "phase_tokens": list(range(PHASE0, PHASE0 + len(prompts))),
         "stages": [{k: v for k, v in s.items() if k != "rom"} for s in stages],
         "phases": [s["kind"] for s in stages],

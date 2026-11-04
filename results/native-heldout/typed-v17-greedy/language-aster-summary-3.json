@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "harness": "native-semantic-simulator",
+  "compiled_controller_executed": false,
+  "objective": "Use only these fictional facts: Aster is a rover; Aster runs on sunlight; Aster maps ice. First draft a factual summary; next remove any fact not explicitly supplied; finally compress it to one sentence of at most 12 words that contains Aster, sunlight, and ice.",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 0.9,
+    "seed": 0,
+    "mode": "greedy",
+    "sampled_rng_equivalence": "exact"
+  },
+  "stages_expected": 14,
+  "stages_attempted": 14,
+  "stages_completed": 14,
+  "stopped": null,
+  "phases": [
+    {
+      "stage": 0,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 255,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 24,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "FIRST TASK:  Aster is a rover; Aster runs on sunlight; Aster maps ice."
+      },
+      "model_text": " Aster is a rover; Aster runs on sunlight; Aster maps ice.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 1.4855487924069166
+    },
+    {
+      "stage": 1,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 17,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify Task 1's result."
+      },
+      "model_text": " Verify Task 1's result.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.8279128335416317
+    },
+    {
+      "stage": 2,
+      "cycle": 1,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 27.375,
+          "17": 24.75
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "FIRST TASK:  Aster is a rover; Aster runs on sunlight; Aster maps ice.",
+      "model_text": "1",
+      "seconds": 0.18751274980604649
+    },
+    {
+      "stage": 3,
+      "cycle": 1,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 14,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  Aster maps ice."
+      },
+      "model_text": " Aster maps ice.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7674796255305409
+    },
+    {
+      "stage": 4,
+      "cycle": 2,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "forced_prefix_tokens": 25,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 0,
+      "decision": null,
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "result.txt"
+      },
+      "read_found": true,
+      "read_text": "Output:  Aster maps ice.",
+      "model_text": "",
+      "seconds": 1.3750046491622925e-05
+    },
+    {
+      "stage": 5,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 237,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 16,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "TASK 1:  Append -hot to ice."
+      },
+      "model_text": " Append -hot to ice.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.8439607908949256
+    },
+    {
+      "stage": 6,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 17,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify Task 1's result."
+      },
+      "model_text": " Verify Task 1's result.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.83975191693753
+    },
+    {
+      "stage": 7,
+      "cycle": 2,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 28.75,
+          "17": 24.25
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "TASK 1:  Append -hot to ice.",
+      "model_text": "1",
+      "seconds": 0.1944722095504403
+    },
+    {
+      "stage": 8,
+      "cycle": 2,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 14,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  ice is hot."
+      },
+      "model_text": " ice is hot.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7888252502307296
+    },
+    {
+      "stage": 9,
+      "cycle": 3,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "forced_prefix_tokens": 25,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 0,
+      "decision": null,
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "result.txt"
+      },
+      "read_found": true,
+      "read_text": "Output:  ice is hot.",
+      "model_text": "",
+      "seconds": 1.3958662748336792e-05
+    },
+    {
+      "stage": 10,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "forced_prefix_tokens": 237,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 16,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task1.txt",
+        "text": "TASK 1:  Append -hot to ice."
+      },
+      "model_text": " Append -hot to ice.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.8623047918081284
+    },
+    {
+      "stage": 11,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "forced_prefix_tokens": 204,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 17,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "task2.txt",
+        "text": "TASK 2:  Verify Task 1's result."
+      },
+      "model_text": " Verify Task 1's result.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.8634516671299934
+    },
+    {
+      "stage": 12,
+      "cycle": 3,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "forced_prefix_tokens": 123,
+      "forced_suffix_tokens": 11,
+      "model_tokens": 1,
+      "decision": {
+        "name": "typed_choice",
+        "mode": "typed_file_choice",
+        "owner": "model",
+        "allowed_tokens": [
+          16,
+          17
+        ],
+        "selected_token": 16,
+        "allowed_text": [
+          "1",
+          "2"
+        ],
+        "selected_text": "1",
+        "unrestricted_top_token": 16,
+        "native_allowed_logits": {
+          "16": 30.0,
+          "17": 21.5
+        }
+      },
+      "completed": true,
+      "function": "read_file",
+      "parameters": {
+        "name": "task1.txt"
+      },
+      "read_found": true,
+      "read_text": "TASK 1:  Append -hot to ice.",
+      "model_text": "1",
+      "seconds": 0.19563079252839088
+    },
+    {
+      "stage": 13,
+      "cycle": 3,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "forced_prefix_tokens": 234,
+      "forced_suffix_tokens": 0,
+      "model_tokens": 14,
+      "decision": null,
+      "completed": true,
+      "function": "write_file",
+      "parameters": {
+        "name": "result.txt",
+        "text": "Output:  ice is hot."
+      },
+      "model_text": " ice is hot.\n</parameter>\n</function>\n</tool_call>",
+      "seconds": 0.7908211657777429
+    }
+  ],
+  "latest_files": {
+    "task1.txt": "TASK 1:  Append -hot to ice.",
+    "task2.txt": "TASK 2:  Verify Task 1's result.",
+    "result.txt": "Output:  ice is hot."
+  },
+  "token_provenance": {
+    "objective_prefill": 831,
+    "forced_rom": 2495,
+    "forced_visible_responses": 343,
+    "model_free": 149,
+    "model_typed_choices": 3
+  },
+  "forward_seconds": 1.800863535143435,
+  "wall_seconds": 8.64866816624999,
+  "limitations": [
+    "host advances phases and simulates visible filesystem responses",
+    "only compiled traces validate controller, qwenFS, and HALT"
+  ],
+  "base": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-m5/models/Qwen3.5-2B",
+  "cycles": 3,
+  "protocol": "babyagi_typed",
+  "device": "mps",
+  "benchmark_id": "babyagi-heldout-v1",
+  "item_id": "language-aster-summary-3"
+}

@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "run": "results/m5-2b-typed-v17/live-pine5-greedy.json",
+  "checkpoint": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-m5/build/babyagi-2b-typed-v17-m5",
+  "protocol": "babyagi_typed",
+  "cycles": 5,
+  "totals": {
+    "emitted_tokens": 5010,
+    "rom_forced": 4163,
+    "filesystem_forced": 582,
+    "controller_control": 24,
+    "model_generated": 241,
+    "model_payload": 91,
+    "model_tool_closure": 150,
+    "forced_total": 4769,
+    "accounted_tokens": 5010,
+    "forced_percent": 95.19,
+    "model_generated_percent": 4.81
+  },
+  "by_kind": {
+    "create": {
+      "rom_forced": 2323,
+      "filesystem_forced": 326,
+      "controller_control": 14,
+      "model_generated": 162,
+      "model_payload": 62,
+      "model_tool_closure": 100
+    },
+    "execute": {
+      "rom_forced": 1170,
+      "filesystem_forced": 110,
+      "controller_control": 5,
+      "model_generated": 74,
+      "model_payload": 24,
+      "model_tool_closure": 50
+    },
+    "prioritize": {
+      "rom_forced": 670,
+      "filesystem_forced": 146,
+      "controller_control": 5,
+      "model_generated": 5,
+      "model_payload": 5,
+      "model_tool_closure": 0
+    }
+  },
+  "decision_summary": {
+    "model_free_text": 15,
+    "typed_model_choice": 5
+  },
+  "decisions": [
+    {
+      "stage": 0,
+      "cycle": 1,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 1,
+      "cycle": 1,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 2,
+      "cycle": 1,
+      "kind": "prioritize",
+      "owner": "typed_model_choice",
+      "payload_tokens": 1,
+      "chosen": "1",
+      "chosen_token_ids": [
+        16
+      ],
+      "allowed_token_ids": [
+        16,
+        17
+      ],
+      "allowed_text": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "stage": 3,
+      "cycle": 1,
+      "kind": "execute",
+      "owner": "model_free_text",
+      "payload_tokens": 2
+    },
+    {
+      "stage": 5,
+      "cycle": 2,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 6
+    },
+    {
+      "stage": 6,
+      "cycle": 2,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 7,
+      "cycle": 2,
+      "kind": "prioritize",
+      "owner": "typed_model_choice",
+      "payload_tokens": 1,
+      "chosen": "1",
+      "chosen_token_ids": [
+        16
+      ],
+      "allowed_token_ids": [
+        16,
+        17
+      ],
+      "allowed_text": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "stage": 8,
+      "cycle": 2,
+      "kind": "execute",
+      "owner": "model_free_text",
+      "payload_tokens": 3
+    },
+    {
+      "stage": 10,
+      "cycle": 3,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 7
+    },
+    {
+      "stage": 11,
+      "cycle": 3,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 12,
+      "cycle": 3,
+      "kind": "prioritize",
+      "owner": "typed_model_choice",
+      "payload_tokens": 1,
+      "chosen": "1",
+      "chosen_token_ids": [
+        16
+      ],
+      "allowed_token_ids": [
+        16,
+        17
+      ],
+      "allowed_text": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "stage": 13,
+      "cycle": 3,
+      "kind": "execute",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 15,
+      "cycle": 4,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 9
+    },
+    {
+      "stage": 16,
+      "cycle": 4,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 17,
+      "cycle": 4,
+      "kind": "prioritize",
+      "owner": "typed_model_choice",
+      "payload_tokens": 1,
+      "chosen": "1",
+      "chosen_token_ids": [
+        16
+      ],
+      "allowed_token_ids": [
+        16,
+        17
+      ],
+      "allowed_text": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "stage": 18,
+      "cycle": 4,
+      "kind": "execute",
+      "owner": "model_free_text",
+      "payload_tokens": 6
+    },
+    {
+      "stage": 20,
+      "cycle": 5,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 10
+    },
+    {
+      "stage": 21,
+      "cycle": 5,
+      "kind": "create",
+      "owner": "model_free_text",
+      "payload_tokens": 5
+    },
+    {
+      "stage": 22,
+      "cycle": 5,
+      "kind": "prioritize",
+      "owner": "typed_model_choice",
+      "payload_tokens": 1,
+      "chosen": "1",
+      "chosen_token_ids": [
+        16
+      ],
+      "allowed_token_ids": [
+        16,
+        17
+      ],
+      "allowed_text": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "stage": 23,
+      "cycle": 5,
+      "kind": "execute",
+      "owner": "model_free_text",
+      "payload_tokens": 8
+    }
+  ],
+  "stages": [
+    {
+      "stage": 0,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 255,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 1,
+      "cycle": 1,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 204,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 2,
+      "cycle": 1,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "semantic_owner": "typed_model_choice",
+      "rom_forced": 134,
+      "filesystem_forced": 26,
+      "controller_control": 1,
+      "model_generated": 1,
+      "model_payload": 1,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 3,
+      "cycle": 1,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 234,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 12,
+      "model_payload": 2,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 4,
+      "cycle": 2,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "semantic_owner": null,
+      "rom_forced": 25,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 0,
+      "model_payload": 0,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 5,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 237,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 16,
+      "model_payload": 6,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 6,
+      "cycle": 2,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 204,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 7,
+      "cycle": 2,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "semantic_owner": "typed_model_choice",
+      "rom_forced": 134,
+      "filesystem_forced": 28,
+      "controller_control": 1,
+      "model_generated": 1,
+      "model_payload": 1,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 8,
+      "cycle": 2,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 234,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 13,
+      "model_payload": 3,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 9,
+      "cycle": 3,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "semantic_owner": null,
+      "rom_forced": 25,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 0,
+      "model_payload": 0,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 10,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 237,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 17,
+      "model_payload": 7,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 11,
+      "cycle": 3,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 204,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 12,
+      "cycle": 3,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "semantic_owner": "typed_model_choice",
+      "rom_forced": 134,
+      "filesystem_forced": 29,
+      "controller_control": 1,
+      "model_generated": 1,
+      "model_payload": 1,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 13,
+      "cycle": 3,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 234,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 14,
+      "cycle": 4,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "semantic_owner": null,
+      "rom_forced": 25,
+      "filesystem_forced": 25,
+      "controller_control": 1,
+      "model_generated": 0,
+      "model_payload": 0,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 15,
+      "cycle": 4,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 237,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 19,
+      "model_payload": 9,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 16,
+      "cycle": 4,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 204,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 17,
+      "cycle": 4,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "semantic_owner": "typed_model_choice",
+      "rom_forced": 134,
+      "filesystem_forced": 31,
+      "controller_control": 1,
+      "model_generated": 1,
+      "model_payload": 1,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 18,
+      "cycle": 4,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 234,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 16,
+      "model_payload": 6,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 19,
+      "cycle": 5,
+      "kind": "create",
+      "op": "read",
+      "file": "result.txt",
+      "semantic_owner": null,
+      "rom_forced": 25,
+      "filesystem_forced": 26,
+      "controller_control": 1,
+      "model_generated": 0,
+      "model_payload": 0,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 20,
+      "cycle": 5,
+      "kind": "create",
+      "op": "write",
+      "file": "task1.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 237,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 20,
+      "model_payload": 10,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 21,
+      "cycle": 5,
+      "kind": "create",
+      "op": "write",
+      "file": "task2.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 204,
+      "filesystem_forced": 23,
+      "controller_control": 1,
+      "model_generated": 15,
+      "model_payload": 5,
+      "model_tool_closure": 10
+    },
+    {
+      "stage": 22,
+      "cycle": 5,
+      "kind": "prioritize",
+      "op": "read",
+      "file": "task{1|2}.txt",
+      "semantic_owner": "typed_model_choice",
+      "rom_forced": 134,
+      "filesystem_forced": 32,
+      "controller_control": 1,
+      "model_generated": 1,
+      "model_payload": 1,
+      "model_tool_closure": 0
+    },
+    {
+      "stage": 23,
+      "cycle": 5,
+      "kind": "execute",
+      "op": "write",
+      "file": "result.txt",
+      "semantic_owner": "model_free_text",
+      "rom_forced": 234,
+      "filesystem_forced": 22,
+      "controller_control": 1,
+      "model_generated": 18,
+      "model_payload": 8,
+      "model_tool_closure": 10
+    }
+  ],
+  "invariants": {
+    "control_sequence_exact": true,
+    "stage_rom_exact": true,
+    "token_partition_exact": true,
+    "model_payload_plus_closure_exact": true
+  }
+}

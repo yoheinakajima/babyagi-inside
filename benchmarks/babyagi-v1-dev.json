@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "babyagi-development-v1",
+  "status": "mutable",
+  "description": "Development-only objectives previously used for prompt design or failure analysis. Never report these as held-out results.",
+  "objective_count": 5,
+  "category_counts": {
+    "ordered_literal": 3,
+    "sequential_arithmetic": 1,
+    "structured_operation": 0,
+    "checkable_language": 1
+  },
+  "leak_sentinels": [],
+  "items": [
+    {
+      "id": "dev-oak-label-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "provenance": "legacy_tuning_and_verified_trace",
+      "objective": "Begin with oak; append -red, then -blue, then -gold, one operation per task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": ["oak-red", "oak-red-blue", "oak-red-blue-gold"]
+      }
+    },
+    {
+      "id": "dev-pine-label-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "provenance": "legacy_tuning_and_failure_traces",
+      "objective": "Begin with pine; append -red, -blue, -gold, -green, and -silver, one operation per task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "pine-red",
+          "pine-red-blue",
+          "pine-red-blue-gold",
+          "pine-red-blue-gold-green",
+          "pine-red-blue-gold-green-silver"
+        ]
+      }
+    },
+    {
+      "id": "dev-elm-format-example",
+      "category": "ordered_literal",
+      "cycles": 2,
+      "provenance": "compiled_prompt_exemplar",
+      "objective": "Begin with elm; append -hot, then append -cold.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": ["elm-hot", "elm-hot-cold"]
+      }
+    },
+    {
+      "id": "dev-double-four-example",
+      "category": "sequential_arithmetic",
+      "cycles": 1,
+      "provenance": "compiled_prompt_exemplar",
+      "objective": "Double 4.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["8"]
+      }
+    },
+    {
+      "id": "dev-luma-launch-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "provenance": "legacy_kshot_leakage_trace",
+      "objective": "Create a launch announcement for the fictional pocket telescope Luma.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {"required_literals": ["Luma"]},
+        "manual_criteria": ["The result contains actual announcement copy rather than a task description."]
+      }
+    }
+  ]
+}

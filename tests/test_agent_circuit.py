@@ -13,7 +13,8 @@ from transformers import AutoTokenizer
 from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5ForCausalLM
 
 from qfs import disk
-from qfs.agent import START, HALT
+from qfs.agent import START
+from qfs.bridge import parse_call
 from qfs.chat import TOOLS
 from qfs import circuit as F
 from tests import test_circuit as reference
@@ -36,17 +37,30 @@ def check(checkpoint, device="mps", chunk=64):
                              "\n</parameter>\n<parameter=text>\n" + objective +
                              "\n</parameter>\n</function>\n</tool_call>", add_special_tokens=False)
     expected = {}
+    choice_positions = {}
     files = {}
     for i, (rom, stage) in enumerate(zip(meta["rom"], meta["stages"])):
         for token in rom:
             expected[len(tokens) - 1] = token
             tokens.append(token)
+        decision_body = []
+        if "decision" in stage:
+            allowed = stage["decision"]["allowed_token_ids"]
+            decision_body = [allowed[(stage["cycle"] - 1) % len(allowed)]]
+            choice_positions[len(tokens) - 1] = allowed
+            tokens += decision_body
+            for token in stage.get("rom_suffix", []):
+                expected[len(tokens) - 1] = token
+                tokens.append(token)
         filename = stage["file"]
+        if stage["op"] == "read" and decision_body:
+            _, parameters = parse_call(tok.decode(rom + decision_body + stage["rom_suffix"]))
+            filename = parameters["name"]
         name = tok.encode(filename, add_special_tokens=False)
         if stage["op"] == "write":
             file_index, version, _ = files.get(filename, (len(files), 0, None))
             version += 1
-            semantic_body = tok.encode(
+            semantic_body = decision_body or tok.encode(
                 objective if stage["kind"] == "bootstrap" else
                 f"Sample content for cycle {stage['cycle']} {stage['kind']}.",
                 add_special_tokens=False)
@@ -56,7 +70,7 @@ def check(checkpoint, device="mps", chunk=64):
             body = tok.encode(stage.get("text_prefix", ""), add_special_tokens=False) + semantic_body
             files[filename] = file_index, version, body
             # Qwen supplies only this semantic value and its normal XML close.
-            if stage["kind"] != "bootstrap":
+            if stage["kind"] != "bootstrap" and not decision_body:
                 tokens += semantic_body + [F.NL] + tok.encode(
                     "</parameter>\n</function>\n</tool_call>", add_special_tokens=False)
             response = (reference.HEAD + [F.ackw(file_index, version), F.SAVED, F.NL,
@@ -68,7 +82,7 @@ def check(checkpoint, device="mps", chunk=64):
         for token in response:
             expected[len(tokens) - 1] = token
             tokens.append(token)
-        control = START + i + 1 if i + 1 < len(meta["rom"]) else HALT
+        control = START + i + 1 if i + 1 < len(meta["rom"]) else meta["halt"]
         expected[len(tokens) - 1] = control
         tokens.append(control)
     # The terminal HALT does not need a forward pass.
@@ -76,7 +90,7 @@ def check(checkpoint, device="mps", chunk=64):
     model = Qwen3_5ForCausalLM.from_pretrained(checkpoint, dtype=torch.bfloat16).to(device).eval()
     disk.attach(model)
     cache = disk.FSCache(model.config)
-    good, bad = 0, []
+    good, bad, choices = 0, [], []
     for start in range(0, len(tokens), chunk):
         out = model(input_ids=torch.tensor([tokens[start:start + chunk]], device=device),
                     past_key_values=cache, use_cache=True)
@@ -89,11 +103,22 @@ def check(checkpoint, device="mps", chunk=64):
                     good += 1
                 else:
                     bad.append({"position": pos, "wanted": expected[pos], "got": pred})
+            if pos in choice_positions:
+                allowed = choice_positions[pos]
+                logits = out.logits[0, offset].float()
+                allowed_values = logits[allowed]
+                masked = logits.clone()
+                masked[allowed] = -torch.inf
+                margin = float(allowed_values.min() - masked.max())
+                top = logits.topk(len(allowed)).indices.tolist()
+                choices.append({"position": pos, "allowed": allowed, "top": top,
+                                "margin": margin, "pass": set(top) == set(allowed) and margin > 0})
         print(f"checked {min(start + chunk, len(tokens))}/{len(tokens)} tokens", flush=True)
     result = {"forced_tokens_correct": good, "forced_tokens_total": len(expected),
-              "failures": bad[:20], "pass": not bad}
+              "failures": bad[:20], "typed_choices": choices,
+              "pass": not bad and all(choice["pass"] for choice in choices)}
     print(json.dumps(result), flush=True)
-    assert not bad, result
+    assert result["pass"], result
     return result
 
 

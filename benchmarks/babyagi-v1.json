@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "babyagi-heldout-v1",
+  "status": "frozen",
+  "frozen_on": "2026-11-03",
+  "description": "Held-out semantic evaluation for bounded compiled BabyAGI loops. Objectives and answers are evaluation data and must never be compiled into prompts or used for prompt selection.",
+  "objective_count": 12,
+  "category_counts": {
+    "ordered_literal": 3,
+    "sequential_arithmetic": 3,
+    "structured_operation": 3,
+    "checkable_language": 3
+  },
+  "leak_sentinels": [
+    "cinder-north",
+    "small moon",
+    "TideTally",
+    "Aster is a fictional rover",
+    "Nia\",\"score\":4"
+  ],
+  "items": [
+    {
+      "id": "literal-cinder-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "objective": "Create a growing code. Begin with cinder. First append -north; next append -east; then append -south; then append -west; finally append -home. Carry out exactly one operation per task in that order, using the previous result as the next input. Return the current code as each result and do not repeat completed work.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "cinder-north",
+          "cinder-north-east",
+          "cinder-north-east-south",
+          "cinder-north-east-south-west",
+          "cinder-north-east-south-west-home"
+        ]
+      }
+    },
+    {
+      "id": "literal-moss-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "objective": "Transform one value over three tasks. Begin with moss. First wrap it in square brackets; next uppercase only its letters; finally append an exclamation mark. Perform exactly one operation per task and use the previous result as the next input.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": ["[moss]", "[MOSS]", "[MOSS]!"]
+      }
+    },
+    {
+      "id": "literal-small-moon-4",
+      "category": "ordered_literal",
+      "cycles": 4,
+      "objective": "Begin with the exact text small moon. First replace its space with an underscore; next uppercase the letters; then prefix ID:; finally append #7. Apply exactly one transformation per task in order, carrying the result forward exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "small_moon",
+          "SMALL_MOON",
+          "ID:SMALL_MOON",
+          "ID:SMALL_MOON#7"
+        ]
+      }
+    },
+    {
+      "id": "arithmetic-seven-3",
+      "category": "sequential_arithmetic",
+      "cycles": 3,
+      "objective": "Start with the number 7. First add 5; next multiply the result by 3; finally subtract 8. Do one operation per task in order and return only the current numeric result.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["12", "36", "28"]
+      }
+    },
+    {
+      "id": "arithmetic-ten-4",
+      "category": "sequential_arithmetic",
+      "cycles": 4,
+      "objective": "Start with 10. First divide by 2; next square the result; then add 11; finally subtract 6. Complete exactly one operation per task and carry the numeric result forward.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["5", "25", "36", "30"]
+      }
+    },
+    {
+      "id": "arithmetic-three-5",
+      "category": "sequential_arithmetic",
+      "cycles": 5,
+      "objective": "Start with 3. First multiply by 4; next add 7; then multiply by 2; then subtract 5; finally add 9. Perform one operation per task in order and return the current number.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["12", "19", "38", "33", "42"]
+      }
+    },
+    {
+      "id": "structured-numbers-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [8,3,5,3,1]. First sort it in ascending numeric order; next remove duplicates while preserving that order; finally keep only odd numbers. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [1, 3, 3, 5, 8],
+          [1, 3, 5, 8],
+          [1, 3, 5]
+        ]
+      }
+    },
+    {
+      "id": "structured-words-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [\"kiwi\",\"fig\",\"pear\",\"plum\"]. First sort by word length and use alphabetical order to break ties; next keep only four-letter words; finally uppercase every remaining word. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          ["fig", "kiwi", "pear", "plum"],
+          ["kiwi", "pear", "plum"],
+          ["KIWI", "PEAR", "PLUM"]
+        ]
+      }
+    },
+    {
+      "id": "structured-records-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [{\"name\":\"Nia\",\"score\":4},{\"name\":\"Ivo\",\"score\":7},{\"name\":\"Sol\",\"score\":4}]. First sort records by descending score and then ascending name; next keep records whose score is at least 4; finally output only their names in the retained order. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            {"name": "Ivo", "score": 7},
+            {"name": "Nia", "score": 4},
+            {"name": "Sol", "score": 4}
+          ],
+          [
+            {"name": "Ivo", "score": 7},
+            {"name": "Nia", "score": 4},
+            {"name": "Sol", "score": 4}
+          ],
+          ["Ivo", "Nia", "Sol"]
+        ]
+      }
+    },
+    {
+      "id": "language-day-acrostic-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Create a tiny poem about dawn. First draft exactly three lines of three words each; next revise the lines so their first letters spell DAY; finally return only the three finished lines with no title or explanation.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "line_count": 3,
+          "words_per_line": 3,
+          "line_initials": "DAY",
+          "forbidden_literals": ["Title:", "Explanation:"]
+        },
+        "manual_criteria": [
+          "All three lines are intelligible English phrases.",
+          "The poem is recognizably about dawn."
+        ]
+      }
+    },
+    {
+      "id": "language-aster-summary-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Use only these fictional facts: Aster is a rover; Aster runs on sunlight; Aster maps ice. First draft a factual summary; next remove any fact not explicitly supplied; finally compress it to one sentence of at most 12 words that contains Aster, sunlight, and ice.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "sentence_count": 1,
+          "max_words": 12,
+          "required_literals": ["Aster", "sunlight", "ice"]
+        },
+        "manual_criteria": [
+          "The sentence states only supplied facts.",
+          "The sentence is grammatical and preserves the rover relationship."
+        ]
+      }
+    },
+    {
+      "id": "language-tidetally-announcement-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "objective": "Create a polished announcement for TideTally, a fictional pocket tide-prediction card for curious families. Decide the useful work across five tasks and produce the actual copy. Do not claim real availability, purchases, testing, or scientific accuracy. The final result must contain a Headline, a two-sentence Body, and a one-sentence CTA.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "required_literals": ["Headline:", "Body:", "CTA:", "TideTally"],
+          "ordered_literals": ["Headline:", "Body:", "CTA:"],
+          "section_sentence_counts": {"Body": 2, "CTA": 1},
+          "forbidden_literals": ["available now", "buy now", "scientifically proven"]
+        },
+        "manual_criteria": [
+          "The copy is useful to curious families and internally coherent.",
+          "The copy treats TideTally as fictional and makes no unsupported real-world claim.",
+          "The CTA is an invitation, not a claim that an external action occurred."
+        ]
+      }
+    }
+  ]
+}

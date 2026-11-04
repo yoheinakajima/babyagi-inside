@@ -1,0 +1,728 @@
+{
+  "schema_version": 1,
+  "harness": "native-semantic-simulator",
+  "compiled_controller_executed": false,
+  "benchmark": {
+    "path": "benchmarks/babyagi-v1.json",
+    "id": "babyagi-heldout-v1",
+    "status": "frozen",
+    "sha256": "22891c9fe8b277dfc111c3c4feb766e62fc29853ed339eeb1b769ae4391c2f49"
+  },
+  "candidate": {
+    "base": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-m5/models/Qwen3.5-2B",
+    "protocol": "babyagi_typed",
+    "program_sha256": "dbb7e2947e0a4714b1729be90c29ef14f1ca23d31e1656df0097592b9eb228d6"
+  },
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 0.9,
+    "seed": 0,
+    "mode": "greedy"
+  },
+  "counts": {
+    "items": 12,
+    "automated_pass": 0,
+    "automated_fail": 12,
+    "manual_pending": 0
+  },
+  "reports": [
+    {
+      "item_id": "literal-cinder-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "trace": "literal-cinder-5.json",
+      "actual_results": [
+        "Create the first task. Convert the actual objective into exactly one first executable task.",
+        "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state.",
+        "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state.",
+        "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state.",
+        "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state."
+      ],
+      "score": {
+        "item_id": "literal-cinder-5",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": "cinder-north",
+            "actual": "Create the first task. Convert the actual objective into exactly one first executable task."
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "cinder-north-east",
+            "actual": "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state."
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "cinder-north-east-south",
+            "actual": "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state."
+          },
+          {
+            "name": "cycle:4",
+            "pass": false,
+            "expected": "cinder-north-east-south-west",
+            "actual": "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state."
+          },
+          {
+            "name": "cycle:5",
+            "pass": false,
+            "expected": "cinder-north-east-south-west-home",
+            "actual": "The previous result was just read; its Output is the current state. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state."
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 24,
+      "stages_expected": 24,
+      "forward_seconds": 4.152599017135799
+    },
+    {
+      "item_id": "literal-moss-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "trace": "literal-moss-3.json",
+      "actual_results": [
+        "[Moss]MOSs!",
+        "[Moss]MOSs!",
+        "[Moss]MOSs!"
+      ],
+      "score": {
+        "item_id": "literal-moss-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": "[moss]",
+            "actual": "[Moss]MOSs!"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "[MOSS]",
+            "actual": "[Moss]MOSs!"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "[MOSS]!",
+            "actual": "[Moss]MOSs!"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 2.2072329092770815
+    },
+    {
+      "item_id": "literal-small-moon-4",
+      "category": "ordered_literal",
+      "cycles": 4,
+      "trace": "literal-small-moon-4.json",
+      "actual_results": [
+        "small moon",
+        "small moon",
+        "small moon",
+        "small moon"
+      ],
+      "score": {
+        "item_id": "literal-small-moon-4",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": "small_moon",
+            "actual": "small moon"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "SMALL_MOON",
+            "actual": "small moon"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "ID:SMALL_MOON",
+            "actual": "small moon"
+          },
+          {
+            "name": "cycle:4",
+            "pass": false,
+            "expected": "ID:SMALL_MOON#7",
+            "actual": "small moon"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 19,
+      "stages_expected": 19,
+      "forward_seconds": 2.0424099657684565
+    },
+    {
+      "item_id": "arithmetic-seven-3",
+      "category": "sequential_arithmetic",
+      "cycles": 3,
+      "trace": "arithmetic-seven-3.json",
+      "actual_results": [
+        "12",
+        "15",
+        "18"
+      ],
+      "score": {
+        "item_id": "arithmetic-seven-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": true,
+            "expected": "12",
+            "actual": "12"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "36",
+            "actual": "15"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "28",
+            "actual": "18"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 1.671985199674964
+    },
+    {
+      "item_id": "arithmetic-ten-4",
+      "category": "sequential_arithmetic",
+      "cycles": 4,
+      "trace": "arithmetic-ten-4.json",
+      "actual_results": [
+        "30",
+        "31",
+        "32",
+        "33"
+      ],
+      "score": {
+        "item_id": "arithmetic-ten-4",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": "5",
+            "actual": "30"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "25",
+            "actual": "31"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "36",
+            "actual": "32"
+          },
+          {
+            "name": "cycle:4",
+            "pass": false,
+            "expected": "30",
+            "actual": "33"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 19,
+      "stages_expected": 19,
+      "forward_seconds": 2.3110813591629267
+    },
+    {
+      "item_id": "arithmetic-three-5",
+      "category": "sequential_arithmetic",
+      "cycles": 5,
+      "trace": "arithmetic-three-5.json",
+      "actual_results": [
+        "3 * 4 + 7 * 2 - 5 + 9",
+        "3 * 4 + 7 * 2 - 5 + 9",
+        "3 * 4 + 7 * 2 - 5 + 9",
+        "3 * 4 + 7 * 2 - 5 + 9",
+        "3 * 4 + 7 * 2 - 5 + 9"
+      ],
+      "score": {
+        "item_id": "arithmetic-three-5",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": "12",
+            "actual": "3 * 4 + 7 * 2 - 5 + 9"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": "19",
+            "actual": "3 * 4 + 7 * 2 - 5 + 9"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": "38",
+            "actual": "3 * 4 + 7 * 2 - 5 + 9"
+          },
+          {
+            "name": "cycle:4",
+            "pass": false,
+            "expected": "33",
+            "actual": "3 * 4 + 7 * 2 - 5 + 9"
+          },
+          {
+            "name": "cycle:5",
+            "pass": false,
+            "expected": "42",
+            "actual": "3 * 4 + 7 * 2 - 5 + 9"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 24,
+      "stages_expected": 24,
+      "forward_seconds": 3.360939801670611
+    },
+    {
+      "item_id": "structured-numbers-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "trace": "structured-numbers-3.json",
+      "actual_results": [
+        "8,3,5,3,1",
+        "8,3,5,3,1",
+        "8,3,5,3,1"
+      ],
+      "score": {
+        "item_id": "structured-numbers-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": [
+              1,
+              3,
+              3,
+              5,
+              8
+            ],
+            "actual": "8,3,5,3,1"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": [
+              1,
+              3,
+              5,
+              8
+            ],
+            "actual": "8,3,5,3,1"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": [
+              1,
+              3,
+              5
+            ],
+            "actual": "8,3,5,3,1"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 1.8667580410838127
+    },
+    {
+      "item_id": "structured-words-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "trace": "structured-words-3.json",
+      "actual_results": [
+        "4-kiwi-fig-pear-plum",
+        "4-kiwi-fig-pear-plum",
+        "4-kiwi-fig-pear-plum"
+      ],
+      "score": {
+        "item_id": "structured-words-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": [
+              "fig",
+              "kiwi",
+              "pear",
+              "plum"
+            ],
+            "actual": "4-kiwi-fig-pear-plum"
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": [
+              "kiwi",
+              "pear",
+              "plum"
+            ],
+            "actual": "4-kiwi-fig-pear-plum"
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": [
+              "KIWI",
+              "PEAR",
+              "PLUM"
+            ],
+            "actual": "4-kiwi-fig-pear-plum"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 2.012288120575249
+    },
+    {
+      "item_id": "structured-records-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "trace": "structured-records-3.json",
+      "actual_results": [
+        "1. 2. 3.",
+        "1. 2. 3.",
+        "1. 2. 3."
+      ],
+      "score": {
+        "item_id": "structured-records-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "cycle:1",
+            "pass": false,
+            "expected": [
+              {
+                "name": "Ivo",
+                "score": 7
+              },
+              {
+                "name": "Nia",
+                "score": 4
+              },
+              {
+                "name": "Sol",
+                "score": 4
+              }
+            ],
+            "actual": "1. 2. 3."
+          },
+          {
+            "name": "cycle:2",
+            "pass": false,
+            "expected": [
+              {
+                "name": "Ivo",
+                "score": 7
+              },
+              {
+                "name": "Nia",
+                "score": 4
+              },
+              {
+                "name": "Sol",
+                "score": 4
+              }
+            ],
+            "actual": "1. 2. 3."
+          },
+          {
+            "name": "cycle:3",
+            "pass": false,
+            "expected": [
+              "Ivo",
+              "Nia",
+              "Sol"
+            ],
+            "actual": "1. 2. 3."
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": false,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 2.433757457882166
+    },
+    {
+      "item_id": "language-day-acrostic-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "trace": "language-day-acrostic-3.json",
+      "actual_results": [
+        "Create a tiny poem about dawn.",
+        "Create a tiny poem about dawn.",
+        "Create a tiny poem about dawn."
+      ],
+      "score": {
+        "item_id": "language-day-acrostic-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "forbidden:Title:",
+            "pass": true,
+            "expected": false,
+            "actual": false
+          },
+          {
+            "name": "forbidden:Explanation:",
+            "pass": true,
+            "expected": false,
+            "actual": false
+          },
+          {
+            "name": "line_count",
+            "pass": false,
+            "expected": 3,
+            "actual": 1
+          },
+          {
+            "name": "words_per_line",
+            "pass": false,
+            "expected": 3,
+            "actual": [
+              6
+            ]
+          },
+          {
+            "name": "line_initials",
+            "pass": false,
+            "expected": "DAY",
+            "actual": "C"
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": true,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 1.7776181194931269
+    },
+    {
+      "item_id": "language-aster-summary-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "trace": "language-aster-summary-3.json",
+      "actual_results": [
+        "Aster maps ice.",
+        "ice is hot.",
+        "ice is hot."
+      ],
+      "score": {
+        "item_id": "language-aster-summary-3",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "required:Aster",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "required:sunlight",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "required:ice",
+            "pass": true,
+            "expected": true,
+            "actual": true
+          },
+          {
+            "name": "max_words",
+            "pass": true,
+            "expected": 12,
+            "actual": 3
+          },
+          {
+            "name": "sentence_count",
+            "pass": true,
+            "expected": 1,
+            "actual": 1
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": true,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 14,
+      "stages_expected": 14,
+      "forward_seconds": 1.800863535143435
+    },
+    {
+      "item_id": "language-tidetally-announcement-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "trace": "language-tidetally-announcement-5.json",
+      "actual_results": [
+        "1. Create the first task. Convert the actual objective into exactly one first executable task. For an ordered objective, combine its initial state with only its earliest operation. For an open goal, choose one concrete action that produces part of the requested deliverable. Valid one-task shapes using fake values are `Append -hot to elm`, `Double 4`, and `Draft the launch note headline`. They show brevity and format only; never copy their content. The file already begins `FIRST TASK: `. Add the actual task in the same short one-line shape, at most 12 words, then close the tool call. Do not add a list, explanation, or answer. Keep it under 30 words. Finish by closing the tool call.",
+        "1. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state. For a transformation, name the complete current value and only the next requested change. For an open goal, name one action that adds to the deliverable. Preserve the original objective's exact values; do not invent a value or action. The file already begins `TASK 1: `. Complete that one line in at most 12 words, then close the tool call. Do not execute the task. Keep it under 30 words. Finish by closing the tool call.",
+        "1. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state. For a transformation, name the complete current value and only the next requested change. For an open goal, name one action that adds to the deliverable. Preserve the original objective's exact values; do not invent a value or action. The file already begins `TASK 1: `. Complete that one line in at most 12 words, then close the tool call. Do not execute the task. Keep it under 30 words. Finish by closing the tool call.",
+        "1. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state. For a transformation, name the complete current value and only the next requested change. For an open goal, name one action that adds to the deliverable. Preserve the original objective's exact values; do not invent a value or action. The file already begins `TASK 1: `. Complete that one line in at most 12 words, then close the tool call. Do not execute the task. Keep it under 30 words. Finish by closing the tool call.",
+        "1. Write exactly one concrete executable task: the earliest explicit operation not yet reflected in that state. For a transformation, name the complete current value and only the next requested change. For an open goal, name one action that adds to the deliverable. Preserve the original objective's exact values; do not invent a value or action. The file already begins `TASK 1: `. Complete that one line in at most 12 words, then close the tool call. Do not execute the task. Keep it under 30 words. Finish by closing the tool call."
+      ],
+      "score": {
+        "item_id": "language-tidetally-announcement-5",
+        "cycle_count_ok": true,
+        "automated_checks": [
+          {
+            "name": "required:Headline:",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "required:Body:",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "required:CTA:",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "required:TideTally",
+            "pass": false,
+            "expected": true,
+            "actual": false
+          },
+          {
+            "name": "forbidden:available now",
+            "pass": true,
+            "expected": false,
+            "actual": false
+          },
+          {
+            "name": "forbidden:buy now",
+            "pass": true,
+            "expected": false,
+            "actual": false
+          },
+          {
+            "name": "forbidden:scientifically proven",
+            "pass": true,
+            "expected": false,
+            "actual": false
+          },
+          {
+            "name": "ordered_literals",
+            "pass": false,
+            "expected": [
+              "Headline:",
+              "Body:",
+              "CTA:"
+            ],
+            "actual": [
+              -1,
+              -1,
+              -1
+            ]
+          },
+          {
+            "name": "section_sentences:Body",
+            "pass": false,
+            "expected": 2,
+            "actual": 0
+          },
+          {
+            "name": "section_sentences:CTA",
+            "pass": false,
+            "expected": 1,
+            "actual": 0
+          }
+        ],
+        "automated_pass": false,
+        "manual_required": true,
+        "manual_pass": null,
+        "pass": false
+      },
+      "stopped": null,
+      "stages_completed": 24,
+      "stages_expected": 24,
+      "forward_seconds": 10.360995727591217
+    }
+  ],
+  "limitations": [
+    "host advances phases and simulates visible filesystem responses",
+    "only compiled traces validate controller, qwenFS, and HALT"
+  ]
+}

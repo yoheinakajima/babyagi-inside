@@ -6,7 +6,9 @@ from qfs.agent import Layout, phase_prompts, program
 class TinyTokenizer:
     def encode(self, text, add_special_tokens=False):
         del add_special_tokens
-        return list(range(len(text.split())))
+        if text in ("1", "2"):
+            return [int(text)]
+        return list(range(100, 100 + len(text.split())))
 
 
 def check():
@@ -17,6 +19,12 @@ def check():
     assert min(two_b.dims) >= F.H
     assert max(two_b.dims) < 4096
     assert set(two_b.dims).isdisjoint(range(F.OFF, F.H))
+    typed_layout = Layout([
+        {"rom": [1, 2], "decision": {"allowed_token_ids": [16, 17]},
+         "rom_suffix": [3, 4]},
+    ], F.H, 4096)
+    assert typed_layout.choice_mask is not None
+    assert len(typed_layout.offset) == 6
     shared, (create, prioritize, execute) = phase_prompts(2, 3, "generative")
     text = shared + create + prioritize + execute
     assert "first user message" in shared
@@ -59,8 +67,22 @@ def check():
         if stage["op"] != "write":
             continue
         assert stage["text_prefix"] == ("T1" if stage["kind"] == "prioritize" else "{")
+    typed_program = program(tok, 5, "babyagi_typed")
+    typed_decisions = [stage for stage in typed_program if "decision" in stage]
+    assert len(typed_program) == 24
+    assert len(typed_decisions) == 5
+    assert all(stage["decision"]["allowed_token_ids"] == [1, 2]
+               and stage["decision"]["owner"] == "model"
+               and stage["op"] == "read"
+               and stage["selected_files"] == ["task1.txt", "task2.txt"]
+               and stage["rom_suffix"] for stage in typed_decisions)
+    assert "INITIAL TASK — Create the first task" in phase_prompts(
+        1, 5, "babyagi_typed")[1][0]
+    assert "previous result was just read" in phase_prompts(
+        2, 5, "babyagi_typed")[1][0]
     assert len(program(tok, 4, "generative")) == 26
-    for cycles, protocol in ((6, "babyagi"), (6, "babyagi_json"), (5, "generative")):
+    for cycles, protocol in ((6, "babyagi"), (6, "babyagi_json"),
+                             (7, "babyagi_typed"), (5, "generative")):
         try:
             program(tok, cycles, protocol)
         except ValueError as exc:

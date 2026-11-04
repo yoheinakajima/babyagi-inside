@@ -1,5 +1,11 @@
 # M5 BabyAGI prompt and 2B follow-up
 
+> Typed-selector update: the five-cycle compiled `babyagi_typed` checkpoint,
+> frozen benchmark, provenance accounting, and publication claim boundary are
+> documented in [typed-babyagi-evidence.md](typed-babyagi-evidence.md). The
+> positive compiled pine trace passes all five development cycles; the frozen
+> native held-out screen is 0/12 and is reported as a limitation, not hidden.
+
 ## Result
 
 Qwen3.5-2B is sufficient for the first semantic BabyAGI success in this

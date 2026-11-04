@@ -25,8 +25,19 @@ def inspect(run_path, checkpoint_override=None):
         phase_index = control - START
         rom = meta["rom"][phase_index]
         end = controls[index + 1][0] - 1 if index + 1 < len(controls) else len(tokens)
-        exact = tokens[start:start + len(rom)] == rom
+        stage_meta = meta["stages"][phase_index]
         body_tokens = tokens[start:end]
+        exact = body_tokens[:len(rom)] == rom
+        decision_token = None
+        if "decision" in stage_meta:
+            decision_at = len(rom)
+            decision_token = (body_tokens[decision_at]
+                              if decision_at < len(body_tokens) else None)
+            suffix = stage_meta.get("rom_suffix", [])
+            suffix_at = decision_at + 1
+            exact = (exact
+                     and decision_token in stage_meta["decision"]["allowed_token_ids"]
+                     and body_tokens[suffix_at:suffix_at + len(suffix)] == suffix)
         calls, pos = [], 0
         while F.TCSTART in body_tokens[pos:]:
             a = body_tokens.index(F.TCSTART, pos)
@@ -38,7 +49,8 @@ def inspect(run_path, checkpoint_override=None):
             calls.append({"function": fn, "parameters": parameters})
             pos = b + 1
         stages.append({
-            "stage": phase_index, **meta["stages"][phase_index], "rom_exact": exact,
+            "stage": phase_index, **stage_meta, "rom_exact": exact,
+            "decision_token": decision_token,
             "response_completed": F.TRESPEND in body_tokens,
             "calls": calls,
             "body": tok.decode(body_tokens),
@@ -48,15 +60,20 @@ def inspect(run_path, checkpoint_override=None):
         for kind in KINDS:
             group = [s for s in stages if s["cycle"] == cycle and s["kind"] == kind]
             expected_files = {s["file"] for s in group if s["op"] == "write"}
-            expected = next(iter(expected_files)) if len(expected_files) == 1 else None
+            expected = (next(iter(expected_files)) if len(expected_files) == 1 else
+                        sorted(expected_files) if expected_files else None)
             calls = [c for s in group for c in s["calls"]]
             writes = [c for c in calls if c["function"] == "write_file"
-                      and expected is not None and c["parameters"].get("name") == expected
+                      and c["parameters"].get("name") in expected_files
                       and c["parameters"].get("text", "").strip()]
+            written_files = {call["parameters"].get("name") for call in writes}
+            writes_complete = expected_files <= written_files
+            ended = bool(group) and all(s["response_completed"] for s in group)
             phases.append({"cycle": cycle, "kind": kind,
                            "expected_file": expected,
-                           "ended": bool(group) and all(s["response_completed"] for s in group),
-                           "expected_file_written": bool(writes), "calls": calls,
+                           "ended": ended,
+                           "expected_file_written": bool(expected_files) and writes_complete,
+                           "phase_complete": ended and writes_complete, "calls": calls,
                            "body": "".join(s["body"] for s in group)})
     all_tokens = record["prefix"] + tokens
     files = disk.compact(all_tokens)
@@ -90,7 +107,7 @@ def inspect(run_path, checkpoint_override=None):
         "stages": stages,
         "reads": reads,
         "filesystem_pass": bool(reads) and all(r["exact"] for r in reads),
-        "complete_cycles": sum(all(p["expected_file_written"] and p["ended"]
+        "complete_cycles": sum(all(p["phase_complete"]
                                    for p in phases if p["cycle"] == c)
                                and sum(p["cycle"] == c for p in phases) == 3
                                for c in range(1, meta["cycles"] + 1)),

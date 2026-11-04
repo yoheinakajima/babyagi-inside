@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "probe": "counterbalanced-typed-file-choice",
+  "base": "/Users/yoheinakajima/Developer/Untapped/qwenfs-babyagi-m5/models/Qwen3.5-2B",
+  "protocol": "babyagi_typed",
+  "compiled_controller_executed": false,
+  "reports": [
+    {
+      "case": "work_first",
+      "expected": "1",
+      "selected": "1",
+      "selected_file": "task1.txt",
+      "allowed_logits": {
+        "16": 19.25,
+        "17": 13.1875
+      },
+      "pass": true
+    },
+    {
+      "case": "work_second",
+      "expected": "2",
+      "selected": "1",
+      "selected_file": "task1.txt",
+      "allowed_logits": {
+        "16": 19.75,
+        "17": 13.5625
+      },
+      "pass": false
+    }
+  ],
+  "pass": false,
+  "interpretation": "The typed gate guarantees a legal filename token. This probe tests whether stock Qwen chooses that token by candidate content."
+}

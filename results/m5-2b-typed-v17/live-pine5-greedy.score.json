@@ -1,0 +1,47 @@
+{
+  "item_id": "dev-pine-label-5",
+  "cycle_count_ok": true,
+  "automated_checks": [
+    {
+      "name": "cycle:1",
+      "pass": true,
+      "expected": "pine-red",
+      "actual": "pine-red"
+    },
+    {
+      "name": "cycle:2",
+      "pass": true,
+      "expected": "pine-red-blue",
+      "actual": "pine-red-blue"
+    },
+    {
+      "name": "cycle:3",
+      "pass": true,
+      "expected": "pine-red-blue-gold",
+      "actual": "pine-red-blue-gold"
+    },
+    {
+      "name": "cycle:4",
+      "pass": true,
+      "expected": "pine-red-blue-gold-green",
+      "actual": "pine-red-blue-gold-green"
+    },
+    {
+      "name": "cycle:5",
+      "pass": true,
+      "expected": "pine-red-blue-gold-green-silver",
+      "actual": "pine-red-blue-gold-green-silver"
+    }
+  ],
+  "automated_pass": true,
+  "manual_required": false,
+  "manual_pass": null,
+  "pass": true,
+  "actual_results": [
+    "pine-red",
+    "pine-red-blue",
+    "pine-red-blue-gold",
+    "pine-red-blue-gold-green",
+    "pine-red-blue-gold-green-silver"
+  ]
+}
