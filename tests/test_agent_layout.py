@@ -24,6 +24,11 @@ def check():
     assert "Output: actual output" in execute
     for objective_specific_value in ("oak", "red", "blue", "gold"):
         assert objective_specific_value not in text
+    babyagi_create = phase_prompts(1, 3, "babyagi")[1][0]
+    assert "INITIAL TASK — Create the first task" in babyagi_create
+    assert "exactly one concrete first executable task" in babyagi_create
+    for objective_specific_value in ("oak", "red", "blue", "gold"):
+        assert objective_specific_value not in babyagi_create
     print({"0.8b_scratch": [min(small.dims), max(small.dims) + 1],
            "2b_scratch": [min(two_b.dims), max(two_b.dims) + 1],
            "qwenfs": [F.OFF, F.H]})

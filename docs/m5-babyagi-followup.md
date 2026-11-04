@@ -30,6 +30,34 @@ The baseline and literal ROMs remain separate selectable protocols. The
 baseline ROM is byte-identical to the pre-follow-up checkpoint. No runtime
 objective values or expected answers occur in the literal prompt.
 
+## Original BabyAGI homage
+
+The optional `babyagi` protocol restores the original bootstrap idea: before
+ordinary task generation, the initial meta-task is **Create the first task**.
+The ROM opens `tasks.txt` with the static prefix `FIRST TASK:` and Qwen completes
+one concrete executable task from the objective. Later creation phases mark the
+bootstrap task complete so it cannot be selected again.
+
+This variant passed the same label objective at seed 0:
+
+- cycle 1 bootstrap: `FIRST TASK: 1. Append -red to 'oak'`;
+- semantic objective: 3/3 exact `Input` and `Output` pairs;
+- controller: PASS, three cycles, 8 exact reads, 9 writes, and model HALT;
+- circuit oracle: 2,263/2,263 forced tokens correct; and
+- live decode: 2,578 tokens in 256.0 seconds.
+
+The homage needed the compiled `FIRST TASK:` prefix. Without it, 2B expanded
+the bootstrap into the entire task list and then repeated the completed first
+operation. The successful version also explicitly retires `FIRST TASK` after
+cycle 1. Task-list discipline is still imperfect: prioritization sometimes
+copied both candidates, and an unused second candidate in cycle 2 had the wrong
+intermediate state. Execution nevertheless selected the correct first operation
+in all three cycles. This remains a one-seed proof, not a reliability claim.
+
+The classic BabyAGI examples used an initial task such as `Develop a task list`,
+which was executed before the regular task-creation loop. The compiled homage
+keeps that spirit while using the more direct label `Create the first task`.
+
 ## Why the prompt worked
 
 The failed baseline asked for two generic “next tasks.” The 2B model interpreted
@@ -145,3 +173,4 @@ uv run python -m tests.test_agent_append_goal results/literal-oak.json
 ```
 
 Use `--protocol generative` only for the experimental state-refresh variant.
+Use `--protocol babyagi` for the successful initial-task homage.

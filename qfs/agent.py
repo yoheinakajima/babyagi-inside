@@ -23,7 +23,7 @@ PHASE0 = F.V_QWEN
 HALT = PHASE0 + 32
 START = PHASE0
 KINDS = ("create", "prioritize", "execute")
-PROTOCOLS = ("baseline", "literal", "generative")
+PROTOCOLS = ("baseline", "literal", "generative", "babyagi")
 
 
 def phase_prompts(cycle, cycles, protocol):
@@ -39,21 +39,39 @@ def phase_prompts(cycle, cycles, protocol):
             "EXECUTE: Perform the selected task just read. Write its actual result, "
             "not a promise or a plan. State input and output when applicable.",
         )
-    elif protocol in ("literal", "generative"):
+    elif protocol in ("literal", "generative", "babyagi"):
         shared = (
             f"Cycle {cycle}/{cycles}. Follow the objective in the first user message literally. "
             "Treat its exact words, strings, symbols, numbers, order, and requested format as "
             "requirements. Do not reinterpret its subject as a business, brand, or fictional "
             "project. Do not invent external actions or facts. "
         )
-        if protocol == "literal":
-            instructions = (
+        if protocol in ("literal", "babyagi"):
+            create = (
                 "CREATE: Identify the explicit operations still unfinished. Write exactly two "
                 "candidate tasks, one per line. Task 1 must be the earliest unfinished operation. "
                 "Task 2 must be the next unfinished operation, or a final verification if only one "
                 "operation remains. Each task must describe only one operation and preserve all "
                 "literal values. Do not perform either task. Use exactly this format:\n"
-                "1. task\n2. task",
+                "1. task\n2. task"
+            )
+            if protocol == "babyagi" and cycle == 1:
+                create = (
+                    "INITIAL TASK — Create the first task. Perform that meta-task now: inspect the "
+                    "objective and write exactly one concrete first executable task, the earliest "
+                    "explicit operation. Preserve every literal value and requested format. Write "
+                    "only the resulting executable task. The file text already begins 'FIRST TASK:'. "
+                    "Complete that one line in at most 15 words, then close the tool call immediately. "
+                    "Do not make a list, add a newline, or execute the resulting task yet."
+                )
+            elif protocol == "babyagi":
+                create = (
+                    "BOOTSTRAP COMPLETE: The task labeled FIRST TASK was already executed. Never "
+                    "copy, repeat, or select it again. Use the previous result just read; its Output "
+                    "is the current state. " + create
+                )
+            instructions = (
+                create,
                 "PRIORITIZE: Select the earliest unfinished operation from the task list. Copy only "
                 "that one task without its number. Do not copy the other task, explain, or perform it.",
                 "EXECUTE: Perform exactly the one selected operation. For a text transformation, "
@@ -114,9 +132,12 @@ def program(tok, cycles=3, protocol="baseline"):
             frame = ("\n<|im_start|>user\n" + shared + instruction +
                      " Keep it under 60 words. Finish by closing the tool call."
                      "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
+            text_prefix = ("FIRST TASK: " if
+                           protocol == "babyagi" and cycle == 1 and kind == "create" else "")
             write = ("<tool_call>\n<function=write_file>\n<parameter=name>\n" + filename +
-                     "\n</parameter>\n<parameter=text>\n")
+                     "\n</parameter>\n<parameter=text>\n" + text_prefix)
             stages.append({"cycle": cycle, "kind": kind, "op": "write", "file": filename,
+                           "text_prefix": text_prefix,
                            "rom": tok.encode(prefix + frame + write, add_special_tokens=False)})
     return stages
 

@@ -46,14 +46,19 @@ def check(checkpoint, device="mps", chunk=64):
         if stage["op"] == "write":
             file_index, version, _ = files.get(filename, (len(files), 0, None))
             version += 1
-            body = tok.encode(objective if stage["kind"] == "bootstrap" else
-                              f"Sample content for cycle {stage['cycle']} {stage['kind']}.",
-                              add_special_tokens=False)
+            semantic_body = tok.encode(
+                objective if stage["kind"] == "bootstrap" else
+                f"Sample content for cycle {stage['cycle']} {stage['kind']}.",
+                add_special_tokens=False)
+            # A protocol may compile a static field prefix into the open write call.
+            # It is already present in the ROM token stream, but it is also part of
+            # the stored file body used by later reference reads.
+            body = tok.encode(stage.get("text_prefix", ""), add_special_tokens=False) + semantic_body
             files[filename] = file_index, version, body
             # Qwen supplies only this semantic value and its normal XML close.
             if stage["kind"] != "bootstrap":
-                tokens += body + [F.NL] + tok.encode("</parameter>\n</function>\n</tool_call>",
-                                                    add_special_tokens=False)
+                tokens += semantic_body + [F.NL] + tok.encode(
+                    "</parameter>\n</function>\n</tool_call>", add_special_tokens=False)
             response = (reference.HEAD + [F.ackw(file_index, version), F.SAVED, F.NL,
                          F.MARK0 + file_index, *name, F.NL, F.TRESPEND] + reference.TURN)
         else:

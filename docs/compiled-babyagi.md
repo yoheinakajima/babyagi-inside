@@ -5,7 +5,9 @@
 > M5 follow-up: Qwen3.5-2B with the new objective-agnostic `literal` protocol
 > passed the same three-step semantic objective in one seed-0 run. A separate
 > `generative` protocol produced cumulative story text but still failed exact
-> `Input` state reporting. See [m5-babyagi-followup.md](m5-babyagi-followup.md).
+> `Input` state reporting. An optional `babyagi` protocol also passed after
+> bootstrapping with the initial meta-task **Create the first task**. See
+> [m5-babyagi-followup.md](m5-babyagi-followup.md).
 > The remainder of this document records the original 0.8B experiment.
 
 A Qwen3.5-0.8B checkpoint was augmented using qwenFS's existing constructed
