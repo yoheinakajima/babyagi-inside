@@ -87,3 +87,19 @@ uv run python -m qfs.execute_budget models/Qwen3.5-2B \
 
 The budget runner writes one JSON result per step and resumes only when the
 suite hash, runner-source hash, budget, item, and cycle all match.
+
+## Amendment: aborted sampler implementation
+
+The first pilot invocation on 2026-11-03 exposed a mechanical implementation
+error before any cross-budget comparison: sorting by cycle and slicing selected
+32 cycle-1 transitions instead of eight cycle positions per category. The
+16-token arm completed; the run was interrupted while beginning the 32-token
+arm. Those files were preserved under
+`results/execution-budget-v3-pilot-aborted-cycle1-selection` and are excluded
+from all selection and accuracy tables.
+
+The corrected sampler deterministically selects cycle positions 1–8 once per
+category, using the shortest chain that contains each position and alternating
+the two frozen template families. The suite, prompts, budgets, scorer, and
+budget-selection rule are unchanged. The runner-source hash prevents the
+aborted records from being resumed into the corrected experiment.

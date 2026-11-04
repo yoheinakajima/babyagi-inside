@@ -63,10 +63,27 @@ def gold_entries(suite, max_steps_per_category=None):
     for category in CATEGORIES:
         entries = grouped[category]
         if max_steps_per_category is not None:
-            # A round-robin over cycles avoids a pilot made only of early steps.
-            entries = sorted(entries, key=lambda entry: (
-                entry["step"]["cycle"], -entry["item"]["cycles"],
-                entry["item"]["id"]))[:max_steps_per_category]
+            # First cover every available cycle position.  At each position use
+            # the shortest compatible chain, alternating template families.
+            # Fill any larger request from the remaining deterministic order.
+            by_cycle = {}
+            for entry in entries:
+                by_cycle.setdefault(entry["step"]["cycle"], []).append(entry)
+            pilot = []
+            for cycle in sorted(by_cycle):
+                candidates = by_cycle[cycle]
+                shortest = min(entry["item"]["cycles"] for entry in candidates)
+                candidates = sorted(
+                    (entry for entry in candidates
+                     if entry["item"]["cycles"] == shortest),
+                    key=lambda entry: entry["item"]["id"])
+                pilot.append(candidates[(cycle - 1) % len(candidates)])
+            remaining = sorted(
+                (entry for entry in entries if entry not in pilot),
+                key=lambda entry: (entry["item"]["cycles"],
+                                   entry["step"]["cycle"],
+                                   entry["item"]["id"]))
+            entries = (pilot + remaining)[:max_steps_per_category]
         selected.extend(entries)
     if not selected:
         raise ValueError("suite has no provenance.gold_steps records")

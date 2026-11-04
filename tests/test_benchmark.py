@@ -40,7 +40,12 @@ def check():
     assert set(gradient["category_counts"].values()) == {8}
     assert {item["cycles"] for item in gradient["items"]} == {2, 3, 5, 8}
     assert len(gold_entries(gradient)) == 144
-    assert len(gold_entries(gradient, max_steps_per_category=3)) == 12
+    pilot = gold_entries(gradient, max_steps_per_category=8)
+    assert len(pilot) == 32
+    for category in gradient["category_counts"]:
+        cycles = [entry["step"]["cycle"] for entry in pilot
+                  if entry["item"]["category"] == category]
+        assert cycles == list(range(1, 9))
 
     heldout_text = json.dumps(heldout).lower()
     for development_only in ("oak", "pine", "elm-hot", "luma"):
