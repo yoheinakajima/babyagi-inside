@@ -58,6 +58,93 @@ The classic BabyAGI examples used an initial task such as `Develop a task list`,
 which was executed before the regular task-creation loop. The compiled homage
 keeps that spirit while using the more direct label `Create the first task`.
 
+The supplied original BabyAGI script also made two design choices that matter
+here: it kept explicit task IDs in a queue, and it passed the last result into
+task creation before reprioritizing. Its Pinecone context is not needed for the
+current short, sequential objectives. No vector store was added.
+
+## Five-cycle controller boundary
+
+The earlier `1..3` guard was not a filesystem limit. qwenFS supports 64 file
+versions, while the compiled agent reserves 32 control microstates before
+HALT. The prose `literal` and `babyagi` protocols use five states for cycle 1
+and six for each later cycle, so five cycles require 29 states and fit. Six
+cycles would require 35 and are now rejected with an explicit phase-budget
+error. The state-refresh `generative` protocol uses seven states after cycle 1,
+so its present maximum is four cycles (26 states); five would require 33.
+
+The new layout test covers those boundaries instead of imposing an arbitrary
+three-cycle maximum. A five-cycle prose checkpoint also passed its independent
+circuit oracle: 3,819/3,819 forced decisions were correct. This establishes
+that the compiled controller, filesystem, and model-generated HALT can operate
+for five cycles. It does **not** establish five-cycle semantic reasoning.
+
+## Five-cycle semantic experiments
+
+All rows below used Qwen3.5-2B, seed 0, temperature 0.7, and top-p 0.9. Each
+controller result includes all five cycles, 14 token-exact reads, all expected
+writes, exact compiled ROM segments, and model-generated HALT.
+
+| Protocol / objective | Controller | Semantic result |
+| --- | --- | --- |
+| Original `babyagi`; five ordered appends | PASS; 5,284 tokens; 663.5 s | 0/5. The initial phase expanded all five operations, then every phase copied that list. |
+| `babyagi_kshot`; five ordered appends | PASS; 4,293 tokens; 522.3 s | 0/5. The first task was correctly `Append -red to pine`, but prioritization treated task text as state and selected later operations. |
+| `babyagi_kshot`; open Luma launch announcement | PASS; 4,200 tokens; 543.9 s | Failed. Every create, prioritize, and execute write repeated `Draft the launch note headline.`; no headline or announcement was written. |
+| `babyagi_json`; five ordered appends | PASS; 6,105 tokens; 636.9 s | Cycle 1 result exact but lifecycle invalid; cycles 2–5 failed. All execute ledgers were valid JSON, but `completed` and `result` froze after `pine-red`. |
+
+The first two runs show why “can run five cycles” and “can do five correct
+cycles” must remain separate claims. The free-form run is also a clean negative
+result: 2B proposed a plausible first task but copied the task description
+instead of performing it, then looped.
+
+### K-shot findings
+
+Small synthetic examples helped the initial format. In direct native probes,
+the compact output-shape prompt produced the correct single first operation in
+four of five clean samples, with the fifth still naming the right operation but
+adding numbering. The compiled ordered run also created the correct first task.
+
+The examples affected content, however. One fake shape was `Draft the launch
+note headline`; the related Luma launch objective repeated that text verbatim
+for all 15 semantic phases. The `babyagi_kshot` protocol is therefore retained
+as an experimental negative control, not promoted over the verified `babyagi`
+prompt. Future examples should be phase-specific, fixed across the benchmark,
+semantically disjoint from evaluation objectives, and evaluated for both format
+gain and content leakage.
+
+### JSON ledger and constrained choice
+
+The experimental `babyagi_json` protocol uses one `tasks.json` ledger with
+`pending`, `completed`, and `result`. Candidates have stable `T1`/`T2` IDs;
+prioritization writes `choice.txt`; execution is supposed to remove the chosen
+pending object, append its task to `completed`, and update `result`. The same
+file is transformed by each phase, so the design still fits in 29 microstates.
+
+The JSON checkpoint passed 4,719/4,719 forced circuit decisions. A native
+one-cycle probe completed the exact transition:
+
+```json
+{"pending":[],"completed":["Append -red to pine"],"result":"pine-red"}
+```
+
+The first live compiled execution produced the correct `pine-red` result and
+added the red task to `completed`, but incorrectly left the same task in
+`pending`. Later creation put that completed red task in `T1` and the correct
+blue task in `T2`. The current hardened selector always commits ranked `T1`, so
+it exposed rather than solved that ordering error. Subsequent execution phases
+rewrote pending candidates instead of advancing the result. The JSON-specific
+evaluator passed schema and result for cycle 1 but failed lifecycle; cycles 2–5
+failed lifecycle and result, as intended.
+
+This makes a decision-style selector directly relevant. Prioritization is a
+classification problem: candidate generation should assign stable IDs, and a
+selector should emit only an allowed ID. A separate JEV-style model or
+host-side logit constraint would be a useful ablation but would weaken the
+claim that the loop is baked entirely into Qwen. The clean target is a compiled
+choice boundary—or a selector compiled into the same checkpoint—followed by a
+transition validator that rejects illegal ledger updates. Until then,
+`babyagi_json` remains experimental.
+
 ## Why the prompt worked
 
 The failed baseline asked for two generic “next tasks.” The 2B model interpreted
@@ -119,10 +206,10 @@ optimizers such as GEPA then evaluate multiple prompt candidates. DSPy also
 supports local models through providers such as Ollama.
 
 The current target is unusual: phase prompts are compiled into a ROM, a full
-candidate build takes roughly half a minute, and a single three-cycle M5 rollout
-takes roughly four to five minutes. Optimizing directly through the compiled
-checkpoint would be slow and would overfit badly to one objective. A useful DSPy
-experiment first needs:
+candidate build takes roughly half a minute, a three-cycle M5 rollout takes
+roughly four to five minutes, and these five-cycle runs took nine to eleven
+minutes. Optimizing directly through the compiled checkpoint would be slow and
+would overfit badly to one objective. A useful DSPy experiment first needs:
 
 1. a fast native-model simulator for the create/prioritize/execute transcript;
 2. a held-out benchmark of at least literal transformations, ordered arithmetic,
@@ -152,10 +239,11 @@ requires relocating or parameterizing qwenFS's circuit dimensions and then
 revalidating every exact register, norm scale, cache mask, native-logit parity,
 and forced token. It is not a model-path substitution.
 
-The 2B prompt success means there is no current evidence that capacity is the
-main blocker. Stay on 2B while building a multi-objective prompt benchmark. Move
-to 4B only if held-out failures persist after state routing and prompt search,
-or treat 4B relocation as a separate compiler project.
+The three-cycle 2B success proves that capacity is not the only blocker. The
+five-cycle failures do not isolate capacity from task lifecycle, selection, and
+state-transition errors. Stay on 2B while building a multi-objective benchmark
+and constrained selector. Move to 4B only if held-out failures persist after
+those controls, or treat 4B relocation as a separate compiler project.
 
 Official 4B configuration: <https://huggingface.co/Qwen/Qwen3.5-4B/blob/main/config.json>
 
@@ -174,3 +262,5 @@ uv run python -m tests.test_agent_append_goal results/literal-oak.json
 
 Use `--protocol generative` only for the experimental state-refresh variant.
 Use `--protocol babyagi` for the successful initial-task homage.
+Use `--protocol babyagi_kshot` and `--protocol babyagi_json` only to reproduce
+the documented experimental failures; neither is a verified general agent.

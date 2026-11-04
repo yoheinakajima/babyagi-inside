@@ -45,13 +45,16 @@ def inspect(run_path, checkpoint_override=None):
         })
     phases = []
     for cycle in range(1, meta["cycles"] + 1):
-        for kind, expected in zip(KINDS, ("tasks.txt", "current.txt", "result.txt")):
+        for kind in KINDS:
             group = [s for s in stages if s["cycle"] == cycle and s["kind"] == kind]
+            expected_files = {s["file"] for s in group if s["op"] == "write"}
+            expected = next(iter(expected_files)) if len(expected_files) == 1 else None
             calls = [c for s in group for c in s["calls"]]
             writes = [c for c in calls if c["function"] == "write_file"
-                      and c["parameters"].get("name") == expected
+                      and expected is not None and c["parameters"].get("name") == expected
                       and c["parameters"].get("text", "").strip()]
             phases.append({"cycle": cycle, "kind": kind,
+                           "expected_file": expected,
                            "ended": bool(group) and all(s["response_completed"] for s in group),
                            "expected_file_written": bool(writes), "calls": calls,
                            "body": "".join(s["body"] for s in group)})
@@ -77,6 +80,7 @@ def inspect(run_path, checkpoint_override=None):
                       "exact": expected == all_tokens[pos + 1:stop]})
     result = {
         "objective": record["objective"], "seed": record["seed"],
+        "protocol": meta["protocol"],
         "halted": bool(tokens and tokens[-1] == meta["halt"]), "token_count": len(tokens),
         "seconds": record["seconds"], "expected_phases": meta["cycles"] * 3,
         "expected_reads": sum(s["op"] == "read" for s in meta["stages"]),

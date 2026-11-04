@@ -23,7 +23,9 @@ PHASE0 = F.V_QWEN
 HALT = PHASE0 + 32
 START = PHASE0
 KINDS = ("create", "prioritize", "execute")
-PROTOCOLS = ("baseline", "literal", "generative", "babyagi")
+PROTOCOLS = (
+    "baseline", "literal", "generative", "babyagi", "babyagi_kshot", "babyagi_json",
+)
 
 
 def phase_prompts(cycle, cycles, protocol):
@@ -39,14 +41,67 @@ def phase_prompts(cycle, cycles, protocol):
             "EXECUTE: Perform the selected task just read. Write its actual result, "
             "not a promise or a plan. State input and output when applicable.",
         )
-    elif protocol in ("literal", "generative", "babyagi"):
+    elif protocol in ("literal", "generative", "babyagi", "babyagi_kshot", "babyagi_json"):
         shared = (
             f"Cycle {cycle}/{cycles}. Follow the objective in the first user message literally. "
             "Treat its exact words, strings, symbols, numbers, order, and requested format as "
             "requirements. Do not reinterpret its subject as a business, brand, or fictional "
             "project. Do not invent external actions or facts. "
         )
-        if protocol in ("literal", "babyagi"):
+        if protocol == "babyagi_json":
+            shared = (
+                f"Cycle {cycle}/{cycles}. Obey the original objective literally. Preserve its "
+                "values, order, and format. Do not invent external facts or actions. "
+            )
+            schema = (
+                'The file is one-line JSON with exactly these fields: '
+                '`pending` (array of objects with string `id` and string `task`), '
+                '`completed` (array of finished task strings), and `result` (actual current '
+                'result or null). Emit valid JSON only and escape newlines in strings.'
+            )
+            if cycle == 1:
+                create = (
+                    "INITIAL TASK — Create the first task. Convert the objective into exactly one "
+                    "concrete first executable task. For ordered work, combine its initial state "
+                    "with only the earliest operation. For an open goal, choose one action that "
+                    "produces part of the requested deliverable. Put only that task in `pending` "
+                    "with ID `T1`; set `result` to null and `completed` to an empty array. For a "
+                    "transformation, the task string must name the initial value, action, and "
+                    "operand; a string containing only the value or only the action is invalid. "
+                    "Valid task-string shapes using unrelated fake values are `Append -hot to elm`, "
+                    "`Double 4`, and `Sketch a garden layout`. They show brevity and format only; "
+                    "never copy their content. The file already begins `{`; complete the JSON "
+                    "object without another opening brace. " + schema
+                )
+            else:
+                create = (
+                    "CREATE: Read the ledger. Completed tasks are finished and must never be "
+                    "repeated. Treat `result` as the current state. Preserve `completed` and "
+                    "`result`, and replace `pending` with at most two concrete unfinished tasks "
+                    "identified as `T1` then `T2`, ranked with the best next task as `T1`. For "
+                    "ordered work, `T1` is the earliest unfinished operation. For an open goal, "
+                    "propose work that adds to or improves the requested deliverable. Do not "
+                    "perform a task. The file text already begins "
+                    "`{`; complete the object without another opening brace. " + schema
+                )
+            instructions = (
+                create,
+                "PRIORITIZE: Read the ranked ledger. Its best next task is `T1`. The file text "
+                "already contains the complete choice `T1`; close the tool call immediately. Do "
+                "not add task text, JSON, punctuation, or an explanation. Do not perform the task.",
+                "EXECUTE: Read the chosen ID. Find its task in the most recently read ledger and "
+                "perform exactly that task. Remove its object from `pending`, append its task string "
+                "to `completed`, and write the actual result—not the task description or a promise—"
+                "into `result`. After execution `result` must not be null. Preserve every other "
+                "ledger value exactly; never invent or rename a pending task. Execution examples "
+                "using fake values: `Append -hot to elm` produces `elm-hot`; `Double 4` produces "
+                "`8`. Never copy example values. For transformations, "
+                "apply the requested change to the prior `result`; use the objective's initial state "
+                "only when the prior result is null. For text creation, write the requested text. "
+                "The file text already begins `{`; complete the object without another opening "
+                "brace. " + schema,
+            )
+        elif protocol in ("literal", "babyagi", "babyagi_kshot"):
             create = (
                 "CREATE: Identify the explicit operations still unfinished. Write exactly two "
                 "candidate tasks, one per line. Task 1 must be the earliest unfinished operation. "
@@ -64,20 +119,52 @@ def phase_prompts(cycle, cycles, protocol):
                     "Complete that one line in at most 15 words, then close the tool call immediately. "
                     "Do not make a list, add a newline, or execute the resulting task yet."
                 )
+            elif protocol == "babyagi_kshot" and cycle == 1:
+                create = (
+                    "INITIAL TASK — Create the first task. Convert the actual objective into exactly "
+                    "one first executable task. For an ordered objective, combine its initial state "
+                    "with only its earliest operation. For an open goal, choose one concrete action "
+                    "that produces part of the requested deliverable. Valid one-task shapes using "
+                    "fake values: `Append -hot to elm`; `Double 4`; `Draft the launch note headline`. "
+                    "These examples show brevity and format only; never copy their content. The file "
+                    "already begins `FIRST TASK:`. Add the actual task in the same short one-line "
+                    "shape, at most 12 words, and close the tool call. Never restate the objective or "
+                    "mention later operations. Do not add a number, label, list, semicolon, newline, "
+                    "explanation, or answer."
+                )
             elif protocol == "babyagi":
                 create = (
                     "BOOTSTRAP COMPLETE: The task labeled FIRST TASK was already executed. Never "
                     "copy, repeat, or select it again. Use the previous result just read; its Output "
                     "is the current state. " + create
                 )
+            elif protocol == "babyagi_kshot":
+                create = (
+                    "BOOTSTRAP COMPLETE: The task labeled FIRST TASK was already executed. Never "
+                    "copy, repeat, or select it again. Use the previous result just read; its Output "
+                    "is the current state. If the objective has ordered operations, preserve them "
+                    "literally and make Task 1 the earliest unfinished operation. If the objective "
+                    "has no ordered operations, propose two concrete tasks that produce or improve "
+                    "the requested deliverable using the current state. Do not claim external work. "
+                    "Write exactly two candidates, one per line, as `1. task` and `2. task`. Do not "
+                    "perform them."
+                )
+            execute = (
+                "EXECUTE: Perform exactly the one selected operation. For a text transformation, "
+                "copy the prior value exactly and apply only the requested change. For text creation, "
+                "write the requested text itself, not a claim that it was written. Use exactly two "
+                "plain-text lines:\nInput: actual input\nOutput: actual output"
+            )
+            if protocol == "babyagi_kshot":
+                execute += (
+                    ". When building a multi-part deliverable, retain useful prior output and extend "
+                    "or refine it only as the selected task requires"
+                )
             instructions = (
                 create,
                 "PRIORITIZE: Select the earliest unfinished operation from the task list. Copy only "
                 "that one task without its number. Do not copy the other task, explain, or perform it.",
-                "EXECUTE: Perform exactly the one selected operation. For a text transformation, "
-                "copy the prior value exactly and apply only the requested change. For text creation, "
-                "write the requested text itself, not a claim that it was written. Use exactly two "
-                "plain-text lines:\nInput: actual input\nOutput: actual output",
+                execute,
             )
         else:
             instructions = (
@@ -108,14 +195,19 @@ def phase_prompts(cycle, cycles, protocol):
 
 def program(tok, cycles=3, protocol="baseline"):
     """Only static instructions are compiled; objectives/tasks are never baked in."""
-    if not 1 <= cycles <= 3:
-        raise ValueError("The bounded circuit supports 1..3 cycles")
+    if cycles < 1:
+        raise ValueError("cycles must be positive")
     stages = []
     for cycle in range(1, cycles + 1):
         shared, instructions = phase_prompts(cycle, cycles, protocol)
+        if protocol == "babyagi_json":
+            write_names = ("tasks.json", "choice.txt", "tasks.json")
+            read_names = ("tasks.json" if cycle > 1 else None, "tasks.json", "choice.txt")
+        else:
+            write_names = ("tasks.txt", "current.txt", "result.txt")
+            read_names = ("result.txt" if cycle > 1 else None, "tasks.txt", "current.txt")
         for kind, filename, read_name, instruction in zip(
-                KINDS, ("tasks.txt", "current.txt", "result.txt"),
-                ("result.txt" if cycle > 1 else None, "tasks.txt", "current.txt"), instructions):
+                KINDS, write_names, read_names, instructions):
             if read_name:
                 read = ("<tool_call>\n<function=read_file>\n<parameter=name>\n" + read_name +
                         "\n</parameter>\n</function>\n</tool_call>")
@@ -132,13 +224,21 @@ def program(tok, cycles=3, protocol="baseline"):
             frame = ("\n<|im_start|>user\n" + shared + instruction +
                      " Keep it under 60 words. Finish by closing the tool call."
                      "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n")
-            text_prefix = ("FIRST TASK: " if
-                           protocol == "babyagi" and cycle == 1 and kind == "create" else "")
+            if protocol == "babyagi_json":
+                text_prefix = "T1" if kind == "prioritize" else "{"
+            else:
+                text_prefix = ("FIRST TASK: " if protocol in ("babyagi", "babyagi_kshot")
+                               and cycle == 1 and kind == "create" else "")
             write = ("<tool_call>\n<function=write_file>\n<parameter=name>\n" + filename +
                      "\n</parameter>\n<parameter=text>\n" + text_prefix)
             stages.append({"cycle": cycle, "kind": kind, "op": "write", "file": filename,
                            "text_prefix": text_prefix,
                            "rom": tok.encode(prefix + frame + write, add_special_tokens=False)})
+    phase_budget = HALT - PHASE0
+    if len(stages) > phase_budget:
+        raise ValueError(
+            f"{protocol} protocol needs {len(stages)} microstates for {cycles} cycles; "
+            f"the compiled controller reserves {phase_budget} before HALT")
     return stages
 
 

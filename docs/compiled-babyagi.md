@@ -8,6 +8,9 @@
 > `Input` state reporting. An optional `babyagi` protocol also passed after
 > bootstrapping with the initial meta-task **Create the first task**. See
 > [m5-babyagi-followup.md](m5-babyagi-followup.md).
+> A later extension proved five controller cycles and explored k-shot and JSON
+> task ledgers, but none passed the five-cycle semantic objective; the same
+> follow-up records those negative results and the constrained-selector design.
 > The remainder of this document records the original 0.8B experiment.
 
 A Qwen3.5-0.8B checkpoint was augmented using qwenFS's existing constructed

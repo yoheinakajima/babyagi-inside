@@ -18,13 +18,16 @@ def check(run_path, checkpoint=None):
     assert len(result["reads"]) == result["expected_reads"], "Missing compiled reads"
     assert result["write_count"] == result["expected_writes"], "Missing model-generated write acks"
     for phase in result["phases"]:
-        if phase["kind"] == "create" and phase["cycle"] > 1:
-            assert any(c["function"] == "read_file" and c["parameters"].get("name") == "result.txt"
-                       for c in phase["calls"]), "Later creation did not read previous result"
-        if phase["kind"] in ("prioritize", "execute"):
-            name = "tasks.txt" if phase["kind"] == "prioritize" else "current.txt"
-            assert any(c["function"] == "read_file" and c["parameters"].get("name") == name
-                       for c in phase["calls"]), f"Missing read of {name}"
+        expected_reads = {
+            stage["file"] for stage in result["stages"]
+            if stage["cycle"] == phase["cycle"] and stage["kind"] == phase["kind"]
+            and stage["op"] == "read"
+        }
+        actual_reads = {
+            call["parameters"].get("name") for call in phase["calls"]
+            if call["function"] == "read_file"
+        }
+        assert expected_reads <= actual_reads, f"Missing reads: {expected_reads - actual_reads}"
     return result
 
 
