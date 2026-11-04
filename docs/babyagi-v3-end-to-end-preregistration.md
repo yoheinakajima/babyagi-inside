@@ -1,5 +1,12 @@
 # BabyAGI v3 paired end-to-end preregistration
 
+> **Post-run audit amendment.** The original host harness omitted the nonzero
+> pretrained-stack embedding of the compiled control token before each stage.
+> A control-aware diagnostic using `0.25 ×` the newline embedding supersedes
+> the original host result. The frozen suite, prompts, budgets, decoding, and
+> scorer were not changed. See `babyagi-v3-end-to-end-results.md`; this document
+> otherwise preserves the preregistered design and original command.
+
 ## Question
 
 Does the frozen 256-token JSON-ledger loop preserve or improve complete-chain

@@ -141,6 +141,26 @@ class NativeRunner:
         self.context.extend(tokens)
         return out.logits[0, -1].float()
 
+    @torch.inference_mode()
+    def feed_embedding(self, embedding):
+        """Advance one semantic timestep with an explicit input embedding."""
+        begin = time.monotonic()
+        out = self.model(inputs_embeds=embedding.reshape(1, 1, -1),
+                         past_key_values=self.cache, use_cache=True,
+                         logits_to_keep=1)
+        self.forward_seconds += time.monotonic() - begin
+        self.cache = out.past_key_values
+        self.context.append(None)
+        return out.logits[0, -1].float()
+
+    def flush_control_surrogate(self, scale):
+        """Feed pending tokens, then the control token's pretrained-stack view."""
+        if self.pending:
+            self.feed(self.pending)
+            self.pending = []
+        embedding = self.model.model.embed_tokens.weight[F.NL].detach() * scale
+        return self.feed_embedding(embedding)
+
     def queue(self, tokens):
         self.pending.extend(tokens)
 
@@ -164,7 +184,8 @@ def _call(stage, tok, call_tokens):
 
 
 def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
-               top_p=0.9, seed=0, limit_per_write=240):
+               top_p=0.9, seed=0, limit_per_write=240,
+               control_surrogate_scale=None):
     """Run an objective through static stages using the stock semantic model."""
     wall_begin = time.monotonic()
     runner = NativeRunner(model, tok, device, temperature, top_p, seed)
@@ -177,6 +198,8 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
     stopped = None
 
     for number, stage in enumerate(stages):
+        if control_surrogate_scale is not None:
+            runner.flush_control_surrogate(control_surrogate_scale)
         view = stage_view(stage)
         phase_begin = time.monotonic()
         report = {"stage": number, "cycle": stage.get("cycle"),
@@ -299,6 +322,7 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
     return {
         "schema_version": 1, "harness": "native-semantic-simulator",
         "compiled_controller_executed": False, "objective": objective,
+        "control_surrogate_scale": control_surrogate_scale,
         "decoding": {"temperature": temperature, "top_p": top_p, "seed": seed,
                      "mode": "greedy" if temperature <= 0 else "sampled",
                      "sampled_rng_equivalence": ("exact" if temperature <= 0 else
@@ -320,14 +344,14 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
 
 def load_and_run(base, objective, cycles=3, protocol="babyagi", device=None,
                  temperature=0.0, top_p=0.9, seed=0, limit_per_write=240,
-                 think_tokens=None):
+                 think_tokens=None, control_surrogate_scale=None):
     device = device or ("cuda" if torch.cuda.is_available() else
                         "mps" if torch.backends.mps.is_available() else "cpu")
     tok = AutoTokenizer.from_pretrained(base)
     stages = program(tok, cycles, protocol, think_tokens)
     model = Qwen3_5ForCausalLM.from_pretrained(base, dtype=torch.bfloat16).to(device).eval()
     result = run_native(model, tok, stages, objective, device, temperature,
-                        top_p, seed, limit_per_write)
+                        top_p, seed, limit_per_write, control_surrogate_scale)
     result.update({"base": str(Path(base).resolve()), "cycles": cycles,
                    "protocol": protocol, "think_tokens": think_tokens,
                    "device": device})
@@ -348,10 +372,13 @@ def main():
     parser.add_argument("--limit-per-write", type=int, default=240)
     parser.add_argument("--think-tokens", type=int,
                         help="bounded reasoning tokens for pointer protocols")
+    parser.add_argument("--control-surrogate-scale", type=float,
+                        help="feed this multiple of the newline embedding before each stage")
     args = parser.parse_args()
     result = load_and_run(args.base, args.objective, args.cycles, args.protocol,
                           args.device, args.temperature, args.top_p, args.seed,
-                          args.limit_per_write, args.think_tokens)
+                          args.limit_per_write, args.think_tokens,
+                          args.control_surrogate_scale)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2) + "\n")

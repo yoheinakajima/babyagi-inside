@@ -1,5 +1,10 @@
 """Cheap checks for end-to-end summaries and deterministic trace selection."""
-from qfs.end_to_end import _arm_summary, _compiled_selection, _paired_summary
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from qfs.end_to_end import (_arm_summary, _compiled_selection,
+                            _load_reused_plain, _paired_summary)
 
 
 def _record(arm, item, category, cycles, checks):
@@ -35,7 +40,25 @@ def check():
     selected = _compiled_selection(suite, selection_rows)
     assert selected["2"]["item_id"] == "a"
     assert selected["3"]["item_id"] == "b"
-    print({"summary": "PASS", "paired": "PASS", "selection": "PASS"})
+
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        (root / "plain").mkdir()
+        item = {"id": "a"}
+        record = {"identity": {"suite_sha256": "suite", "arm": "plain",
+                               "item_id": "a", "think_tokens": 256,
+                               "plain_answer_tokens": 256}}
+        (root / "plain" / "a.json").write_text(json.dumps(record))
+        assert _load_reused_plain(root, item, "suite", 256, 256) == record
+        try:
+            _load_reused_plain(root, item, "wrong-suite", 256, 256)
+        except ValueError as error:
+            assert "identity mismatch" in str(error)
+        else:
+            raise AssertionError("mismatched reused plain record was accepted")
+
+    print({"summary": "PASS", "paired": "PASS", "selection": "PASS",
+           "plain_reuse": "PASS"})
 
 
 if __name__ == "__main__":

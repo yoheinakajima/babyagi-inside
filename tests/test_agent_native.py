@@ -1,8 +1,10 @@
 """Cheap tests for the stock-weight semantic harness; no model checkpoint required."""
+from types import SimpleNamespace
+
 import torch
 
 from qfs import circuit as F
-from qfs.agent_native import choose_token, stage_view, visible_response_tokens
+from qfs.agent_native import NativeRunner, choose_token, stage_view, visible_response_tokens
 from qfs.agent_suite import native_results
 
 
@@ -10,6 +12,20 @@ class FakeTokenizer:
     def encode(self, text, add_special_tokens=False):
         del add_special_tokens
         return [1000 + ord(char) for char in text]
+
+
+class FakeModel:
+    def __init__(self):
+        weight = torch.zeros((F.NL + 1, 4))
+        weight[F.NL] = 2
+        self.model = SimpleNamespace(
+            embed_tokens=SimpleNamespace(weight=weight))
+        self.calls = []
+
+    def __call__(self, **kwargs):
+        self.calls.append(kwargs)
+        return SimpleNamespace(logits=torch.zeros((1, 1, 8)),
+                               past_key_values=len(self.calls))
 
 
 def check():
@@ -41,6 +57,15 @@ def check():
     assert choose_token(logits, 0.0, 0.9, gen, allowed=[16, 17]) == 17
     assert choose_token(logits, 0.0, 0.9, gen, vocab_stop=3) == 0
 
+    fake = FakeModel()
+    runner = NativeRunner(fake, None, "cpu")
+    runner.queue([1, 2])
+    runner.flush_control_surrogate(0.25)
+    assert fake.calls[0]["input_ids"].tolist() == [[1, 2]]
+    assert torch.equal(fake.calls[1]["inputs_embeds"],
+                       torch.full((1, 1, 4), 0.5))
+    assert runner.context == [1, 2, None]
+
     tok = FakeTokenizer()
     write = visible_response_tokens(tok, "write_file", "tasks.txt")
     assert write[:6] == [F.NL, F.IMSTART, F.USER, F.NL, F.TRESP, F.NL]
@@ -65,7 +90,8 @@ def check():
         }},
     ]}
     assert native_results(trace) == ["oak-red", [1, 2, 3]]
-    print({"stage_adapter": "PASS", "typed_choice": "PASS", "responses": "PASS"})
+    print({"stage_adapter": "PASS", "typed_choice": "PASS",
+           "control_surrogate": "PASS", "responses": "PASS"})
 
 
 if __name__ == "__main__":

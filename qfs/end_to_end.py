@@ -67,10 +67,11 @@ def _plan_check(item, trace):
 
 
 def _identity(suite_hash, runner_hash, arm, item_id, think_tokens,
-              plain_answer_tokens):
+              plain_answer_tokens, control_surrogate_scale=None):
     return {"suite_sha256": suite_hash, "runner_sha256": runner_hash,
             "arm": arm, "item_id": item_id, "think_tokens": think_tokens,
-            "plain_answer_tokens": plain_answer_tokens}
+            "plain_answer_tokens": plain_answer_tokens,
+            "control_surrogate_scale": control_surrogate_scale}
 
 
 def _load_if_matching(path, identity):
@@ -98,11 +99,12 @@ def _run_plain_record(model, tok, item, device, think_tokens, answer_tokens,
 
 
 def _run_host_record(model, tok, item, device, think_tokens, answer_tokens,
-                     identity):
+                     identity, control_surrogate_scale=None):
     stages = program(tok, item["cycles"], "babyagi_ledger_pointer", think_tokens)
     trace = run_native(model, tok, stages, item["objective"], device=device,
                        temperature=0.0, top_p=0.9, seed=0,
-                       limit_per_write=answer_tokens)
+                       limit_per_write=answer_tokens,
+                       control_surrogate_scale=control_surrogate_scale)
     actual = native_results(trace)
     score = score_item(item, actual)
     return {"schema_version": 1, "identity": identity,
@@ -213,8 +215,20 @@ def _compiled_selection(suite, host):
     return selected
 
 
+def _load_reused_plain(root, item, suite_hash, think_tokens, answer_tokens):
+    path = Path(root) / "plain" / f"{item['id']}.json"
+    record = json.loads(path.read_text())
+    identity = record.get("identity", {})
+    expected = {"suite_sha256": suite_hash, "arm": "plain", "item_id": item["id"],
+                "think_tokens": think_tokens,
+                "plain_answer_tokens": answer_tokens}
+    if any(identity.get(key) != value for key, value in expected.items()):
+        raise ValueError(f"reused plain record identity mismatch: {path}")
+    return record
+
+
 def run(base, suite_path, output_dir, think_tokens=256, plain_answer_tokens=256,
-        device=None):
+        device=None, control_surrogate_scale=None, plain_from=None):
     suite_path, output_dir = Path(suite_path), Path(output_dir)
     suite = load_suite(suite_path)
     suite_hash, runner_hash = file_sha256(suite_path), _runner_sha256()
@@ -227,8 +241,20 @@ def run(base, suite_path, output_dir, think_tokens=256, plain_answer_tokens=256,
     records = {arm: {} for arm in ARMS}
     for arm in ARMS:
         for index, item in enumerate(suite["items"], 1):
-            identity = _identity(suite_hash, runner_hash, arm, item["id"],
-                                 think_tokens, plain_answer_tokens)
+            if arm == "plain" and plain_from is not None:
+                record = _load_reused_plain(
+                    plain_from, item, suite_hash, think_tokens, plain_answer_tokens)
+                records[arm][item["id"]] = record
+                print(json.dumps({"arm": arm, "item": index,
+                                  "items": len(suite["items"]),
+                                  "item_id": item["id"],
+                                  "chain_pass": record["score"]["automated_pass"],
+                                  "reused": True}), flush=True)
+                continue
+            identity = _identity(
+                suite_hash, runner_hash, arm, item["id"], think_tokens,
+                plain_answer_tokens,
+                control_surrogate_scale if arm == "host" else None)
             path = output_dir / arm / f"{item['id']}.json"
             record = _load_if_matching(path, identity)
             if record is None:
@@ -239,7 +265,7 @@ def run(base, suite_path, output_dir, think_tokens=256, plain_answer_tokens=256,
                 else:
                     record = _run_host_record(
                         model, tok, item, device, think_tokens,
-                        plain_answer_tokens, identity)
+                        plain_answer_tokens, identity, control_surrogate_scale)
                 _write_record(path, record)
             records[arm][item["id"]] = record
             print(json.dumps({"arm": arm, "item": index, "items": len(suite["items"]),
@@ -253,6 +279,8 @@ def run(base, suite_path, output_dir, think_tokens=256, plain_answer_tokens=256,
         "model": str(Path(base).resolve()), "device": device,
         "runner_sha256": runner_hash, "decoding": "greedy",
         "think_tokens": think_tokens,
+        "host_control_surrogate_scale": control_surrogate_scale,
+        "plain_source": str(Path(plain_from).resolve()) if plain_from else None,
         "plain_token_ceiling": "cycles * think_tokens + plain_answer_tokens",
         "plain_answer_tokens": plain_answer_tokens,
         "arms": {arm: _arm_summary(list(rows.values()))
@@ -284,9 +312,14 @@ def main():
     parser.add_argument("--think-tokens", type=int, default=256)
     parser.add_argument("--plain-answer-tokens", type=int, default=256)
     parser.add_argument("--device")
+    parser.add_argument("--control-surrogate-scale", type=float,
+                        help="host semantic view of each compiled control token")
+    parser.add_argument("--plain-from", type=Path,
+                        help="reuse validated plain records from this result root")
     args = parser.parse_args()
     report = run(args.base, args.suite, args.output_dir, args.think_tokens,
-                 args.plain_answer_tokens, args.device)
+                 args.plain_answer_tokens, args.device,
+                 args.control_surrogate_scale, args.plain_from)
     print(json.dumps({"output": str(args.output_dir / "summary.json"),
                       "plain": report["arms"]["plain"]["chain_pass"],
                       "host": report["arms"]["host"]["chain_pass"],

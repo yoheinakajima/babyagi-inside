@@ -1,114 +1,145 @@
-# BabyAGI v3 paired end-to-end results
+# BabyAGI v3 end-to-end results and parity correction
 
 ## Result
 
-The frozen 256-token JSON-ledger loop improved exact whole-chain success over
-one-turn thinking-enabled Qwen3.5-2B on the same 32 deterministic objectives:
+The compiled BabyAGI-style loop is a working systems result and a narrow
+arithmetic capability result. Across ten live compiled traces, all ten executed
+the expected controller phases, filesystem reads and writes, cycle pointer, and
+HALT with exact token accounting. Eight arithmetic traces solved their complete
+chains at lengths 2, 3, 5, or 8. Two structured-operation traces ran all eight
+cycles correctly at the systems level but produced the wrong task ledger and
+therefore failed the benchmark.
+
+This is stronger direct evidence than the host semantic simulator, but it is
+not a compiled-suite accuracy estimate: the ten traces were selected for
+diagnosis rather than sampled as a complete or representative set.
+
+## Post-run parity correction
+
+The first paired run reported host-loop success of 9/32 versus 5/32 for plain
+chat. A subsequent live-compile audit found that the stock-weight host harness
+omitted one semantic timestep present before every compiled stage. The compiled
+control symbol has a nonzero view in Qwen's pretrained dimensions:
+
+```text
+control embedding in native dimensions = 0.25 × newline embedding
+```
+
+The original host run therefore did not simulate the model context actually
+used by the compiled checkpoint. In particular, its two structured-operation
+successes were false positives. The 9/32 result is retained as an audit artifact
+but is superseded and must not be used as the paper headline.
+
+The corrected harness flushes pending visible tokens and feeds the control
+symbol's pretrained-stack embedding before every stage. It leaves the frozen
+benchmark, prompts, decoding, token budgets, and scorer unchanged. Reusing the
+validated plain records, the corrected paired diagnostic is:
 
 | arm | exact chains | chain accuracy | exact transitions | transition accuracy |
 | --- | ---: | ---: | ---: | ---: |
 | plain chat | 5/32 | 15.6% | 23/144 | 16.0% |
-| host JSON-ledger loop | 9/32 | 28.1% | 52/144 | 36.1% |
-| paired change | +4 | +12.5 points | +29 | +20.1 points |
+| control-aware host proxy | 7/32 | 21.9% | 35/144 | 24.3% |
+| paired change | +2 | +6.25 points | +12 | +8.3 points |
 
-The protocol retained all five plain-chat successes and added four successes:
+There were three host-proxy improvements and one host-proxy regression. The
+exact McNemar result is `p = 0.625`; the preregistered item bootstrap interval
+is `[-6.25, +18.75]` percentage points. This does not establish a statistical
+capability improvement.
 
-- `v3-arithmetic-multiply-2`
-- `v3-arithmetic-multiply-8`
-- `v3-structured-even-8`
-- `v3-structured-odd-8`
+All seven control-aware host successes are sequential arithmetic. The other
+categories remain at zero exact chains:
 
-There were zero paired regressions. The exact McNemar test over the four
-discordant items is `p = 0.125`, so this small suite does not establish a
-conventional significance claim. The preregistered item bootstrap interval for
-the paired delta is `[+3.1, +25.0]` percentage points. The loop achieved 180%
-of the plain-chat exact-chain ceiling (`28.1 / 15.6`).
-
-These are greedy bf16/MPS results on the frozen suite and suite hash in
-`babyagi-v3-end-to-end-preregistration.md`. No prompt or scorer was changed
-after observing the results.
-
-## Breakdown
-
-### By category
-
-| category | plain chains | host chains | plain transitions | host transitions |
+| category | plain chains | host-proxy chains | plain transitions | host-proxy transitions |
 | --- | ---: | ---: | ---: | ---: |
-| ordered literal | 0/8 | 0/8 | 0/36 | 1/36 |
+| ordered literal | 0/8 | 0/8 | 0/36 | 0/36 |
 | sequential arithmetic | 5/8 | 7/8 | 23/36 | 34/36 |
-| structured operation | 0/8 | 2/8 | 0/36 | 16/36 |
+| structured operation | 0/8 | 0/8 | 0/36 | 0/36 |
 | checkable language | 0/8 | 0/8 | 0/36 | 1/36 |
 
-The gain is therefore real but narrow: the loop materially helps arithmetic
-and recovers two eight-step structured chains, while literal and language
-chains remain unsolved.
+The host proxy is still an approximation because qwenFS file responses use
+extended embeddings that stock Qwen cannot consume directly. The harness feeds
+ordinary-token semantic surrogates for those responses. That remaining gap is
+material: the proxy stopped during the five-cycle multiply-first item, whereas
+the live compiled checkpoint completed it exactly. Host results are therefore
+prompt-screening and diagnostic evidence; live compiled traces are authoritative
+for compiled behavior.
 
-### By source-chain length
+## Live compiled evidence
 
-| cycles | plain chains | host chains | plain transitions | host transitions |
-| ---: | ---: | ---: | ---: | ---: |
-| 2 | 1/8 | 2/8 | 2/16 | 5/16 |
-| 3 | 1/8 | 1/8 | 3/24 | 4/24 |
-| 5 | 2/8 | 2/8 | 10/40 | 10/40 |
-| 8 | 1/8 | 4/8 | 8/64 | 33/64 |
+The four add-first traces were selected by the preregistered rule. The remaining
+six were diagnostic traces chosen after the first paired run: its four apparent
+host-only gains, the corrected host's additional three-cycle gain, and its
+apparent five-cycle regression.
 
-The largest difference appears at eight cycles, where decomposition and
-explicit state carry raise exact-chain success from 1/8 to 4/8.
+| item | cycles | benchmark result | controller / FS / HALT | exact result sequence |
+| --- | ---: | --- | --- | --- |
+| `v3-arithmetic-add-2` | 2 | pass | pass | `[9, 18]` |
+| `v3-arithmetic-add-3` | 3 | pass | pass | `[11, 22, 19]` |
+| `v3-arithmetic-add-5` | 5 | pass | pass | `[15, 30, 27, 32, 96]` |
+| `v3-arithmetic-add-8` | 8 | pass | pass | `[21, 42, 39, 44, 132, 124, 248, 257]` |
+| `v3-arithmetic-multiply-2` | 2 | pass | pass | `[21, 25]` |
+| `v3-arithmetic-multiply-3` | 3 | pass | pass | `[24, 29, 25]` |
+| `v3-arithmetic-multiply-5` | 5 | pass | pass | `[30, 37, 33, 66, 73]` |
+| `v3-arithmetic-multiply-8` | 8 | pass | pass | `[39, 49, 45, 90, 97, 194, 185, 196]` |
+| `v3-structured-even-8` | 8 | fail | pass | wrong ledger; 0/8 transitions |
+| `v3-structured-odd-8` | 8 | fail | pass | wrong ledger; 0/8 transitions |
 
-## Failure and plan diagnostics
+Every positive trace includes a model-written JSON ledger, one model-written
+result per cycle, state persisted through qwenFS, and bounded model-owned
+reasoning at each execute stage. Priority is a deterministic compiled ledger
+pointer, not a model-owned comparison. The multiply-first five-cycle trace is
+especially useful: the live checkpoint produced `[30, 37, 33, 66, 73]` even
+though the corrected host proxy stopped while closing its third write.
 
-The plain arm hit its registered maximum-new-token ceiling on all 32 items and
-failed result-array parsing on 24. A ceiling hit does not imply failure by
-itself: five capped generations still contained a correct parseable chain.
-The host arm had zero trace parse failures and zero external limit hits.
+The negative structured traces isolate the semantic failure from the machinery.
+Both checkpoints completed 24/24 phases and halted. The model instead created a
+ledger whose first task added the combined amount and whose remaining tasks each
+added one. The controller then faithfully executed that bad plan for eight
+cycles. This is a useful failure trace, not an agent-capability success.
 
-All 32 host ledgers parsed, and all 32 extracted `initial` values matched. The
-frozen exact task-string metric was nevertheless 0/32. This is a lexical
-fidelity failure, not a JSON failure: for example, the model wrote
-`multiply by 2` where the provenance string is
-`multiply the result by 2`. Some ledgers that fail this exact-string metric
-still execute every transition correctly. The result therefore supports
-reliable structured ledger extraction, but not verbatim reproduction of gold
-task clauses. A semantic plan scorer would be post hoc and is not substituted
-for the frozen metric here.
+All ten traces pass exact token-ownership accounting. For example, the
+five-cycle multiply-first trace emitted 3,448 tokens: 1,428 model-generated
+tokens, including 1,280 bounded-reasoning tokens, and 2,020 ROM, filesystem, or
+controller-forced tokens. The eight-cycle multiply-first trace emitted 5,610
+tokens and completed all 24 phases.
 
-## Live compiled traces
+## Plan diagnostics
 
-The preregistered selector chose the lexicographically first host success at
-each length, which was the add-first arithmetic item at 2, 3, 5, and 8 cycles.
-Each checkpoint passed the independent circuit oracle before live decoding.
-The live decoder received one objective prefill; every subsequent input was a
-sampled model token. qwenFS responses, phase transitions, the cycle pointer,
-and HALT were produced by the compiled model.
+All 32 control-aware host ledgers parsed, and 31/32 extracted `initial` values
+matched. The frozen exact task-string metric was 0/32 because semantically close
+phrases such as `multiply by 2` do not equal the provenance string
+`multiply the result by 2`. No post-hoc semantic scorer is substituted for that
+metric.
 
-| cycles | exact results | phases | controller / FS / HALT | emitted | model-generated | host answers exact |
-| ---: | --- | ---: | --- | ---: | ---: | ---: |
-| 2 | `[9, 18]` | 6/6 | pass | 1,475 | 583 | 3/3 |
-| 3 | `[11, 22, 19]` | 9/9 | pass | 2,094 | 861 | 4/4 |
-| 5 | `[15, 30, 27, 32, 96]` | 15/15 | pass | 3,376 | 1,416 | 6/6 |
-| 8 | `[21, 42, 39, 44, 132, 124, 248, 257]` | 24/24 | pass | 5,396 | 2,250 | 9/9 |
+The structured negative traces reveal a more important failure than lexical
+variation: the generated operations themselves are wrong. A future benchmark
+should report lexical fidelity and semantic task fidelity separately.
 
-Token ownership accounted exactly in every trace. The 8-cycle run contains
-2,048 model-owned reasoning tokens and 112 model-owned payload tokens; 3,146
-of 5,396 emitted tokens are controller or filesystem forced. All model-owned
-ledger/result answer spans match the corresponding host trace token-for-token.
-Private bounded reasoning does not match token-for-token because the compiled
-and host executions have different low-level contexts; answer equivalence is
-the relevant semantic comparison.
+## What the experiment supports
 
-These four selected traces are systems-equivalence evidence, not a full
-compiled-suite capability estimate. They also do not cover the host-only wins,
-because the frozen lexicographic selector chose the add-first family.
+The evidence supports this claim:
+
+> A pretrained Qwen3.5-2B checkpoint can execute an in-weight compiled
+> BabyAGI-style create-ledger / fixed-priority / execute / persist loop for at
+> least eight cycles, with model-owned JSON creation and bounded reasoning. On
+> the tested traces it reliably executes several sequential-arithmetic chains,
+> while structured task creation remains unsolved.
+
+It does not support broad autonomous planning, a model-owned prioritization
+claim, a statistically established improvement over plain chat, or a 32-item
+compiled accuracy claim. Establishing the latter requires live decoding all 32
+items or a new preregistered representative sample.
 
 ## Reproduction artifacts
 
-The machine-readable paired results are under the ignored directory
-`results/end-to-end-v3-b256/`:
+The ignored result roots are:
 
-- `summary.json`: suite-level and paired statistics;
-- `plain/` and `host/`: all 64 item records;
-- `compiled/`: live runs, controller/filesystem evaluations, token accounts,
-  and host-answer equivalence reports for 2, 3, 5, and 8 cycles.
+- `results/end-to-end-v3-b256/`: original paired run, four preregistered live
+  traces, and six diagnostic live traces;
+- `results/end-to-end-v3-b256-control-surrogate/`: corrected control-aware host
+  diagnostic and the validated reused plain records;
+- `results/end-to-end-v3-b256/control-surrogate-diagnostic/`: direct structured
+  parity reproduction.
 
 The compiled checkpoints are:
 
@@ -117,15 +148,13 @@ The compiled checkpoints are:
 - `build/babyagi-2b-ledger-pointer-b256-m5`
 - `build/babyagi-2b-ledger-pointer-b256-m8`
 
-Each checkpoint is approximately 8.8 GB. The exact paired-run command remains
-in the preregistration document.
+The corrected host diagnostic is reproduced with:
 
-## Interpretation
-
-This experiment supports the narrow claim that a pretrained 2B Qwen model can
-run a compiled BabyAGI-style create-ledger / fixed-priority / execute / persist
-loop for at least eight cycles, and that the tested JSON-ledger protocol can
-improve complete-chain execution over a one-turn baseline. It does not yet
-support broad autonomous planning: priority is a compiled cycle pointer, exact
-plan strings fail, the suite is deterministic, and two of four task categories
-remain at zero exact chains.
+```sh
+uv run python -m qfs.end_to_end models/Qwen3.5-2B \
+  benchmarks/babyagi-v3.json \
+  results/end-to-end-v3-b256-control-surrogate \
+  --think-tokens 256 --plain-answer-tokens 256 \
+  --control-surrogate-scale 0.25 \
+  --plain-from results/end-to-end-v3-b256 --device mps
+```
