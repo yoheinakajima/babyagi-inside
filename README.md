@@ -38,12 +38,12 @@ The script invokes the existing `qfs.agent` build command for `babyagi_ledger_po
 
 - Expected build time per checkpoint: `TODO(verify)`—no build-duration measurement is preserved in the tracked artifacts.
 - Expected peak memory: `TODO(verify)`—no peak-memory measurement is preserved in the tracked artifacts. Build one checkpoint at a time until this is measured.
-- Qwen3.5-2B source revision: `TODO(verify)`—the exact 2B snapshot hash is not recorded in tracked files or the local Hugging Face cache.
+- Qwen3.5-2B content pin: [`provenance/qwen3.5-2b.sha256`](provenance/qwen3.5-2b.sha256) records SHA-256 for the exact weights, config, tokenizer, and tokenizer config used locally. The upstream revision ID was not recorded.
 - qwenFS-derived compiler source: `48f4f45b6269bf8a0f27ea954a05b2caced929a6`; the repository documentation records upstream qwenFS baseline `fe3f5c0dbebe5c827781e98ad839aecebcce32fa`.
 
 ## Reproduce the ten archived live traces
 
-Requirements: Apple Silicon with MPS, the local `models/Qwen3.5-2B` base model, `uv`, and roughly 10 GB free disk per compiled checkpoint. These are the command forms implemented by the repository's existing CLI modules. Historical records confirm greedy decoding, seed 0, a 256-token reasoning span, and the checkpoint settings shown below. The exact historical base-model revision remains `TODO(verify)` before claiming byte-for-byte checkpoint reproduction.
+Requirements: Apple Silicon with MPS, the local `models/Qwen3.5-2B` base model matching [`provenance/qwen3.5-2b.sha256`](provenance/qwen3.5-2b.sha256), `uv`, and roughly 10 GB free disk per compiled checkpoint. These are the command forms implemented by the repository's existing CLI modules. Historical records confirm greedy decoding, seed 0, a 256-token reasoning span, and the checkpoint settings shown below.
 
 Build the four cycle-specific checkpoints:
 
@@ -110,6 +110,7 @@ These ten traces were selected for diagnosis, not sampled to estimate accuracy. 
 ## Credits and licenses
 
 - [qwenFS](https://github.com/vixhal-baraiya/qwenFS) by Vixhal Baraiya supplies the compiled filesystem foundation and is MIT-licensed.
+- The original filesystem demo video remains available in the upstream [qwenFS repository](https://github.com/vixhal-baraiya/qwenFS); it is not duplicated here.
 - [Qwenputer](https://github.com/divagr18/qwenputer) by Divyansh Agrawal is credited for compiler lineage.
 - [Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B) is provided by the Qwen team under Apache License 2.0.
 - BabyAGI was created by Yohei Nakajima.

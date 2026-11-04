@@ -1,0 +1,4 @@
+aa33250c4fc64891ddfaba3a314fd9542ea371843c387178b425fbcc5ed680b1  models/Qwen3.5-2B/model.safetensors-00001-of-00001.safetensors
+ed1c1723241f23f7f4e23430759cbd7dcfb4103cbdfe052bfe7626b57c2615b4  models/Qwen3.5-2B/config.json
+5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42  models/Qwen3.5-2B/tokenizer.json
+49e2b6e395f959f077f1e992b338919c0d4a9732fc6e613995e06557f843500c  models/Qwen3.5-2B/tokenizer_config.json
