@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BabyAGI Inside</title>
+<meta name="description" content="A bounded agent loop compiled into the weights of Qwen3.5-2B. No training. The host only samples tokens until the model halts itself.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: an instrument panel. One live replay at the top, then short evidence sections on a quiet ruled grid. */
+:root{
+  --bg:#FAFAF7;
+  --panel:#FFFFFD;
+  --tint:#F3F3EE;
+  --ink:#171717;
+  --muted:#696961;
+  --rule:#DCDCD4;
+  --accent:#0550AE;
+  --circuit:#97978E;
+  --circuit-ink:#3D3D38;
+  --qwen:#2A78D6;
+  --qwen-soft:#9CC0EE;
+  --qwen-tint:#E3EEFB;
+  --fs:#087D26;
+  --fs-tint:#E2F2E5;
+  --pick:#A76900;
+  --halt:#9A2D25;
+  --halt-tint:#F9E7E5;
+  --off:#EBEBE4;
+  --deep:#2B2B28;
+  --deep-ink:#FAFAF7;
+  --deep-muted:#B3B3A9;
+  --deep-accent:#8FBCFF;
+  --font-display:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1C1A;--panel:#232321;--tint:#262624;--ink:#ECECE6;--muted:#A3A39A;--rule:#383834;--accent:#8FBCFF;--circuit:#6E6E66;--circuit-ink:#C9C9C0;--qwen:#7FB2F0;--qwen-soft:#3E5F8C;--qwen-tint:#1E2A3A;--fs:#6FD08A;--fs-tint:#1B3123;--pick:#E8B04A;--halt:#FF9A8F;--halt-tint:#3A201D;--off:#2C2C29;--deep:#2E2E2B;--deep-ink:#FAFAF7;--deep-muted:#B3B3A9;--deep-accent:#8FBCFF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1C1A;--panel:#232321;--tint:#262624;--ink:#ECECE6;--muted:#A3A39A;--rule:#383834;--accent:#8FBCFF;--circuit:#6E6E66;--circuit-ink:#C9C9C0;--qwen:#7FB2F0;--qwen-soft:#3E5F8C;--qwen-tint:#1E2A3A;--fs:#6FD08A;--fs-tint:#1B3123;--pick:#E8B04A;--halt:#FF9A8F;--halt-tint:#3A201D;--off:#2C2C29;--deep:#2E2E2B;--deep-ink:#FAFAF7;--deep-muted:#B3B3A9;--deep-accent:#8FBCFF;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+a{color:var(--accent);text-decoration:none;text-underline-offset:3px}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:#CFE3FF}
+main a[href^="http"]:not(.btn)::after{content:" ↗";font-family:var(--font-mono);font-size:.85em;color:var(--muted)}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+code,.mono{font-family:var(--font-mono)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.measure{max-width:66ch}
+header.top{border-bottom:1px solid var(--rule)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:14px;letter-spacing:0;color:var(--ink);text-decoration:none}
+nav.links{display:flex;gap:20px;flex-wrap:wrap;font-size:15px}
+nav.links a{color:var(--muted);text-decoration:none}
+nav.links a:hover{color:var(--ink)}
+
+/* Hero */
+.hero{padding-top:56px;padding-bottom:28px}
+.kicker{font-family:var(--font-mono);font-size:13px;letter-spacing:0;color:var(--muted)}
+.hero h1{font-family:var(--font-body);font-weight:600;font-size:clamp(44px,8vw,88px);line-height:1.02;letter-spacing:-.035em;margin:14px 0 18px}
+.hero h1 .cursor{display:inline-block;width:.5em;height:.8em;background:var(--accent);margin-left:.1em;vertical-align:-.04em;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lead{font-size:clamp(19px,2.2vw,23px);line-height:1.45;max-width:46ch}
+.lead b{font-weight:600}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:0;border:1px solid var(--rule);background:var(--panel);color:var(--ink);font-weight:500;font-size:15px;text-decoration:none;cursor:pointer;font-family:var(--font-body)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.note-pending{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+
+/* Player */
+.player{margin-top:36px;background:var(--panel);border:1px solid var(--rule);border-radius:0;overflow:hidden}
+.player-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--rule)}
+.player-bar .title{font-family:var(--font-mono);font-size:13px;letter-spacing:0;color:var(--muted)}
+.controls{display:flex;gap:8px}
+.controls button{min-height:36px;padding:0 14px;border-radius:0;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:var(--font-mono);font-size:13px;cursor:pointer}
+.controls button:hover{border-color:var(--ink)}
+.cols{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr) minmax(0,1fr);gap:0}
+.col{padding:18px;border-right:1px solid var(--rule);min-width:0}
+.col:last-child{border-right:none}
+.cap{font-family:var(--font-mono);font-size:12px;letter-spacing:0;color:var(--muted);margin-bottom:12px}
+.code{font-family:var(--font-mono);font-size:13.5px;line-height:1;display:flex;flex-direction:column;gap:2px}
+.code .ln{padding:7px 10px;border-radius:0;white-space:pre;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.code .ln .c{color:var(--muted)}
+.code .ln.on{background:var(--qwen-tint)}
+.code .ln.on.k-f{background:var(--off)}
+.code .ln.on.k-s{background:var(--fs-tint)}
+.code .ln.on.k-x{background:var(--halt-tint)}
+.objective{margin-top:16px;padding:12px 14px;border:1px solid var(--rule);border-radius:0;font-size:14px;line-height:1.45;color:var(--muted)}
+.objective b{color:var(--ink);font-weight:600}
+.out{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:14px;margin-bottom:12px;min-height:22px}
+.out .who{font-weight:600}
+.lanes-head,.lane-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.lanes-head{font-family:var(--font-mono);font-size:12px;margin-bottom:6px;text-align:center}
+.lanes{display:flex;flex-direction:column;gap:1px;height:288px;overflow:hidden}
+.lane-row{height:5px;flex-shrink:0}
+.lane-row i{display:block;height:5px;border-radius:2px;background:var(--off)}
+.lane-row i.f{background:var(--circuit)}
+.lane-row i.x{background:var(--halt)}
+.lane-row i.s{background:var(--fs)}
+.lane-row i.q{background:var(--qwen)}
+.lane-row i.t{background:var(--qwen-soft)}
+.decides{margin-top:12px;display:grid;gap:6px;font-size:14px}
+.decides div{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:0;border:1px solid var(--rule)}
+.decides div.on{border-color:var(--ink)}
+.decides .tag{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{font-family:var(--font-mono);font-size:12px;padding:6px 10px;border-radius:0;border:1px solid var(--rule);color:var(--muted)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.results{display:grid;gap:5px;margin-bottom:14px}
+.res{display:flex;align-items:center;gap:12px;height:34px;padding:0 12px;border-radius:0;border:1px solid var(--rule);font-family:var(--font-mono);font-size:14px;color:var(--muted)}
+.res b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.res.done{background:var(--fs-tint);border-color:transparent}
+.res.now{border:2px solid var(--pick)}
+.count{font-size:15px;line-height:1.5}
+.count .big{font-family:var(--font-mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.count .q{color:var(--qwen)}
+.tape{display:flex;gap:1px;height:16px;margin-top:12px}
+.tape i{flex:1;border-radius:1px;background:var(--off)}
+.tape i.f{background:var(--circuit)}.tape i.s{background:var(--fs)}.tape i.q{background:var(--qwen)}.tape i.t{background:var(--qwen-soft)}.tape i.x{background:var(--halt)}
+.tape i.off{opacity:.25}
+.player-foot{padding:12px 18px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.key{display:flex;gap:14px;flex-wrap:wrap}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* Sections */
+section.s{padding:72px 0;border-top:1px solid var(--rule)}
+.s-head{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:24px;align-items:start;margin-bottom:28px}
+.s-num{font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:0;padding-top:8px}
+.s-head h2{font-size:clamp(28px,3.6vw,40px);line-height:1.12;letter-spacing:-.015em;font-weight:600}
+.s-head p{margin-top:12px;color:var(--muted);max-width:62ch}
+.s-body{margin-left:244px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:22px}
+.card h3{font-size:14px;font-family:var(--font-mono);font-weight:500;color:var(--muted);letter-spacing:0;margin-bottom:14px}
+.card.us{border-color:var(--ink)}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:14px}
+.node{padding:10px 14px;border-radius:0;border:2px solid var(--circuit);background:var(--off)}
+.node.q{border-color:var(--qwen);background:var(--qwen-tint)}
+.arrow{color:var(--muted)}
+.card p{font-size:15px;color:var(--muted);margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:0;color:var(--muted);padding:0 14px 10px 0;border-bottom:1px solid var(--ink)}
+td{padding:11px 14px 11px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+tr.us td{font-weight:600}
+.drive{font-family:var(--font-mono);font-size:13px;padding:2px 8px;border-radius:0;background:var(--qwen-tint);color:var(--qwen);white-space:nowrap}
+tr.us .drive{background:var(--ink);color:var(--bg)}
+.table-box{overflow-x:auto}
+.small{font-size:14px;color:var(--muted);margin-top:14px}
+.diagram{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:16px;overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:640px;height:auto}
+.trace{background:var(--panel);border:1px solid var(--rule);border-radius:0;overflow:hidden}
+.tr{display:grid;grid-template-columns:110px minmax(0,1fr);border-bottom:1px solid var(--rule)}
+.tr:last-child{border-bottom:none}
+.tr .who{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:12px 14px;border-right:3px solid var(--circuit);color:var(--muted)}
+.tr.q .who{border-right-color:var(--qwen);color:var(--qwen)}
+.tr.t .who{border-right-color:var(--qwen-soft);color:var(--qwen)}
+.tr.s .who{border-right-color:var(--fs);color:var(--fs)}
+.tr.x .who{border-right-color:var(--halt);color:var(--halt)}
+.tr .txt{font-family:var(--font-mono);font-size:13.5px;padding:12px 16px;white-space:pre-wrap;word-break:break-word}
+.tr .txt em{font-style:normal;color:var(--muted)}
+.checks{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.checks li{display:flex;gap:10px;align-items:baseline;font-size:15px}
+.mark{font-family:var(--font-mono);font-weight:600;width:22px;flex-shrink:0}
+.mark.ok{color:var(--fs)}.mark.no{color:var(--halt)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:28px}
+.tile{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:18px}
+.tile .n{font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile .l{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.4}
+.isnt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.isnt ul{margin:0;padding-left:18px;display:grid;gap:10px;font-size:15px}
+pre.bib{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:16px;font-size:13px;overflow-x:auto;margin:0}
+.copy-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+#paper{background:var(--deep);color:var(--deep-ink);border-top:none}
+#paper .s-num,#paper .s-head p,#paper .cap{color:var(--deep-muted)}
+#paper a{color:var(--deep-accent)}
+#paper .btn{background:transparent;color:var(--deep-ink);border-color:#5a5a55}
+#paper .btn.primary{background:var(--deep-ink);color:var(--deep);border-color:var(--deep-ink)}
+#paper pre.bib{background:#232321;border-color:#45453f;color:var(--deep-ink)}
+footer{border-top:1px solid var(--rule);padding:32px 0 48px;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width: 980px){
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .col{border-right:none;border-bottom:1px solid var(--rule)}
+  .col:last-child{border-bottom:none}
+  .lanes{height:160px}
+  .s-head{grid-template-columns:minmax(0,1fr);gap:6px}
+  .s-body{margin-left:0}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 640px){
+  .grid2,.isnt{grid-template-columns:minmax(0,1fr)}
+  .tr{grid-template-columns:minmax(0,1fr)}
+  .tr .who{border-right:none;border-left:3px solid var(--circuit);padding-bottom:4px}
+  .tr.q .who,.tr.t .who{border-left-color:var(--qwen)}.tr.s .who{border-left-color:var(--fs)}.tr.x .who{border-left-color:var(--halt)}
+  .tiles{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero h1 .cursor{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">BabyAGI&nbsp;Inside</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#replay">Replay</a>
+      <a href="#arrow">What's new</a>
+      <a href="#cycle">How it works</a>
+      <a href="#results">Results</a>
+      <a href="#paper">Paper</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap hero">
+  <div class="kicker">research prototype · nov 2026 · yohei nakajima</div>
+  <h1>BabyAGI Inside<span class="cursor" aria-hidden="true"></span></h1>
+  <p class="lead">A bounded agent loop, compiled into the weights of <b>Qwen3.5-2B</b>. No training. After one prompt, the host only samples tokens until the model halts itself.</p>
+  <div class="cta">
+    <a class="btn primary" href="#paper">Read the paper</a>
+    <a class="btn" href="[REPO URL]">Code</a>
+    <a class="btn" href="#replay">Watch a run</a>
+  </div>
+
+  <div class="player" id="replay" aria-label="Replay of a live compiled run">
+    <div class="player-bar">
+      <span class="title">run/multiply-first-5 · live compiled · replay</span>
+      <div class="controls">
+        <button type="button" id="btn-play" aria-pressed="false">Pause</button>
+        <button type="button" id="btn-restart">Restart</button>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <div class="cap">loop · compiled into the weights</div>
+        <div class="code" id="code"></div>
+        <div class="objective"><b>Objective:</b> one unseen five-step arithmetic chain (multiply-first). It is the only input. Everything after it is emitted by the checkpoint.</div>
+      </div>
+      <div class="col">
+        <div class="cap">emitter · who writes each token</div>
+        <div class="out"><span>out</span><span class="who" id="out-who">forced by circuit</span></div>
+        <div class="lanes-head"><span style="color:var(--circuit-ink)">circuit</span><span style="color:var(--fs)">qwenFS</span><span style="color:var(--qwen)">Qwen</span></div>
+        <div class="lanes" id="lanes" aria-hidden="true"></div>
+        <div class="decides">
+          <div id="d-comp"><span>Compiled layers</span><span class="tag" id="d-comp-tag">decides</span></div>
+          <div id="d-qwen"><span>Qwen's 24 layers</span><span class="tag" id="d-qwen-tag">runs</span></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="cap">state</div>
+        <div class="chips" id="chips"></div>
+        <div class="results" id="results"></div>
+        <div class="count">
+          <div><span class="big" id="c-tok">0</span> <span class="mono" style="color:var(--muted)">/ 3,448 tokens</span></div>
+          <div>written by Qwen: <b class="q mono" id="c-q">0</b> <span style="color:var(--muted)">(<span class="mono" id="c-t">0</span> thinking)</span></div>
+        </div>
+        <div class="tape" id="tape" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="player-foot">
+      <div class="key">
+        <span><i style="background:var(--circuit)"></i>circuit</span>
+        <span><i style="background:var(--fs)"></i>qwenFS</span>
+        <span><i style="background:var(--qwen-soft)"></i>Qwen thinking</span>
+        <span><i style="background:var(--qwen)"></i>Qwen writing</span>
+        <span><i style="background:var(--halt)"></i>HALT</span>
+      </div>
+      <span>Totals and results are exact. Order within each phase is reconstructed; compiled tokens play fast-forward.</span>
+    </div>
+  </div>
+</div>
+
+<section class="s" id="arrow">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§01 what's new</div>
+      <div>
+        <h2>The arrow flips</h2>
+        <p>A wave of projects compiles machines into Qwen's weights: a CPU, a GPU, a filesystem, a TPU, a Linux box. In each, Qwen calls the machine. Here the compiled loop calls Qwen.</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="grid2">
+        <div class="card">
+          <h3>everyone else</h3>
+          <div class="flow"><span class="node q">Qwen</span><span class="arrow">tool call →</span><span class="node">compiled machine</span></div>
+          <p>Qwen is the agent. It decides when to use the CPU, GPU or filesystem compiled into its weights.</p>
+        </div>
+        <div class="card us">
+          <h3>babyagi inside</h3>
+          <div class="flow"><span class="node">compiled loop</span><span class="arrow">every step →</span><span class="node q">Qwen</span></div>
+          <p>The loop decides when Qwen speaks and where its words go. Qwen decides what to say.</p>
+        </div>
+      </div>
+      <div class="table-box" style="margin-top:24px">
+        <table>
+          <thead><tr><th>Project</th><th>Base</th><th>Compiled in</th><th>Who drives</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/divagr18/qwenputer">Qwenputer</a></td><td class="num">4B</td><td>RISC-V CPU, filesystem</td><td><span class="drive">Qwen → CPU</span></td></tr>
+            <tr><td><a href="https://github.com/vixhal-baraiya/qwenFS">qwenFS</a></td><td class="num">2B</td><td>Filesystem, 7 tools</td><td><span class="drive">Qwen → files</span></td></tr>
+            <tr><td><a href="https://github.com/vixhal-baraiya/qwenGPU">qwenGPU</a></td><td class="num">2B</td><td>SIMT GPU running CUDA</td><td><span class="drive">Qwen → GPU</span></td></tr>
+            <tr><td><a href="https://github.com/Bobliuuu/qwentpu">qwenTPU</a></td><td class="num">0.8–4B</td><td>Matrix-multiply array</td><td><span class="drive">Qwen → TPU</span></td></tr>
+            <tr><td><a href="https://github.com/itsrealranky/linuxformer">linuxformer</a></td><td class="num">4B</td><td>CPU that boots Linux</td><td><span class="drive">Qwen → shell</span></td></tr>
+            <tr class="us"><td>BabyAGI Inside</td><td class="num">2B</td><td>Agent loop, task ledger, halt, on qwenFS</td><td><span class="drive">loop → Qwen</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Related precedents: workflows internalized by fine-tuning (<a href="https://arxiv.org/abs/2605.22502">Dennis et al.</a>), compiled modules gated with a pretrained LM (<a href="https://arxiv.org/html/2304.01665v3">Neural Comprehension</a>), and a compiled oversight monitor inside Qwen (<a href="https://divagr.com/blog/building-oversight-tools-into-a-models-weights">Agrawal</a>). BabyAGI Inside is training-free and runs a whole multi-cycle task loop.</p>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="cycle">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§02 how it works</div>
+      <div>
+        <h2>One cycle, repeated N times</h2>
+        <p>The weights implement the controller and the filesystem. The ledger and results a run produces live in its inference state. Qwen writes only inside the blue boxes; every transition between boxes is compiled.</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="diagram">
+        <svg viewBox="0 0 760 330" role="img" aria-label="One cycle of the compiled loop: point to task, think, write result, persist; repeated N times, then HALT">
+          <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+          <rect x="24" y="150" width="712" height="156" rx="0" fill="var(--off)" stroke="var(--rule)"/>
+          <g fill="none" stroke="var(--muted)" stroke-width="1.25">
+            <path d="M188 100H218" marker-end="url(#ar)"/>
+            <path d="M292 128V172H114V192" marker-end="url(#ar)"/>
+            <path d="M188 220H218" marker-end="url(#ar)"/>
+            <path d="M366 220H396" marker-end="url(#ar)"/>
+            <path d="M544 220H572" marker-end="url(#ar)"/>
+            <path d="M646 248V270H114V248" marker-end="url(#ar)"/>
+            <path d="M646 192V128" marker-end="url(#ar)"/>
+          </g>
+          <g font-family="IBM Plex Sans, system-ui, sans-serif" text-anchor="middle">
+            <rect x="40" y="72" width="148" height="56" rx="0" fill="none" stroke="var(--circuit)" stroke-dasharray="4 4" stroke-width="1.25"/>
+            <text x="114" y="98" font-size="13" font-weight="600" fill="var(--ink)">Objective prefill</text>
+            <text x="114" y="116" font-size="11.5" fill="var(--muted)">host, once</text>
+            <rect x="218" y="72" width="148" height="56" rx="0" fill="var(--qwen-tint)" stroke="var(--qwen)" stroke-width="2"/>
+            <text x="292" y="98" font-size="13" font-weight="600" fill="var(--ink)">Create task ledger</text>
+            <text x="292" y="116" font-size="11.5" fill="var(--muted)">Qwen writes JSON</text>
+            <rect x="572" y="72" width="148" height="56" rx="0" fill="var(--panel)" stroke="var(--halt)" stroke-width="2"/>
+            <text x="646" y="98" font-size="13" font-weight="600" fill="var(--ink)">HALT</text>
+            <text x="646" y="116" font-size="11.5" fill="var(--muted)">circuit</text>
+            <rect x="40" y="192" width="148" height="56" rx="0" fill="var(--panel)" stroke="var(--circuit)" stroke-width="1.25"/>
+            <text x="114" y="218" font-size="13" font-weight="600" fill="var(--ink)">Point to task</text>
+            <text x="114" y="236" font-size="11.5" fill="var(--muted)">circuit, fixed order</text>
+            <rect x="218" y="192" width="148" height="56" rx="0" fill="var(--qwen-tint)" stroke="var(--qwen)" stroke-width="2"/>
+            <text x="292" y="218" font-size="13" font-weight="600" fill="var(--ink)">Think (256)</text>
+            <text x="292" y="236" font-size="11.5" fill="var(--muted)">Qwen, span forced shut</text>
+            <rect x="396" y="192" width="148" height="56" rx="0" fill="var(--qwen-tint)" stroke="var(--qwen)" stroke-width="2"/>
+            <text x="470" y="218" font-size="13" font-weight="600" fill="var(--ink)">Write result</text>
+            <text x="470" y="236" font-size="11.5" fill="var(--muted)">Qwen</text>
+            <rect x="572" y="192" width="148" height="56" rx="0" fill="var(--fs-tint)" stroke="var(--fs)" stroke-width="2"/>
+            <text x="646" y="218" font-size="13" font-weight="600" fill="var(--ink)">Persist result</text>
+            <text x="646" y="236" font-size="11.5" fill="var(--muted)">qwenFS, read back</text>
+            <text x="380" y="263" font-size="11.5" fill="var(--muted)">next cycle</text>
+            <text x="676" y="146" font-size="11.5" fill="var(--muted)">after N</text>
+            <text x="40" y="296" font-size="11.5" fill="var(--muted)" text-anchor="start">Repeats N times; N is fixed when the checkpoint is built (2, 3, 5 or 8)</text>
+          </g>
+        </svg>
+      </div>
+      <div class="grid2" style="margin-top:20px">
+        <div class="card">
+          <h3>host.py · the whole runtime</h3>
+<pre class="mono" style="margin:0;font-size:14px;line-height:1.6;overflow-x:auto">ids = prefill(objective) + [START]
+while ids[-1] != HALT:
+    ids.append(argmax(model(ids)))</pre>
+          <p>No scheduler, parser, tool executor, retry logic or logits processor. Every prompt, tool call, file response and control symbol after the objective comes from the checkpoint.</p>
+        </div>
+        <div class="card">
+          <h3>2023 → 2026</h3>
+          <p style="margin-top:0">BabyAGI (2023) was a Python loop around GPT-4: create, prioritize, execute, store. Here what Python did is compiled and what GPT-4 did, Qwen does, in a simplified form: one up-front plan, fixed-order prioritization and a cycle count fixed at build. The checkpoint widens Qwen's residual stream to 4,096 and leaves Qwen's own weights unchanged apart from norm rescaling.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="trace">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§03 inside a run</div>
+      <div>
+        <h2>One cycle, token by token</h2>
+        <p>Abridged excerpt of cycle 2 of the five-cycle multiply-first run. Each row is labeled by who emitted it. Token text is shown schematically; full traces are in the repository.</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="trace">
+        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; read_file result.txt &lt;/tool_call&gt;</div></div>
+        <div class="tr s"><div class="who">qwenFS</div><div class="txt">&lt;tool_response&gt; 30 &lt;/tool_response&gt;   <em>cycle 1's result, read back exactly</em></div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">Cycle 2/5. Next task from the ledger: …   <em>the pointer advances</em></div></div>
+        <div class="tr t"><div class="who">Qwen · think</div><div class="txt">&lt;think&gt; … 256 tokens of Qwen's own reasoning … &lt;/think&gt;   <em>closed by the circuit at 256</em></div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; write_file result.txt   <em>the circuit opens the write</em></div></div>
+        <div class="tr q"><div class="who">Qwen · write</div><div class="txt">37 &lt;/tool_call&gt;   <em>Qwen writes the result and closes the call</em></div></div>
+        <div class="tr s"><div class="who">qwenFS</div><div class="txt">saved result.txt</div></div>
+        <div class="tr x"><div class="who">circuit</div><div class="txt">… three more cycles … HALT   <em>after cycle 5: 30, 37, 33, 66, 73</em></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="wrong-plan">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§04 a revealing failure</div>
+      <div>
+        <h2>A wrong plan, executed faithfully</h2>
+        <p>On two eight-cycle structured tasks, the loop did everything it was built to do. The plan Qwen wrote was wrong, and the loop carried it out for eight cycles. Because orchestration is fixed, the failure is visible at the point where it happens.</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="grid2">
+        <div class="card">
+          <h3>what the loop did</h3>
+          <ul class="checks">
+            <li><span class="mark ok">✓</span>24 of 24 phases, in order</li>
+            <li><span class="mark ok">✓</span>Every file write and exact read-back</li>
+            <li><span class="mark ok">✓</span>Eight cycles, then HALT</li>
+            <li><span class="mark ok">✓</span>Every token accounted to its owner</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>what qwen planned</h3>
+          <ul class="checks">
+            <li><span class="mark no">✗</span>Task 1 added the combined amount</li>
+            <li><span class="mark no">✗</span>Tasks 2 to 8 each added one</li>
+            <li><span class="mark no">✗</span>0 of 8 transitions correct</li>
+          </ul>
+          <p>The same pattern in both structured traces. Arithmetic chains, where the plan is easy, came out right every time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="results">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§05 results</div>
+      <div>
+        <h2>It runs as built</h2>
+        <p>Ten live traces on the compiled checkpoint, two to eight cycles, Apple M5 (MPS, bf16). The four add-first traces were chosen by a preregistered rule; the other six were chosen afterwards for diagnosis.</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="tiles">
+        <div class="tile"><div class="n">10/10</div><div class="l">live traces completed every phase and halted</div></div>
+        <div class="tile"><div class="n">1,716</div><div class="l">of 1,716 forced tokens matched the reference</div></div>
+        <div class="tile"><div class="n">8/8</div><div class="l">arithmetic chains solved, up to 8 cycles</div></div>
+        <div class="tile"><div class="n">41%</div><div class="l">of a five-cycle run written by Qwen, mostly thinking</div></div>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Trace</th><th>Cycles</th><th>Loop</th><th>Task</th><th>Results</th></tr></thead>
+          <tbody>
+            <tr><td>arithmetic-add-2</td><td class="num">2</td><td>ran</td><td>pass</td><td class="num">9, 18</td></tr>
+            <tr><td>arithmetic-add-3</td><td class="num">3</td><td>ran</td><td>pass</td><td class="num">11, 22, 19</td></tr>
+            <tr><td>arithmetic-add-5</td><td class="num">5</td><td>ran</td><td>pass</td><td class="num">15, 30, 27, 32, 96</td></tr>
+            <tr><td>arithmetic-add-8</td><td class="num">8</td><td>ran</td><td>pass</td><td class="num">21, 42, 39, 44, 132, 124, 248, 257</td></tr>
+            <tr><td>arithmetic-multiply-2</td><td class="num">2</td><td>ran</td><td>pass</td><td class="num">21, 25</td></tr>
+            <tr><td>arithmetic-multiply-3</td><td class="num">3</td><td>ran</td><td>pass</td><td class="num">24, 29, 25</td></tr>
+            <tr><td>arithmetic-multiply-5</td><td class="num">5</td><td>ran</td><td>pass</td><td class="num">30, 37, 33, 66, 73</td></tr>
+            <tr><td>arithmetic-multiply-8</td><td class="num">8</td><td>ran</td><td>pass</td><td class="num">39, 49, 45, 90, 97, 194, 185, 196</td></tr>
+            <tr><td>structured-even-8</td><td class="num">8</td><td>ran</td><td>fail</td><td>wrong plan, 0/8</td></tr>
+            <tr><td>structured-odd-8</td><td class="num">8</td><td>ran</td><td>fail</td><td>wrong plan, 0/8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">With the loop inactive, the merged checkpoint closely matches stock Qwen on the tested prefixes (top-1 4/4, KL ≤ 0.002). A full 32-item compiled evaluation is in progress.</p>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="scope">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§06 scope</div>
+      <div><h2>What this is, and what it isn't</h2></div>
+    </div>
+    <div class="s-body isnt">
+      <div class="card">
+        <h3>it is</h3>
+        <ul>
+          <li>A working prototype of an agent loop compiled into a pretrained model's weights, without training.</li>
+          <li>A checkpoint whose host loop only samples tokens.</li>
+          <li>A way to see exactly which tokens the model wrote, and where it went wrong.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>it isn't</h3>
+        <ul>
+          <li>A smarter Qwen. Capability is still a 2B model's.</li>
+          <li>Unbounded. The cycle count is fixed when the checkpoint is built.</li>
+          <li>Proven for every possible output. Validation covers the tested traces on Apple MPS, bf16.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="paper">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§07 paper and code</div>
+      <div>
+        <h2>BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights</h2>
+        <p>Yohei Nakajima, 2026. Built on <a href="https://github.com/vixhal-baraiya/qwenFS">qwenFS</a> by Vixhal Baraiya, whose compiler lineage traces to <a href="https://github.com/divagr18/qwenputer">Qwenputer</a> by Divyansh Agrawal. Inspired by <a href="https://github.com/yoheinakajima/babyagi">BabyAGI</a> (2023).</p>
+      </div>
+    </div>
+    <div class="s-body">
+      <div class="cta" style="margin-top:0;margin-bottom:24px">
+        <a class="btn primary" href="[ZENODO DOI URL]">Paper (PDF, DOI)</a>
+        <a class="btn" href="[REPO URL]">Code and traces</a>
+      </div>
+      <div class="copy-row"><span class="cap" style="margin:0">cite</span><button type="button" class="btn" id="btn-copy" style="min-height:36px">Copy BibTeX</button></div>
+<pre class="bib mono" id="bib">@misc{nakajima2026babyagiinside,
+  author = {Nakajima, Yohei},
+  title  = {BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights},
+  year   = {2026},
+  doi    = {[ZENODO DOI]},
+  url    = {https://babyagi.yohei.me}
+}</pre>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>BabyAGI Inside · a research prototype by Yohei Nakajima</span>
+    <span class="mono">host: sample() until HALT</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Five-cycle multiply-first trace. Totals are exact: 3,448 tokens, 2,020 forced, 1,428 by Qwen (1,280 thinking).
+  // Per-phase split is reconstructed from those totals until per-stage accounting is published.
+  var RESULTS = [30, 37, 33, 66, 73];
+  var phases = [];
+  phases.push({ph:'create', segs:[['f',279],['q',63],['s',20]]});
+  for (var c = 1; c <= 5; c++) {
+    phases.push({ph:'read', cyc:c, segs:[['f',20],['s',60]]});
+    phases.push({ph:'point', cyc:c, segs:[['f',64]]});
+    phases.push({ph:'think', cyc:c, segs:[['f',40],['t',256]]});
+    phases.push({ph:'write', cyc:c, segs:[['f',100],['q',17]]});
+    phases.push({ph:'persist', cyc:c, segs:[['s',60]]});
+  }
+  phases.push({ph:'halt', cyc:5, segs:[['x',1]]});
+  var RATE = {f:420, s:320, t:120, q:12, x:2};
+
+  var segs = [], kinds = [], t0 = 0, tok0 = 0;
+  phases.forEach(function(p, pi){
+    p.segs.forEach(function(s){
+      segs.push({k:s[0], n:s[1], rate:RATE[s[0]], t0:t0, tok0:tok0, pi:pi});
+      t0 += s[1] / RATE[s[0]]; tok0 += s[1];
+      for (var i = 0; i < s[1]; i++) kinds.push(s[0]);
+    });
+  });
+  var TOTAL_T = t0, TOTAL = tok0, HOLD = 4;
+
+  var codeDefs = [
+    ['create', 'ledger = qwen.write(plan)', ''],
+    ['', 'for cycle in 1..5:', ''],
+    ['read', '  state  = fs.read(result)', ''],
+    ['point', '  task   = ledger.next()', '   # circuit'],
+    ['think', '  think  = qwen.think(256)', ''],
+    ['write', '  result = qwen.write(task)', ''],
+    ['persist', '  fs.save(result)', ''],
+    ['halt', 'HALT', '                     # circuit']
+  ];
+  var phaseKind = {create:'q', read:'s', point:'f', think:'q', write:'q', persist:'s', halt:'x'};
+  var codeEl = document.getElementById('code');
+  var lines = codeDefs.map(function(d){
+    var el = document.createElement('div'); el.className = 'ln';
+    el.appendChild(document.createTextNode(d[1]));
+    if (d[2]) { var s = document.createElement('span'); s.className = 'c'; s.textContent = d[2]; el.appendChild(s); }
+    codeEl.appendChild(el); return {ph:d[0], el:el};
+  });
+
+  var chipDefs = [['read','read'],['point','point'],['think','think'],['write','write'],['persist','persist'],['halt','HALT']];
+  var chipsEl = document.getElementById('chips');
+  var chips = chipDefs.map(function(d){ var el = document.createElement('span'); el.className = 'chip'; el.textContent = d[1]; chipsEl.appendChild(el); return {ph:d[0], el:el}; });
+
+  var resEl = document.getElementById('results');
+  var resRows = RESULTS.map(function(v, i){
+    var el = document.createElement('div'); el.className = 'res';
+    el.innerHTML = '<span>cycle ' + (i + 1) + '</span><b>·</b>';
+    resEl.appendChild(el); return el;
+  });
+
+  var ROWS = 56, lanesEl = document.getElementById('lanes'), laneCells = [];
+  for (var r = 0; r < ROWS; r++) {
+    var row = document.createElement('div'); row.className = 'lane-row';
+    var a = document.createElement('i'), b = document.createElement('i'), q = document.createElement('i');
+    row.appendChild(a); row.appendChild(b); row.appendChild(q); lanesEl.appendChild(row);
+    laneCells.push([a, b, q]);
+  }
+
+  var CELLS = 120, tapeEl = document.getElementById('tape'), tapeCells = [], per = Math.ceil(TOTAL / CELLS);
+  for (var ci = 0; ci < CELLS; ci++) {
+    var sl = kinds.slice(ci * per, (ci + 1) * per); if (!sl.length) break;
+    var k = 'f', nq = 0, nt = 0, ns = 0;
+    sl.forEach(function(x){ if (x === 'q') nq++; else if (x === 't') nt++; else if (x === 's') ns++; else if (x === 'x') k = 'x'; });
+    if (k !== 'x') k = nq ? 'q' : (nt > sl.length / 2 ? 't' : (ns > sl.length / 2 ? 's' : 'f'));
+    var el = document.createElement('i'); tapeEl.appendChild(el); tapeCells.push({el:el, k:k, start:ci * per});
+  }
+
+  var outWho = document.getElementById('out-who');
+  var dComp = document.getElementById('d-comp'), dQwen = document.getElementById('d-qwen');
+  var dCompTag = document.getElementById('d-comp-tag'), dQwenTag = document.getElementById('d-qwen-tag');
+  var cTok = document.getElementById('c-tok'), cQ = document.getElementById('c-q'), cT = document.getElementById('c-t');
+  var fmt = function(n){ return n.toLocaleString('en-US'); };
+  var OUT = {f:['forced by circuit','var(--circuit-ink)'], s:['qwenFS response','var(--fs)'], t:['Qwen thinking','var(--qwen)'], q:['Qwen writing','var(--qwen)'], x:['HALT','var(--halt)']};
+
+  function render(t){
+    var done = t >= TOTAL_T, seg = segs[segs.length - 1];
+    for (var i = 0; i < segs.length; i++) { if (t < segs[i].t0 + segs[i].n / segs[i].rate) { seg = segs[i]; break; } }
+    var within = done ? seg.n : Math.min(seg.n, Math.floor((t - seg.t0) * seg.rate) + 1);
+    var tok = done ? TOTAL : seg.tok0 + within;
+    var p = phases[seg.pi], ph = done ? 'halt' : p.ph, k = done ? 'x' : seg.k;
+
+    lines.forEach(function(l){ l.el.className = 'ln' + (l.ph === ph ? ' on k-' + phaseKind[ph] : ''); });
+    chips.forEach(function(c){ c.el.className = 'chip' + (c.ph === ph ? ' on' : ''); });
+
+    var cycDone = 0;
+    phases.forEach(function(pp, pi){ if (pp.ph === 'write' && (pi < seg.pi || (pi === seg.pi && (done || within >= seg.n) && seg.k === 'q'))) cycDone++; });
+    if (done) cycDone = 5;
+    resRows.forEach(function(el, i){
+      var isDone = i < cycDone, isNow = !done && i === cycDone && p.cyc === i + 1 && (ph === 'think' || ph === 'write');
+      el.className = 'res' + (isDone ? ' done' : (isNow ? ' now' : ''));
+      el.lastChild.textContent = isDone ? String(RESULTS[i]) : (isNow ? '…' : '·');
+    });
+
+    for (var r = 0; r < ROWS; r++) {
+      var idx = tok - 1 - r, kk = idx >= 0 ? kinds[idx] : null, cells = laneCells[r];
+      cells[0].className = (kk === 'f' || kk === 'x') ? kk : '';
+      cells[1].className = kk === 's' ? 's' : '';
+      cells[2].className = (kk === 'q' || kk === 't') ? kk : '';
+    }
+    tapeCells.forEach(function(c){ c.el.className = c.k + (c.start >= tok ? ' off' : ''); });
+
+    var o = OUT[k]; outWho.textContent = o[0]; outWho.style.color = o[1];
+    var qwenOn = k === 'q' || k === 't';
+    dComp.className = qwenOn ? '' : 'on'; dQwen.className = qwenOn ? 'on' : '';
+    dCompTag.textContent = qwenOn ? 'runs' : 'decides this token';
+    dQwenTag.textContent = qwenOn ? 'decides this token' : 'runs, overridden';
+
+    var nq = 0, nt = 0;
+    for (var j = 0; j < tok; j++) { if (kinds[j] === 'q') nq++; else if (kinds[j] === 't') nt++; }
+    cTok.textContent = fmt(tok); cQ.textContent = fmt(nq + nt); cT.textContent = fmt(nt);
+  }
+
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var t = reduce ? TOTAL_T : 6.5, playing = !reduce, last = null;
+  var btnPlay = document.getElementById('btn-play');
+  function setBtn(){ btnPlay.textContent = playing ? 'Pause' : 'Play'; btnPlay.setAttribute('aria-pressed', playing ? 'false' : 'true'); }
+  setBtn(); render(t);
+
+  function frame(ts){
+    if (last === null) last = ts;
+    var dt = Math.min(0.1, (ts - last) / 1000); last = ts;
+    if (playing) { t += dt; if (t > TOTAL_T + HOLD) t = 0; render(t); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  btnPlay.addEventListener('click', function(){ playing = !playing; if (playing && t >= TOTAL_T) t = 0; setBtn(); });
+  document.getElementById('btn-restart').addEventListener('click', function(){ t = 0; playing = true; setBtn(); render(t); });
+
+  document.getElementById('btn-copy').addEventListener('click', function(){
+    var btn = this, text = document.getElementById('bib').textContent;
+    try {
+      navigator.clipboard.writeText(text).then(function(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy BibTeX'; }, 1600); }, function(){ btn.textContent = 'Select and copy'; });
+    } catch (e) { btn.textContent = 'Select and copy'; }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+{
+  "trace_id": "v3-arithmetic-add-3",
+  "cycles": 3,
+  "objective": "Start with the number 7. First add 4; next multiply the result by 2; finally subtract 3. Perform exactly one operation per task in order and return only the complete current number after each task.",
+  "ledger": {
+    "initial": 7,
+    "tasks": [
+      "add 4",
+      "multiply by 2",
+      "subtract 3"
+    ]
+  },
+  "results": [
+    11,
+    22,
+    19
+  ],
+  "expected": [
+    11,
+    22,
+    19
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 2094,
+    "forced": 1233,
+    "qwenfs": 313,
+    "qwen_reasoning": 768,
+    "qwen_payload": 93
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

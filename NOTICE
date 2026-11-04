@@ -1,0 +1,32 @@
+BabyAGI Inside
+Copyright 2026 Yohei Nakajima
+
+CODE
+
+This repository is derived in part from qwenFS:
+  https://github.com/vixhal-baraiya/qwenFS
+  Copyright (c) 2026 TheVixhal
+  Licensed under the MIT License.
+
+The qwenFS copyright and permission notice must be retained in copies or
+substantial portions of the derived software. The repository-level LICENSE
+preserves that notice.
+
+Qwenputer by Divyansh Agrawal is credited as compiler lineage:
+  https://github.com/divagr18/qwenputer
+
+This credit does not assert that Qwenputer source code is redistributed here.
+
+MODEL AND CHECKPOINT WEIGHTS
+
+Qwen3.5-2B is distributed by the Qwen team under Apache License 2.0:
+  https://huggingface.co/Qwen/Qwen3.5-2B
+
+The MIT license for this repository's code does not relicense Qwen model
+weights or checkpoints derived from them. If modified Qwen-derived weights are
+distributed, the distributor must comply with Apache License 2.0, including
+providing a copy of that license, retaining applicable notices, and stating
+that the files were modified. At the time of this audit, the official
+Qwen3.5-2B repository listed no separate upstream NOTICE file.
+
+No checkpoint weights are included in this Git repository.

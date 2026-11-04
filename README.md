@@ -1,165 +1,100 @@
-# qwenFS: Qwen keeps its own files
+# BabyAGI Inside
 
-Local research extension: [compiled BabyAGI proof of concept](docs/compiled-babyagi.md).
+BabyAGI Inside compiles a bounded BabyAGI-style agent loop into a widened Qwen3.5-2B checkpoint: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency: the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, while their semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck.
 
-**qwenFS is an experimental model: Qwen3.5-2B with a filesystem compiled and inserted directly
-into its weights.** It is not a plugin, a tool server or a database behind an API. The
-filesystem is 8 transformer layers in front of Qwen's own 24, and none of their weights are
-learned: every one is set by construction. Qwen saves, reads, organizes and links its own files
-through its normal tool calls, and the model answers every call itself.
+## The host loop
 
-![qwenFS saving a file and reading it back: the FS layers, the file table and the copy layer, token by token](docs/qfs-demo.gif)
-
-## How it works
-
-**The calls.** Qwen writes ordinary Qwen3.5 tool calls. The circuit reads each call as Qwen
-writes it, keying on the single tokens Qwen's tool-call format always uses (`=name`, `=text`,
-`=target`, `>`, newline, `</tool_call>`, …). A call's kind comes from its parameters; only
-`unlink_files` is told apart by its function-name token. After `</tool_call>`, the circuit
-prints the tool response itself, in a user turn as Qwen's chat template has it, then opens a new
-assistant turn, and Qwen answers.
-
-| Tool | What it does | The circuit's response |
-|---|---|---|
-| `write_file(name, text)` | save a file (replaces it) | `saved` and the path |
-| `read_file(name)` | read a file, token for token | the stored text, or `not found` |
-| `list_files()` | every file | one path per line, or `empty` |
-| `link_files(name, target)` | link a file to another | `linked` and both paths |
-| `unlink_files(name, target)` | remove that link | `removed` and both paths |
-| `list_links(file)` | files a file links to | one path per line, or `empty` |
-| `list_backlinks(path)` | files that link to a file | one path per line, or `empty` |
-
-Paths make folders (`people/alice.txt`, `projects/cafe.txt`); links and backlinks make a graph.
-
-**Where the filesystem lives.** Every part of the model has a job:
-
-- **Attention** holds the files. A write's text stays in the copy layer's attention log, keyed by
-  (file index, version, offset); a read is an exact copy, token by token. A second attention head
-  looks paths up: a path finds its file's index, or falls back to "not found".
-- **Gated DeltaNet state** holds the tables and registers: the version table, the path table
-  (for listings), the file count, the call's state, and the links. A link is a row of state per
-  (source, target) pair: `link_files` writes it, `unlink_files` empties it, so links never
-  duplicate. Rows store their bit in the target's column and in the source's, and a multi-hot
-  query over a file's rows reads all its links, or all its backlinks, at once.
-- **MLPs** parse the tool calls and pick every forced token: acks, the response frame, echoed
-  paths, the next link to list.
-- **Offsets** come from a decaying DeltaNet counter, read in the head norm's eps regime and
-  decoded exactly to 600 tokens.
-
-**Exactness.** Every token carries a ballast dim, so each norm in the FS layers is a fixed scale.
-Registers pad their state rows to 2, 8, 32 or 128 set rails, so reads come back as exactly 0/1
-or ±1. A key that is off sits far below zero, since a DeltaNet key's l2-norm would rescale any
-small value to full strength. `qfs/circuit.py` describes each layer.
-
-**The merge.** `qfs.merge` widens Qwen's residual from 2048 to 3072, zero-pads its matrices,
-scales its norm gains by √(2048/3072), puts the FS layers in front of Qwen's and appends the FS
-tokens to the vocabulary. The FS layers clear their dims before Qwen's layers run, except a small
-output code that the tied lm_head reads at the end, so a forced token wins and Qwen's logits are
-untouched everywhere else.
-
-**Disk.** A filesystem saves to a compact image: the paths, the latest text of each file as
-3-byte token ids, and the links (about 3.3–3.8 bytes per stored token). A fresh session mounts
-the image (the tables and lookup rows) and pages a file's text in only when the model emits that
-file's read ack. Paging rebuilds the copy rows from the token ids with the model's own
-projections. See `qfs/disk.py`.
-
-## What runs where
-
-- **The weights**: parsing each call, every lookup, every table update, every forced token,
-  every copied token of a read. Nothing outside the model decides what a response says.
-- **The chat loop** (`qfs/chat.py`): decodes tokens and stops at `<|im_end|>`. It samples at
-  temperature 0.7: with greedy decoding, a 2B model tends to repeat tool calls. Forced tokens lead
-  by hundreds of logits, so sampling never changes them.
-- **Disk paging** (`qfs/disk.py`): when the model emits a read ack, the runtime loads that
-  file's bytes, like a disk controller. The model picks the file and copies the text.
-- **The app's panel** (`qfs/monitor.py`): it reads the filesystem out of the model's state (the
-  version, path and link tables) and keeps no copy of its own.
-
-## The doc
-
-`docs/fs-agent.md` is Qwen's system prompt by default: a reference for the tools, their
-responses and conventions, with worked examples. Every example response in it was printed by the
-merged model (`qfs/gen_doc.py`). In a scenario eval (save and recall, updating a list,
-organizing, links and backlinks, unlinking one file, a missing file; 3 seeds, 48 turns):
-
-| | Turns passed | Scenarios passed | Unneeded calls |
-|---|---|---|---|
-| No doc | 46/48 | 17/18 | 6 |
-| With the doc | 48/48 | 18/18 | 0 |
-
-The sample is small; the drop in unneeded calls is the clearer effect.
-
-## Results
-
-On Qwen3.5-2B, on Apple silicon (MPS, bf16):
-
-- **Scripted sessions** of writes, overwrites, deletes, missing names, links, repeated links,
-  unlinks and listings (16 files): every forced token exact, 74/74 calls per session.
-- **A dense graph**: one file linked to and from all 31 others, a duplicate and a self-link, then
-  unlinks at the start, middle and end: exact.
-- **From disk**, in a fresh session with an empty context: exact.
-- **Merged into Qwen3.5-2B**, in context and from disk: exact.
-- **Qwen's text**: the top-1 prediction is unchanged at all 139 positions checked; KL about 2e-3
-  (from rounding the rescaled norm gains to bf16).
-
-## Limits
-
-- 32 files, paths of up to 8 tokens, about 590 tokens per write, 63 versions per file; a text
-  cannot contain `</`.
-- No search inside files and no partial edits: changing a file means writing it again.
-- Qwen's judgment is the weak part, not the filesystem: it sometimes answers from the
-  conversation instead of reading a file, or makes calls it wasn't asked for.
-- About 20 tokens/s on MPS (PyTorch fallback kernels for Gated DeltaNet).
-
-## Quickstart
-
-Requirements: Python 3.11+, [uv](https://docs.astral.sh/uv/),
-[just](https://github.com/casey/just), and about 16 GB of free memory for the merged model
-(Apple silicon, an NVIDIA GPU or a CPU).
-
-```bash
-git clone https://github.com/vixhal-baraiya/qwenFS && cd qwenFS
-just setup
-just build
-just chat
+```python
+ids = prefill(objective) + [START]
+while ids[-1] != HALT:
+    ids.append(argmax(model(ids)))
 ```
 
-`just build` downloads Qwen3.5-2B and compiles the filesystem into it. `just chat` opens the
-chat app: each tool call shows as one line with the circuit's response under it, and the panel
-on the right is the filesystem as the model holds it, decoded from its DeltaNet state after
-every response: the files and folders, the links, the FS layers lighting up as they act, and
-the disk. `/save` stores the filesystem (in `fs/` by default) and `/mount` starts a new chat on
-a stored one, whose files page in when Qwen reads them; `/help` lists the rest.
+The host does not parse phases, execute tools, inject follow-up prompts, repair outputs, or manage a task list after the initial objective.
 
-`just ask "Save notes/todo.txt: call the dentist" "What's on my todo list?"` sends messages
-without the app. `just` lists every recipe: `test` (the circuit alone, no Qwen needed),
-`test-disk`, `test-tui` (the app on a scripted session), `check` (the merged model) and `eval`
-(add `--doc docs/fs-agent.md` to use the doc).
+## Checkpoint layout
 
-## Repository
+The widened residual stream is partitioned as follows:
 
-| Path | What it is |
-|---|---|
-| `qfs/circuit.py` | The filesystem as Qwen3.5 layers: every weight, layer by layer |
-| `qfs/merge.py` | Building the merged Qwen3.5 checkpoint |
-| `qfs/disk.py` | The disk image: saving, mounting and paging files in |
-| `qfs/tui.py` | The chat app: the chat, and the filesystem panel |
-| `qfs/bridge.py` | The app's session: a turn as a stream of events |
-| `qfs/monitor.py` | The filesystem decoded from the model's state; the panel's lights |
-| `qfs/chat.py` | The chat loop, and a command-line chat |
-| `qfs/evaluate.py` | The scenario eval |
-| `qfs/gen_doc.py` | Writes `docs/fs-agent.md`, running its examples on the model |
-| `docs/fs-agent.md` | The filesystem reference Qwen gets as its system prompt |
-| `tests/` | The circuit on scripted sessions, the disk image, the merged model |
+| Dimensions | Owner | Purpose |
+| ---: | --- | --- |
+| 0–2047 | Qwen | Native Qwen3.5-2B model state |
+| 2048–3071 | qwenFS | Compiled filesystem state and operations |
+| 3072–3208 | Agent | Controller and bounded-agent scratch state |
 
-## Related
+Cycle count is fixed at checkpoint construction. The verified set uses separate checkpoints for 2, 3, 5, and 8 cycles.
 
-[qwenGPU](https://github.com/vixhal-baraiya/qwenGPU) compiles a SIMT GPU into the same model.
-qwenFS shares no code with it: its layers are built directly in Qwen3.5's own layer types.
+## Reproduce the ten archived live traces
 
-## License
+Requirements: Apple Silicon with MPS, the local `models/Qwen3.5-2B` base model, `uv`, and roughly 10 GB free disk per compiled checkpoint. These are the command forms implemented by the repository's existing CLI modules. Historical records confirm greedy decoding, seed 0, a 256-token reasoning span, and the checkpoint settings shown below. `TODO(verify)`: pin the exact historical base-model revision and compiler source commit before claiming byte-for-byte checkpoint reproduction.
 
-The code is MIT, see [LICENSE](LICENSE). A checkpoint built with `qfs.merge` is a modified
-[Qwen3.5](https://huggingface.co/Qwen/Qwen3.5-2B) model (its config is widened and filesystem
-layers are added; Qwen's own weights are unchanged apart from rescaled norm gains), so its
-weights fall under Qwen's Apache-2.0 license.
+Build the four cycle-specific checkpoints:
+
+```sh
+for cycles in 2 3 5 8; do
+  uv run python -m qfs.agent models/Qwen3.5-2B \
+    "build/babyagi-2b-ledger-pointer-b256-m${cycles}" \
+    --cycles "${cycles}" --protocol babyagi_ledger_pointer \
+    --think-tokens 256 --device mps
+done
+```
+
+Then decode, inspect, account for, and score the ten objectives. Each invocation starts with a fresh qwenFS cache. The two structured items are expected to fail the exact semantic scorer; the command preserves those failures.
+
+```sh
+trace_ids='v3-arithmetic-add-2
+v3-arithmetic-add-3
+v3-arithmetic-add-5
+v3-arithmetic-add-8
+v3-arithmetic-multiply-2
+v3-arithmetic-multiply-3
+v3-arithmetic-multiply-5
+v3-arithmetic-multiply-8
+v3-structured-even-8
+v3-structured-odd-8'
+
+mkdir -p results/babyagi-inside-live
+printf '%s\n' "$trace_ids" | while IFS= read -r trace_id; do
+  cycles="$(jq -r --arg id "$trace_id" '.items[] | select(.id == $id) | .cycles' benchmarks/babyagi-v3.json)"
+  objective="$(jq -r --arg id "$trace_id" '.items[] | select(.id == $id) | .objective' benchmarks/babyagi-v3.json)"
+  prefix="results/babyagi-inside-live/${trace_id}"
+
+  uv run python -m qfs.agent_decode \
+    "build/babyagi-2b-ledger-pointer-b256-m${cycles}" "$objective" \
+    --output "${prefix}-run.json" --device mps \
+    --temperature 0 --seed 0 --limit 6000
+  uv run python -m qfs.agent_evaluate \
+    "${prefix}-run.json" --output "${prefix}-evaluation.json"
+  uv run python -m qfs.agent_account \
+    "${prefix}-run.json" --output "${prefix}-account.json"
+  uv run python -m qfs.benchmark score-evaluation \
+    benchmarks/babyagi-v3.json "$trace_id" "${prefix}-evaluation.json" || true
+done
+```
+
+The `|| true` keeps the batch running after the scorer returns status 1 for either preserved structured-task failure; it does not change an artifact or score. The clean, compact exports of the historical runs are in [`traces/`](traces/README.md). Regenerating those JSON exports is CPU-only and does not load a model.
+
+## What is verified
+
+- Ten completed live compiled-checkpoint diagnostics reach HALT with the expected number of cycles and exact controller, qwenFS read/write, and disjoint token-accounting checks.
+- All eight sequential arithmetic chains match their frozen expected results, at 2, 3, 5, and 8 cycles.
+- Both eight-cycle structured-operation traces complete mechanically but fail exact task semantics: the controller executes the ledger Qwen wrote, and the ledger is wrong.
+- The host provides nothing after the objective; the checkpoints run greedily until their compiled HALT token.
+
+These ten traces were selected for diagnosis, not sampled to estimate accuracy. `TODO(sweep)`: report the frozen 32-item live-compiled sweep, its paired plain-Qwen comparison, confidence intervals, and any system exceptions after that run is complete and validated.
+
+## What remains exploratory
+
+- Whether the compiled protocol improves capability over plain Qwen. The earlier corrected host proxy was statistically inconclusive and is not a substitute for the live sweep.
+- Post-hoc operation-signature plan fidelity. Frozen exact task strings remain the primary plan metric.
+- Runtime comparisons and the compiled circuit-oracle check on CUDA.
+- Runtime-variable cycle count; the current controller uses one checkpoint per fixed cycle count.
+
+## Credits and licenses
+
+- [qwenFS](https://github.com/vixhal-baraiya/qwenFS) by Vixhal Baraiya supplies the compiled filesystem foundation and is MIT-licensed.
+- [Qwenputer](https://github.com/divagr18/qwenputer) by Divyansh Agrawal is credited for compiler lineage.
+- [Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B) is provided by the Qwen team under Apache License 2.0.
+- BabyAGI was created by Yohei Nakajima.
+
+Repository code is MIT-licensed; see [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Qwen-derived checkpoint weights are separately governed by Qwen's Apache-2.0 terms and are not relicensed by this repository's MIT license.

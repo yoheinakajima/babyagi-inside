@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights"
+type: software
+authors:
+  - family-names: Nakajima
+    given-names: Yohei
+doi: "TODO(zenodo)"
+license: MIT
+preferred-citation:
+  type: software
+  title: "BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights"
+  authors:
+    - family-names: Nakajima
+      given-names: Yohei
+  year: 2026
+  doi: "TODO(zenodo)"
+

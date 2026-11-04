@@ -1,0 +1,72 @@
+{
+  "trace_id": "v3-arithmetic-add-2",
+  "cycles": 2,
+  "objective": "Start with the number 6. First add 3; finally multiply the result by 2. Perform exactly one operation per task in order and return only the complete current number after each task.",
+  "ledger": {
+    "initial": 6,
+    "tasks": [
+      "add 3",
+      "multiply by 2"
+    ]
+  },
+  "results": [
+    9,
+    18
+  ],
+  "expected": [
+    9,
+    18
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 1475,
+    "forced": 892,
+    "qwenfs": 193,
+    "qwen_reasoning": 512,
+    "qwen_payload": 71
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

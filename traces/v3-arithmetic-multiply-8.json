@@ -1,0 +1,216 @@
+{
+  "trace_id": "v3-arithmetic-multiply-8",
+  "cycles": 8,
+  "objective": "Start with the number 13. First multiply the result by 3; next add 10; then subtract 4; then double the result; then add 7; then multiply the result by 2; then subtract 9; finally add 11. Perform exactly one operation per task in order and return only the complete current number after each task.",
+  "ledger": {
+    "initial": 13,
+    "tasks": [
+      "multiply 13 by 3",
+      "add 10 to the result",
+      "subtract 4 from the result",
+      "double the result",
+      "add 7 to the result",
+      "multiply the result by 2",
+      "subtract 9 from the result",
+      "add 11 to the result"
+    ]
+  },
+  "results": [
+    39,
+    49,
+    45,
+    90,
+    97,
+    194,
+    185,
+    196
+  ],
+  "expected": [
+    39,
+    49,
+    45,
+    90,
+    97,
+    194,
+    185,
+    196
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 5610,
+    "forced": 3337,
+    "qwenfs": 1312,
+    "qwen_reasoning": 2048,
+    "qwen_payload": 225
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}
