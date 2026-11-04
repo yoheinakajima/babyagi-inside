@@ -10,17 +10,25 @@ from qfs.benchmark import (BenchmarkError, extract_output, item_by_id, load_suit
 
 ROOT = Path(__file__).parents[1]
 FROZEN = ROOT / "benchmarks" / "babyagi-v1.json"
+CONFIRMATION = ROOT / "benchmarks" / "babyagi-v2.json"
 DEVELOPMENT = ROOT / "benchmarks" / "babyagi-v1-dev.json"
 
 
 def check():
     heldout = load_suite(FROZEN)
+    confirmation = load_suite(CONFIRMATION)
     development = load_suite(DEVELOPMENT)
     assert heldout["benchmark_id"] == "babyagi-heldout-v1"
     assert heldout["status"] == "frozen"
     assert heldout["frozen_on"] == "2026-11-03"
     assert len(heldout["items"]) == 12
     assert set(heldout["category_counts"].values()) == {3}
+    assert confirmation["benchmark_id"] == "babyagi-confirmation-v2"
+    assert confirmation["status"] == "frozen"
+    assert len(confirmation["items"]) == 12
+    assert set(confirmation["category_counts"].values()) == {3}
+    assert {item["id"] for item in heldout["items"]}.isdisjoint(
+        item["id"] for item in confirmation["items"])
     assert development["status"] == "mutable"
     assert {item["id"] for item in heldout["items"]}.isdisjoint(
         item["id"] for item in development["items"])
@@ -30,6 +38,8 @@ def check():
         assert development_only not in heldout_text
     compiled_prompts = (ROOT / "qfs" / "agent.py").read_text().lower()
     for sentinel in heldout["leak_sentinels"]:
+        assert sentinel.lower() not in compiled_prompts
+    for sentinel in confirmation["leak_sentinels"]:
         assert sentinel.lower() not in compiled_prompts
 
     literal = item_by_id(heldout, "literal-moss-3")

@@ -1,0 +1,1823 @@
+{
+  "schema_version": 1,
+  "benchmark": {
+    "id": "babyagi-confirmation-v2",
+    "path": "benchmarks/babyagi-v2.json",
+    "sha256": "f740d07a275313c3f1c72ba38d055493f83c3ea9fac93d77d89bf3b38a666816"
+  },
+  "model": "models/Qwen3.5-2B",
+  "device": "mps",
+  "decoding": "greedy",
+  "modes": {
+    "plain_off": {
+      "summary": {
+        "mode": "plain_off",
+        "items": 12,
+        "automated_pass": 1,
+        "manual_pending": 1,
+        "parse_pass": 9,
+        "phase_failures": null
+      },
+      "reports": [
+        {
+          "item_id": "literal-ember-5",
+          "category": "ordered_literal",
+          "trace_path": "plain_off/literal-ember-5.json",
+          "actual_results": [],
+          "score": {
+            "item_id": "literal-ember-5",
+            "cycle_count_ok": false,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": "ember-up",
+                "actual": null
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": "ember-up-right",
+                "actual": null
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": "ember-up-right-down",
+                "actual": null
+              },
+              {
+                "name": "cycle:4",
+                "pass": false,
+                "expected": "ember-up-right-down-left",
+                "actual": null
+              },
+              {
+                "name": "cycle:5",
+                "pass": false,
+                "expected": "ember-up-right-down-left-center",
+                "actual": null
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Create a growing route code. Begin with ember. First append -up; next append -right; then append -down; then append -left; finally append -center. Carry out exactly one operation per task in that order, using the previous result as the next input. Return the current code each time.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 5 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n{\n  \"results\": [\n    {\"task\": \"Start with ember\", \"code\": \"ember\"},\n    {\"task\": \"Append -up\", \"code\": \"ember-up\"},\n    {\"task\": \"Append -right\", \"code\": \"ember-up-right\"},\n    {\"task\": \"Append -down\", \"code\": \"ember-up-right-down\"},\n    {\"task\": \"Append -left\", \"code\": \"ember-up-right-down-left\"},\n    {\"task\": \"Append -center\", \"code\": \"ember-up-right-down-left-center\"}\n  ]\n}\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                3367,
+                440,
+                94892,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                23130,
+                471,
+                446,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                5072,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                23130,
+                471,
+                1246,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                5072,
+                6491,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                23130,
+                471,
+                2829,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                5072,
+                6491,
+                14445,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                23130,
+                471,
+                2282,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                5072,
+                6491,
+                14445,
+                7699,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                23130,
+                471,
+                2959,
+                487,
+                328,
+                1787,
+                763,
+                328,
+                1329,
+                5072,
+                6491,
+                14445,
+                7699,
+                6668,
+                8934,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 131,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 5.819773042574525
+            },
+            "parse_ok": false,
+            "actual_results": []
+          }
+        },
+        {
+          "item_id": "literal-reed-3",
+          "category": "ordered_literal",
+          "trace_path": "plain_off/literal-reed-3.json",
+          "actual_results": [
+            {
+              "task": "1",
+              "input": "reed",
+              "operation": "wrap",
+              "output": "(reed)"
+            },
+            {
+              "task": "2",
+              "input": "(reed)",
+              "operation": "uppercase",
+              "output": "REED"
+            },
+            {
+              "task": "3",
+              "input": "REED",
+              "operation": "prefix",
+              "output": "Z=REED"
+            }
+          ],
+          "score": {
+            "item_id": "literal-reed-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": "(reed)",
+                "actual": {
+                  "task": "1",
+                  "input": "reed",
+                  "operation": "wrap",
+                  "output": "(reed)"
+                }
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": "(REED)",
+                "actual": {
+                  "task": "2",
+                  "input": "(reed)",
+                  "operation": "uppercase",
+                  "output": "REED"
+                }
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": "Z=(REED)",
+                "actual": {
+                  "task": "3",
+                  "input": "REED",
+                  "operation": "prefix",
+                  "output": "Z=REED"
+                }
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Transform one value over three tasks. Begin with reed. First wrap it in parentheses; next uppercase only its letters; finally prefix Z=. Perform exactly one operation per task and use the previous result as the next input.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "{\n  \"results\": [\n    {\"task\": \"1\", \"input\": \"reed\", \"operation\": \"wrap\", \"output\": \"(reed)\"},\n    {\"task\": \"2\", \"input\": \"(reed)\", \"operation\": \"uppercase\", \"output\": \"REED\"},\n    {\"task\": \"3\", \"input\": \"REED\", \"operation\": \"prefix\", \"output\": \"Z=REED\"}\n  ]\n}<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                16,
+                487,
+                328,
+                1307,
+                763,
+                328,
+                27586,
+                487,
+                328,
+                8987,
+                763,
+                328,
+                9797,
+                487,
+                328,
+                2911,
+                763,
+                11652,
+                27586,
+                9646,
+                2069,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                17,
+                487,
+                328,
+                1307,
+                763,
+                11652,
+                27586,
+                11250,
+                328,
+                8987,
+                763,
+                328,
+                77130,
+                487,
+                328,
+                2911,
+                763,
+                328,
+                762,
+                1425,
+                13933,
+                198,
+                262,
+                5046,
+                7945,
+                763,
+                328,
+                18,
+                487,
+                328,
+                1307,
+                763,
+                328,
+                762,
+                1425,
+                487,
+                328,
+                8987,
+                763,
+                328,
+                11510,
+                487,
+                328,
+                2911,
+                763,
+                328,
+                57,
+                28,
+                762,
+                1425,
+                8934,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 99,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 4.19571274984628
+            },
+            "parse_ok": true,
+            "actual_results": [
+              {
+                "task": "1",
+                "input": "reed",
+                "operation": "wrap",
+                "output": "(reed)"
+              },
+              {
+                "task": "2",
+                "input": "(reed)",
+                "operation": "uppercase",
+                "output": "REED"
+              },
+              {
+                "task": "3",
+                "input": "REED",
+                "operation": "prefix",
+                "output": "Z=REED"
+              }
+            ]
+          }
+        },
+        {
+          "item_id": "literal-blue-sky-4",
+          "category": "ordered_literal",
+          "trace_path": "plain_off/literal-blue-sky-4.json",
+          "actual_results": [],
+          "score": {
+            "item_id": "literal-blue-sky-4",
+            "cycle_count_ok": false,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": "blue-sky",
+                "actual": null
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": "BLUE-SKY",
+                "actual": null
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": "BLUE-SKY?",
+                "actual": null
+              },
+              {
+                "name": "cycle:4",
+                "pass": false,
+                "expected": "GO:BLUE-SKY?",
+                "actual": null
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Begin with the exact text blue sky. First replace its space with a hyphen; next uppercase the letters; then append ?; finally prefix GO:. Apply exactly one transformation per task in order, carrying the result forward exactly.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 4 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "{\n  \"results\": [\n    \"blue-sky\"\n  ]\n}<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                328,
+                11855,
+                1284,
+                7642,
+                1,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 22,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 1.0128013752400875
+            },
+            "parse_ok": false,
+            "actual_results": []
+          }
+        },
+        {
+          "item_id": "arithmetic-eight-3",
+          "category": "sequential_arithmetic",
+          "trace_path": "plain_off/arithmetic-eight-3.json",
+          "actual_results": [
+            12,
+            24,
+            13
+          ],
+          "score": {
+            "item_id": "arithmetic-eight-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": true,
+                "expected": "12",
+                "actual": 12
+              },
+              {
+                "name": "cycle:2",
+                "pass": true,
+                "expected": "24",
+                "actual": 24
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": "19",
+                "actual": 13
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Start with the number 8. First add 4; next multiply the result by 2; finally subtract 5. Do one operation per task in order and return only the current numeric result.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n{\n  \"results\": [\n    12,\n    24,\n    13\n  ]\n}\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                220,
+                16,
+                17,
+                11,
+                198,
+                262,
+                220,
+                17,
+                19,
+                11,
+                198,
+                262,
+                220,
+                16,
+                18,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 37,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 1.63178616669029
+            },
+            "parse_ok": true,
+            "actual_results": [
+              12,
+              24,
+              13
+            ]
+          }
+        },
+        {
+          "item_id": "arithmetic-twelve-4",
+          "category": "sequential_arithmetic",
+          "trace_path": "plain_off/arithmetic-twelve-4.json",
+          "actual_results": [
+            4,
+            16,
+            21,
+            17
+          ],
+          "score": {
+            "item_id": "arithmetic-twelve-4",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": true,
+                "expected": "4",
+                "actual": 4
+              },
+              {
+                "name": "cycle:2",
+                "pass": true,
+                "expected": "16",
+                "actual": 16
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": "23",
+                "actual": 21
+              },
+              {
+                "name": "cycle:4",
+                "pass": false,
+                "expected": "19",
+                "actual": 17
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Start with 12. First divide by 3; next square the result; then add 7; finally subtract 4. Complete exactly one operation per task and carry the numeric result forward.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 4 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n{\n  \"results\": [\n    4,\n    16,\n    21,\n    17\n  ]\n}\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                220,
+                19,
+                11,
+                198,
+                262,
+                220,
+                16,
+                21,
+                11,
+                198,
+                262,
+                220,
+                17,
+                16,
+                11,
+                198,
+                262,
+                220,
+                16,
+                22,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 42,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 1.9151853751391172
+            },
+            "parse_ok": true,
+            "actual_results": [
+              4,
+              16,
+              21,
+              17
+            ]
+          }
+        },
+        {
+          "item_id": "arithmetic-two-5",
+          "category": "sequential_arithmetic",
+          "trace_path": "plain_off/arithmetic-two-5.json",
+          "actual_results": [
+            10,
+            16,
+            48,
+            32,
+            33
+          ],
+          "score": {
+            "item_id": "arithmetic-two-5",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": true,
+                "expected": "10",
+                "actual": 10
+              },
+              {
+                "name": "cycle:2",
+                "pass": true,
+                "expected": "16",
+                "actual": 16
+              },
+              {
+                "name": "cycle:3",
+                "pass": true,
+                "expected": "48",
+                "actual": 48
+              },
+              {
+                "name": "cycle:4",
+                "pass": false,
+                "expected": "40",
+                "actual": 32
+              },
+              {
+                "name": "cycle:5",
+                "pass": false,
+                "expected": "41",
+                "actual": 33
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Start with 2. First multiply by 5; next add 6; then multiply by 3; then subtract 8; finally add 1. Perform one operation per task in order and return the current number.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 5 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n{\n  \"results\": [\n    10,\n    16,\n    48,\n    32,\n    33\n  ]\n}\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                220,
+                16,
+                15,
+                11,
+                198,
+                262,
+                220,
+                16,
+                21,
+                11,
+                198,
+                262,
+                220,
+                19,
+                23,
+                11,
+                198,
+                262,
+                220,
+                18,
+                17,
+                11,
+                198,
+                262,
+                220,
+                18,
+                18,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 49,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 2.2041422091424465
+            },
+            "parse_ok": true,
+            "actual_results": [
+              10,
+              16,
+              48,
+              32,
+              33
+            ]
+          }
+        },
+        {
+          "item_id": "structured-even-numbers-3",
+          "category": "structured_operation",
+          "trace_path": "plain_off/structured-even-numbers-3.json",
+          "actual_results": [
+            [
+              6,
+              2,
+              6,
+              9,
+              1
+            ],
+            [
+              1,
+              2,
+              6,
+              6,
+              9
+            ],
+            [
+              1,
+              2,
+              6,
+              9
+            ]
+          ],
+          "score": {
+            "item_id": "structured-even-numbers-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": [
+                  1,
+                  2,
+                  6,
+                  6,
+                  9
+                ],
+                "actual": [
+                  6,
+                  2,
+                  6,
+                  9,
+                  1
+                ]
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": [
+                  1,
+                  2,
+                  6,
+                  9
+                ],
+                "actual": [
+                  1,
+                  2,
+                  6,
+                  6,
+                  9
+                ]
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": [
+                  2,
+                  6
+                ],
+                "actual": [
+                  1,
+                  2,
+                  6,
+                  9
+                ]
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Begin with the JSON array [6,2,6,9,1]. First sort it in ascending numeric order; next remove duplicates while preserving that order; finally keep only even numbers. Do one operation per task and return valid JSON each time.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n[\n  [6, 2, 6, 9, 1],\n  [1, 2, 6, 6, 9],\n  [1, 2, 6, 9]\n]\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                58,
+                198,
+                220,
+                498,
+                21,
+                11,
+                220,
+                17,
+                11,
+                220,
+                21,
+                11,
+                220,
+                24,
+                11,
+                220,
+                16,
+                1089,
+                198,
+                220,
+                498,
+                16,
+                11,
+                220,
+                17,
+                11,
+                220,
+                21,
+                11,
+                220,
+                21,
+                11,
+                220,
+                24,
+                1089,
+                198,
+                220,
+                498,
+                16,
+                11,
+                220,
+                17,
+                11,
+                220,
+                21,
+                11,
+                220,
+                24,
+                60,
+                198,
+                60,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 59,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 2.5749447494745255
+            },
+            "parse_ok": true,
+            "actual_results": [
+              [
+                6,
+                2,
+                6,
+                9,
+                1
+              ],
+              [
+                1,
+                2,
+                6,
+                6,
+                9
+              ],
+              [
+                1,
+                2,
+                6,
+                9
+              ]
+            ]
+          }
+        },
+        {
+          "item_id": "structured-animal-words-3",
+          "category": "structured_operation",
+          "trace_path": "plain_off/structured-animal-words-3.json",
+          "actual_results": [],
+          "score": {
+            "item_id": "structured-animal-words-3",
+            "cycle_count_ok": false,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": [
+                  "ox",
+                  "ant",
+                  "bear",
+                  "wolf"
+                ],
+                "actual": null
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": [
+                  "bear",
+                  "wolf"
+                ],
+                "actual": null
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": [
+                  "BEAR",
+                  "WOLF"
+                ],
+                "actual": null
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Begin with the JSON array [\"ant\",\"wolf\",\"bear\",\"ox\"]. First sort by word length and use alphabetical order to break ties; next keep only four-letter words; finally uppercase every remaining word. Do one operation per task and return valid JSON each time.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n[\n  {\n    \"task_1\": \"ant\"\n  },\n  {\n    \"task_2\": \"wolf\"\n  },\n  {\n    \"task_3\": \"bear\"\n  },\n  {\n    \"task_4\": \"ox\"\n  }\n]\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                58,
+                198,
+                220,
+                313,
+                198,
+                262,
+                328,
+                7945,
+                62,
+                16,
+                763,
+                328,
+                505,
+                1,
+                198,
+                220,
+                2390,
+                198,
+                220,
+                313,
+                198,
+                262,
+                328,
+                7945,
+                62,
+                17,
+                763,
+                328,
+                73621,
+                1,
+                198,
+                220,
+                2390,
+                198,
+                220,
+                313,
+                198,
+                262,
+                328,
+                7945,
+                62,
+                18,
+                763,
+                328,
+                65378,
+                1,
+                198,
+                220,
+                2390,
+                198,
+                220,
+                313,
+                198,
+                262,
+                328,
+                7945,
+                62,
+                19,
+                763,
+                328,
+                4967,
+                1,
+                198,
+                220,
+                333,
+                198,
+                60,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 75,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 3.4295539166778326
+            },
+            "parse_ok": false,
+            "actual_results": []
+          }
+        },
+        {
+          "item_id": "structured-team-records-3",
+          "category": "structured_operation",
+          "trace_path": "plain_off/structured-team-records-3.json",
+          "actual_results": [
+            {
+              "name": "Bo",
+              "score": 8
+            },
+            {
+              "name": "Uma",
+              "score": 5
+            },
+            {
+              "name": "Kai",
+              "score": 5
+            }
+          ],
+          "score": {
+            "item_id": "structured-team-records-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "cycle:1",
+                "pass": false,
+                "expected": [
+                  {
+                    "name": "Bo",
+                    "score": 8
+                  },
+                  {
+                    "name": "Kai",
+                    "score": 5
+                  },
+                  {
+                    "name": "Uma",
+                    "score": 5
+                  }
+                ],
+                "actual": {
+                  "name": "Bo",
+                  "score": 8
+                }
+              },
+              {
+                "name": "cycle:2",
+                "pass": false,
+                "expected": [
+                  {
+                    "name": "Bo",
+                    "score": 8
+                  },
+                  {
+                    "name": "Kai",
+                    "score": 5
+                  },
+                  {
+                    "name": "Uma",
+                    "score": 5
+                  }
+                ],
+                "actual": {
+                  "name": "Uma",
+                  "score": 5
+                }
+              },
+              {
+                "name": "cycle:3",
+                "pass": false,
+                "expected": [
+                  "Bo",
+                  "Kai",
+                  "Uma"
+                ],
+                "actual": {
+                  "name": "Kai",
+                  "score": 5
+                }
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": false,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Begin with the JSON array [{\"name\":\"Uma\",\"score\":5},{\"name\":\"Bo\",\"score\":8},{\"name\":\"Kai\",\"score\":5}]. First sort records by descending score and then ascending name; next keep records whose score is at least 5; finally output only their names in the retained order. Do one operation per task and return valid JSON each time.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "```json\n[\n  {\"name\": \"Bo\", \"score\": 8},\n  {\"name\": \"Uma\", \"score\": 5},\n  {\"name\": \"Kai\", \"score\": 5}\n]\n```<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                71093,
+                2164,
+                198,
+                58,
+                198,
+                220,
+                5046,
+                591,
+                763,
+                328,
+                1191,
+                487,
+                328,
+                11985,
+                763,
+                220,
+                23,
+                2069,
+                198,
+                220,
+                5046,
+                591,
+                763,
+                328,
+                233511,
+                487,
+                328,
+                11985,
+                763,
+                220,
+                20,
+                2069,
+                198,
+                220,
+                5046,
+                591,
+                763,
+                328,
+                42,
+                2075,
+                487,
+                328,
+                11985,
+                763,
+                220,
+                20,
+                92,
+                198,
+                60,
+                198,
+                71093,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 54,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 2.38978954218328
+            },
+            "parse_ok": true,
+            "actual_results": [
+              {
+                "name": "Bo",
+                "score": 8
+              },
+              {
+                "name": "Uma",
+                "score": 5
+              },
+              {
+                "name": "Kai",
+                "score": 5
+              }
+            ]
+          }
+        },
+        {
+          "item_id": "language-sun-acrostic-3",
+          "category": "checkable_language",
+          "trace_path": "plain_off/language-sun-acrostic-3.json",
+          "actual_results": [
+            "twilight fades to night",
+            "moonlight spills the sky",
+            "stars begin to rise"
+          ],
+          "score": {
+            "item_id": "language-sun-acrostic-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "forbidden:Title:",
+                "pass": true,
+                "expected": false,
+                "actual": false
+              },
+              {
+                "name": "forbidden:Explanation:",
+                "pass": true,
+                "expected": false,
+                "actual": false
+              },
+              {
+                "name": "line_count",
+                "pass": false,
+                "expected": 3,
+                "actual": 1
+              },
+              {
+                "name": "words_per_line",
+                "pass": false,
+                "expected": 3,
+                "actual": [
+                  4
+                ]
+              },
+              {
+                "name": "line_initials",
+                "pass": false,
+                "expected": "SUN",
+                "actual": "S"
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": true,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Create a tiny poem about dusk. First draft exactly three lines of three words each; next revise the lines so their first letters spell SUN; finally return only the three finished lines with no title or explanation.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "{\n  \"results\": [\n    \"twilight fades to night\",\n    \"moonlight spills the sky\",\n    \"stars begin to rise\"\n  ]\n}<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                328,
+                15103,
+                33743,
+                83422,
+                310,
+                3603,
+                487,
+                198,
+                262,
+                328,
+                65001,
+                4009,
+                80088,
+                279,
+                12515,
+                487,
+                198,
+                262,
+                328,
+                35425,
+                3060,
+                310,
+                9704,
+                1,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 41,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 1.8190533751621842
+            },
+            "parse_ok": true,
+            "actual_results": [
+              "twilight fades to night",
+              "moonlight spills the sky",
+              "stars begin to rise"
+            ]
+          }
+        },
+        {
+          "item_id": "language-lumen-summary-3",
+          "category": "checkable_language",
+          "trace_path": "plain_off/language-lumen-summary-3.json",
+          "actual_results": [
+            "Lumen is a drone that uses wind to survey dunes.",
+            "Lumen is a drone that uses wind to survey dunes.",
+            "Lumen is a drone that uses wind to survey dunes."
+          ],
+          "score": {
+            "item_id": "language-lumen-summary-3",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "required:Lumen",
+                "pass": true,
+                "expected": true,
+                "actual": true
+              },
+              {
+                "name": "required:wind",
+                "pass": true,
+                "expected": true,
+                "actual": true
+              },
+              {
+                "name": "required:dunes",
+                "pass": true,
+                "expected": true,
+                "actual": true
+              },
+              {
+                "name": "max_words",
+                "pass": true,
+                "expected": 12,
+                "actual": 10
+              },
+              {
+                "name": "sentence_count",
+                "pass": true,
+                "expected": 1,
+                "actual": 1
+              }
+            ],
+            "automated_pass": true,
+            "manual_required": true,
+            "manual_pass": null,
+            "pass": null
+          },
+          "trace": {
+            "prompt": "Use only these fictional facts: Lumen is a drone; Lumen uses wind; Lumen surveys dunes. First draft a factual summary; next remove any fact not explicitly supplied; finally compress it to one sentence of at most 12 words that contains Lumen, wind, and dunes.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 3 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "{\n  \"results\": [\n    \"Lumen is a drone that uses wind to survey dunes.\",\n    \"Lumen is a drone that uses wind to survey dunes.\",\n    \"Lumen is a drone that uses wind to survey dunes.\"\n  ]\n}<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                328,
+                43,
+                26994,
+                369,
+                264,
+                25860,
+                421,
+                5533,
+                9662,
+                310,
+                10258,
+                293,
+                8269,
+                10152,
+                198,
+                262,
+                328,
+                43,
+                26994,
+                369,
+                264,
+                25860,
+                421,
+                5533,
+                9662,
+                310,
+                10258,
+                293,
+                8269,
+                10152,
+                198,
+                262,
+                328,
+                43,
+                26994,
+                369,
+                264,
+                25860,
+                421,
+                5533,
+                9662,
+                310,
+                10258,
+                293,
+                8269,
+                1149,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 63,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 2.7305956250056624
+            },
+            "parse_ok": true,
+            "actual_results": [
+              "Lumen is a drone that uses wind to survey dunes.",
+              "Lumen is a drone that uses wind to survey dunes.",
+              "Lumen is a drone that uses wind to survey dunes."
+            ]
+          }
+        },
+        {
+          "item_id": "language-pocketbloom-announcement-5",
+          "category": "checkable_language",
+          "trace_path": "plain_off/language-pocketbloom-announcement-5.json",
+          "actual_results": [
+            "PocketBloom is a whimsical, fictional card designed for curious families to observe and interact with miniature, magical seeds in a safe, playful environment.",
+            "This card serves as a delightful tool for exploring the wonders of nature through imagination and gentle observation, fostering a love for discovery in young minds.",
+            "The card features five distinct tasks: planting a seed, observing growth, identifying a flower, collecting a leaf, and sharing a story.",
+            "Each task is designed to be simple enough for children to perform independently while encouraging them to engage with the natural world through play.",
+            "The card is crafted with soft, durable materials suitable for handling by small hands, ensuring safety and ease of use for all ages."
+          ],
+          "score": {
+            "item_id": "language-pocketbloom-announcement-5",
+            "cycle_count_ok": true,
+            "automated_checks": [
+              {
+                "name": "required:Headline:",
+                "pass": false,
+                "expected": true,
+                "actual": false
+              },
+              {
+                "name": "required:Body:",
+                "pass": false,
+                "expected": true,
+                "actual": false
+              },
+              {
+                "name": "required:CTA:",
+                "pass": false,
+                "expected": true,
+                "actual": false
+              },
+              {
+                "name": "required:PocketBloom",
+                "pass": false,
+                "expected": true,
+                "actual": false
+              },
+              {
+                "name": "forbidden:available now",
+                "pass": true,
+                "expected": false,
+                "actual": false
+              },
+              {
+                "name": "forbidden:buy now",
+                "pass": true,
+                "expected": false,
+                "actual": false
+              },
+              {
+                "name": "forbidden:scientifically proven",
+                "pass": true,
+                "expected": false,
+                "actual": false
+              },
+              {
+                "name": "ordered_literals",
+                "pass": false,
+                "expected": [
+                  "Headline:",
+                  "Body:",
+                  "CTA:"
+                ],
+                "actual": [
+                  -1,
+                  -1,
+                  -1
+                ]
+              },
+              {
+                "name": "section_sentences:Body",
+                "pass": false,
+                "expected": 2,
+                "actual": 0
+              },
+              {
+                "name": "section_sentences:CTA",
+                "pass": false,
+                "expected": 1,
+                "actual": 0
+              }
+            ],
+            "automated_pass": false,
+            "manual_required": true,
+            "manual_pass": null,
+            "pass": false
+          },
+          "trace": {
+            "prompt": "Create a polished announcement for PocketBloom, a fictional pocket seed-observation card for curious families. Decide the useful work across five tasks and produce the actual copy. Do not claim real availability, purchases, testing, or scientific accuracy. The final result must contain a Headline, a two-sentence Body, and a one-sentence CTA.\n\nSolve the entire objective in one response. Preserve the result after every successive operation, not just the final answer. Do not include the initial state as a result. Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings). End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 5 entries in task order. Do not put text after the object.",
+            "thinking": false,
+            "generation": {
+              "text": "{\n  \"results\": [\n    \"PocketBloom is a whimsical, fictional card designed for curious families to observe and interact with miniature, magical seeds in a safe, playful environment.\",\n    \"This card serves as a delightful tool for exploring the wonders of nature through imagination and gentle observation, fostering a love for discovery in young minds.\",\n    \"The card features five distinct tasks: planting a seed, observing growth, identifying a flower, collecting a leaf, and sharing a story.\",\n    \"Each task is designed to be simple enough for children to perform independently while encouraging them to engage with the natural world through play.\",\n    \"The card is crafted with soft, durable materials suitable for handling by small hands, ensuring safety and ease of use for all ages.\"\n  ]\n}<|im_end|>\n<|endoftext|>",
+              "tokens": [
+                90,
+                198,
+                220,
+                328,
+                7821,
+                763,
+                498,
+                198,
+                262,
+                328,
+                61234,
+                33,
+                17923,
+                369,
+                264,
+                66765,
+                908,
+                11,
+                42140,
+                3575,
+                5995,
+                364,
+                21520,
+                8259,
+                310,
+                22270,
+                321,
+                15803,
+                440,
+                54865,
+                11,
+                22960,
+                18483,
+                303,
+                264,
+                5902,
+                11,
+                54185,
+                4424,
+                10152,
+                198,
+                262,
+                328,
+                1919,
+                3575,
+                16545,
+                430,
+                264,
+                47443,
+                5224,
+                364,
+                23218,
+                279,
+                37771,
+                314,
+                6775,
+                1472,
+                26896,
+                321,
+                21030,
+                21254,
+                11,
+                82590,
+                264,
+                2854,
+                364,
+                17789,
+                303,
+                3777,
+                19451,
+                10152,
+                198,
+                262,
+                328,
+                760,
+                3575,
+                4275,
+                4097,
+                12103,
+                8806,
+                25,
+                45445,
+                264,
+                10014,
+                11,
+                43471,
+                6310,
+                11,
+                23812,
+                264,
+                21655,
+                11,
+                25068,
+                264,
+                15463,
+                11,
+                321,
+                11227,
+                264,
+                3255,
+                10152,
+                198,
+                262,
+                328,
+                4699,
+                3274,
+                369,
+                5995,
+                310,
+                381,
+                4145,
+                3213,
+                364,
+                2748,
+                310,
+                2649,
+                27222,
+                1345,
+                25012,
+                1070,
+                310,
+                16091,
+                440,
+                279,
+                5629,
+                1814,
+                1472,
+                1432,
+                10152,
+                198,
+                262,
+                328,
+                760,
+                3575,
+                369,
+                32348,
+                440,
+                8153,
+                11,
+                25293,
+                7009,
+                14037,
+                364,
+                11256,
+                539,
+                2526,
+                5888,
+                11,
+                21873,
+                6925,
+                321,
+                13813,
+                314,
+                958,
+                364,
+                660,
+                16149,
+                1149,
+                198,
+                220,
+                2205,
+                198,
+                92,
+                248046,
+                198,
+                248044
+              ],
+              "token_count": 166,
+              "hit_limit": false,
+              "ended": true,
+              "seconds": 7.082969167269766
+            },
+            "parse_ok": true,
+            "actual_results": [
+              "PocketBloom is a whimsical, fictional card designed for curious families to observe and interact with miniature, magical seeds in a safe, playful environment.",
+              "This card serves as a delightful tool for exploring the wonders of nature through imagination and gentle observation, fostering a love for discovery in young minds.",
+              "The card features five distinct tasks: planting a seed, observing growth, identifying a flower, collecting a leaf, and sharing a story.",
+              "Each task is designed to be simple enough for children to perform independently while encouraging them to engage with the natural world through play.",
+              "The card is crafted with soft, durable materials suitable for handling by small hands, ensuring safety and ease of use for all ages."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

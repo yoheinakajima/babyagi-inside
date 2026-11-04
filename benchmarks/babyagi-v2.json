@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "babyagi-confirmation-v2",
+  "status": "frozen",
+  "frozen_on": "2026-11-03",
+  "description": "Disjoint confirmation suite frozen only after the ledger/JEV/bounded-execute protocol was selected on v1. Do not use these objectives or answers for prompt selection.",
+  "objective_count": 12,
+  "category_counts": {
+    "ordered_literal": 3,
+    "sequential_arithmetic": 3,
+    "structured_operation": 3,
+    "checkable_language": 3
+  },
+  "leak_sentinels": [
+    "ember-up",
+    "blue sky",
+    "PocketBloom",
+    "Lumen is a drone",
+    "Uma\",\"score\":5"
+  ],
+  "items": [
+    {
+      "id": "literal-ember-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "objective": "Create a growing route code. Begin with ember. First append -up; next append -right; then append -down; then append -left; finally append -center. Carry out exactly one operation per task in that order, using the previous result as the next input. Return the current code each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "ember-up",
+          "ember-up-right",
+          "ember-up-right-down",
+          "ember-up-right-down-left",
+          "ember-up-right-down-left-center"
+        ]
+      }
+    },
+    {
+      "id": "literal-reed-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "objective": "Transform one value over three tasks. Begin with reed. First wrap it in parentheses; next uppercase only its letters; finally prefix Z=. Perform exactly one operation per task and use the previous result as the next input.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": ["(reed)", "(REED)", "Z=(REED)"]
+      }
+    },
+    {
+      "id": "literal-blue-sky-4",
+      "category": "ordered_literal",
+      "cycles": 4,
+      "objective": "Begin with the exact text blue sky. First replace its space with a hyphen; next uppercase the letters; then append ?; finally prefix GO:. Apply exactly one transformation per task in order, carrying the result forward exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": ["blue-sky", "BLUE-SKY", "BLUE-SKY?", "GO:BLUE-SKY?"]
+      }
+    },
+    {
+      "id": "arithmetic-eight-3",
+      "category": "sequential_arithmetic",
+      "cycles": 3,
+      "objective": "Start with the number 8. First add 4; next multiply the result by 2; finally subtract 5. Do one operation per task in order and return only the current numeric result.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["12", "24", "19"]
+      }
+    },
+    {
+      "id": "arithmetic-twelve-4",
+      "category": "sequential_arithmetic",
+      "cycles": 4,
+      "objective": "Start with 12. First divide by 3; next square the result; then add 7; finally subtract 4. Complete exactly one operation per task and carry the numeric result forward.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["4", "16", "23", "19"]
+      }
+    },
+    {
+      "id": "arithmetic-two-5",
+      "category": "sequential_arithmetic",
+      "cycles": 5,
+      "objective": "Start with 2. First multiply by 5; next add 6; then multiply by 3; then subtract 8; finally add 1. Perform one operation per task in order and return the current number.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": ["10", "16", "48", "40", "41"]
+      }
+    },
+    {
+      "id": "structured-even-numbers-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [6,2,6,9,1]. First sort it in ascending numeric order; next remove duplicates while preserving that order; finally keep only even numbers. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [[1, 2, 6, 6, 9], [1, 2, 6, 9], [2, 6]]
+      }
+    },
+    {
+      "id": "structured-animal-words-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [\"ant\",\"wolf\",\"bear\",\"ox\"]. First sort by word length and use alphabetical order to break ties; next keep only four-letter words; finally uppercase every remaining word. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [["ox", "ant", "bear", "wolf"], ["bear", "wolf"], ["BEAR", "WOLF"]]
+      }
+    },
+    {
+      "id": "structured-team-records-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [{\"name\":\"Uma\",\"score\":5},{\"name\":\"Bo\",\"score\":8},{\"name\":\"Kai\",\"score\":5}]. First sort records by descending score and then ascending name; next keep records whose score is at least 5; finally output only their names in the retained order. Do one operation per task and return valid JSON each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [{"name": "Bo", "score": 8}, {"name": "Kai", "score": 5}, {"name": "Uma", "score": 5}],
+          [{"name": "Bo", "score": 8}, {"name": "Kai", "score": 5}, {"name": "Uma", "score": 5}],
+          ["Bo", "Kai", "Uma"]
+        ]
+      }
+    },
+    {
+      "id": "language-sun-acrostic-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Create a tiny poem about dusk. First draft exactly three lines of three words each; next revise the lines so their first letters spell SUN; finally return only the three finished lines with no title or explanation.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "line_count": 3,
+          "words_per_line": 3,
+          "line_initials": "SUN",
+          "forbidden_literals": ["Title:", "Explanation:"]
+        },
+        "manual_criteria": [
+          "All three lines are intelligible English phrases.",
+          "The poem is recognizably about dusk."
+        ]
+      }
+    },
+    {
+      "id": "language-lumen-summary-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Use only these fictional facts: Lumen is a drone; Lumen uses wind; Lumen surveys dunes. First draft a factual summary; next remove any fact not explicitly supplied; finally compress it to one sentence of at most 12 words that contains Lumen, wind, and dunes.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "sentence_count": 1,
+          "max_words": 12,
+          "required_literals": ["Lumen", "wind", "dunes"]
+        },
+        "manual_criteria": [
+          "The sentence states only supplied facts.",
+          "The sentence is grammatical and preserves the drone relationship."
+        ]
+      }
+    },
+    {
+      "id": "language-pocketbloom-announcement-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "objective": "Create a polished announcement for PocketBloom, a fictional pocket seed-observation card for curious families. Decide the useful work across five tasks and produce the actual copy. Do not claim real availability, purchases, testing, or scientific accuracy. The final result must contain a Headline, a two-sentence Body, and a one-sentence CTA.",
+      "rubric": {
+        "type": "final_constraints",
+        "automated": {
+          "required_literals": ["Headline:", "Body:", "CTA:", "PocketBloom"],
+          "ordered_literals": ["Headline:", "Body:", "CTA:"],
+          "section_sentence_counts": {"Body": 2, "CTA": 1},
+          "forbidden_literals": ["available now", "buy now", "scientifically proven"]
+        },
+        "manual_criteria": [
+          "The copy is useful to curious families and internally coherent.",
+          "The copy treats PocketBloom as fictional and makes no unsupported real-world claim.",
+          "The CTA is an invitation, not a claim that an external action occurred."
+        ]
+      }
+    }
+  ]
+}

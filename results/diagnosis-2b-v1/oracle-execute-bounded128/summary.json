@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "benchmark": {
+    "id": "babyagi-heldout-v1",
+    "sha256": "22891c9fe8b277dfc111c3c4feb766e62fc29853ed339eeb1b769ae4391c2f49"
+  },
+  "model": "models/Qwen3.5-2B",
+  "device": "mps",
+  "items": 12,
+  "automated_pass": 5,
+  "manual_pending": 1,
+  "correct_prefixes": 20,
+  "cycles": 41
+}

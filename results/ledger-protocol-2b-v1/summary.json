@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "benchmark": {
+    "id": "babyagi-heldout-v1",
+    "sha256": "22891c9fe8b277dfc111c3c4feb766e62fc29853ed339eeb1b769ae4391c2f49"
+  },
+  "model": "models/Qwen3.5-2B",
+  "device": "mps",
+  "mode": "ledger_jev_bounded128",
+  "items": 12,
+  "automated_pass": 2,
+  "manual_pending": 0,
+  "plan_parse_pass": 12,
+  "full_parse_pass": 12,
+  "cycles": 44,
+  "choose_correct": 28,
+  "choose_total": 44,
+  "task2_expected": 23,
+  "task2_selected": 21,
+  "binary_one_yes_one_no": 5,
+  "correct_prefixes": 13
+}

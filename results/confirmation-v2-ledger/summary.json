@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "benchmark": {
+    "id": "babyagi-confirmation-v2",
+    "sha256": "f740d07a275313c3f1c72ba38d055493f83c3ea9fac93d77d89bf3b38a666816"
+  },
+  "model": "models/Qwen3.5-2B",
+  "device": "mps",
+  "mode": "ledger_jev_bounded128",
+  "items": 12,
+  "automated_pass": 1,
+  "manual_pending": 0,
+  "plan_parse_pass": 11,
+  "full_parse_pass": 11,
+  "cycles": 41,
+  "choose_correct": 28,
+  "choose_total": 41,
+  "task2_expected": 21,
+  "task2_selected": 22,
+  "binary_one_yes_one_no": 5,
+  "correct_prefixes": 7
+}

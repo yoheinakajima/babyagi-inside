@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "model": "Qwen3.5-2B",
+  "decoding": "greedy",
+  "selected_protocol": {
+    "name": "ledger_jev_bounded128",
+    "plan": "one persistent JSON object with separate initial and ordered tasks",
+    "choose": "independent Y/N logit margins; select the larger margin",
+    "execute": "exactly 128 model-owned reasoning tokens, forced result prefix, model result payload",
+    "compiled_controller_executed": false
+  },
+  "v1_validation": {
+    "benchmark": "babyagi-heldout-v1",
+    "sha256": "22891c9fe8b277dfc111c3c4feb766e62fc29853ed339eeb1b769ae4391c2f49",
+    "plain_chat_automated_pass": 4,
+    "plain_chat_items": 12,
+    "protocol_automated_pass": 2,
+    "protocol_pass_ids": ["arithmetic-seven-3", "structured-records-3"],
+    "plan_parse_pass": 12,
+    "choice_correct": 28,
+    "choice_total": 44,
+    "task2_expected": 23,
+    "task2_selected": 21,
+    "correct_result_prefixes": 13,
+    "cycles": 44,
+    "ceiling_retention": 0.5
+  },
+  "v2_confirmation": {
+    "benchmark": "babyagi-confirmation-v2",
+    "sha256": "f740d07a275313c3f1c72ba38d055493f83c3ea9fac93d77d89bf3b38a666816",
+    "plain_chat_automated_pass": 1,
+    "plain_chat_manual_review": {
+      "item_id": "language-lumen-summary-3",
+      "pass": true,
+      "reason": "The sentence is grammatical, uses only supplied facts, and preserves the drone relationship."
+    },
+    "protocol_automated_pass": 1,
+    "protocol_pass_ids": ["arithmetic-eight-3"],
+    "plan_parse_pass": 11,
+    "choice_correct": 28,
+    "choice_total": 41,
+    "task2_expected": 21,
+    "task2_selected": 22,
+    "correct_result_prefixes": 7,
+    "cycles": 41,
+    "ceiling_retention": 1.0,
+    "protocol_frozen_before_evaluation": true,
+    "post_confirmation_prompt_changes": false
+  },
+  "diagnostics": {
+    "side_by_side_selector": {
+      "correct": 25,
+      "total": 50,
+      "work_first_correct": 25,
+      "work_second_correct": 0,
+      "neutral_logit_1_minus_2": 6.3375,
+      "constant_calibration_correct": 25
+    },
+    "oracle_task_execute": {
+      "diagnostic_only": true,
+      "automated_pass": 5,
+      "items": 12,
+      "correct_prefixes": 20,
+      "cycles_attempted": 41
+    },
+    "selector_ablations_v1": {
+      "raw_independent_margin": {"correct": 28, "total": 44},
+      "bounded_think32": {"correct": 26, "total": 44},
+      "ordinal_emitted_digit": {"correct": 22, "total": 44},
+      "ordinal_expected_value": {"correct": 25, "total": 44},
+      "copy_selected_task": {"correct": 25, "total": 44}
+    }
+  },
+  "claim_boundary": {
+    "supported": "The compiled systems artifact is real, and the selected native-weight host protocol recovers exact multi-cycle semantic successes on validation and disjoint confirmation suites.",
+    "not_yet_supported": "The semantically successful ledger/JEV/bounded-execute protocol is compiled into the checkpoint."
+  }
+}
