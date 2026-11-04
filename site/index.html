@@ -554,6 +554,7 @@ while ids[-1] != HALT:
           </tbody>
         </table>
       </div>
+      <p class="small">Every result correctly executed Qwen's own task (8/8) in both structured traces, but none matched the benchmark because Qwen wrote the wrong ledger.</p>
       <p class="small">Across all 32 runs the loop solved 8 chains, plain Qwen 5, every one of them arithmetic. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode and appended text to a stored file; the controller still ran every phase and halted. With the loop inactive, the merged checkpoint matches stock Qwen on 4/4 test prefixes (maximum KL 0.0019).</p>
     </div>
   </div>
