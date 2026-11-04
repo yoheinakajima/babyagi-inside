@@ -247,14 +247,18 @@ def phase_prompts(cycle, cycles, protocol):
     return shared, instructions
 
 
-def program(tok, cycles=3, protocol="baseline"):
+def program(tok, cycles=3, protocol="baseline", think_tokens=None):
     """Only static instructions are compiled; objectives/tasks are never baked in."""
     if cycles < 1:
         raise ValueError("cycles must be positive")
+    if think_tokens is not None and protocol not in (
+            "babyagi_pointer", "babyagi_ledger_pointer"):
+        raise ValueError("think_tokens is only supported by pointer protocols")
+    bounded_tokens = POINTER_THINK_TOKENS if think_tokens is None else think_tokens
     if protocol == "babyagi_pointer":
-        return pointer_program(tok, cycles)
+        return pointer_program(tok, cycles, bounded_tokens)
     if protocol == "babyagi_ledger_pointer":
-        return ledger_pointer_program(tok, cycles)
+        return ledger_pointer_program(tok, cycles, bounded_tokens)
     stages = []
     for cycle in range(1, cycles + 1):
         shared, instructions = phase_prompts(cycle, cycles, protocol)
@@ -721,9 +725,9 @@ def compile_into(model, stages, xs, native_width=1024, scratch_start=1024,
     return a
 
 
-def build(src, dst, cycles=3, device="mps", protocol="baseline"):
+def build(src, dst, cycles=3, device="mps", protocol="baseline", think_tokens=None):
     tok = AutoTokenizer.from_pretrained(src)
-    stages = program(tok, cycles, protocol)
+    stages = program(tok, cycles, protocol, think_tokens)
     prompts = [s["rom"] for s in stages]
     cfg = M.text_config(src)
     native_width = cfg["hidden_size"]
@@ -748,6 +752,8 @@ def build(src, dst, cycles=3, device="mps", protocol="baseline"):
     tok.save_pretrained(dst)
     (dst / "agent.json").write_text(json.dumps({
         "base": str(src), "cycles": cycles, "protocol": protocol,
+        "think_tokens": (next((stage["free_span"] for stage in stages
+                               if stage.get("free_span")), None)),
         "start": START, "halt": HALT,
         "native_hidden": native_width, "merged_hidden": target_hidden,
         "scratch": [layout.dims[0], layout.dims[-1] + 1],
@@ -768,8 +774,11 @@ def main():
     parser.add_argument("--cycles", type=int, default=3)
     parser.add_argument("--device", default="mps")
     parser.add_argument("--protocol", choices=PROTOCOLS, default="baseline")
+    parser.add_argument("--think-tokens", type=int,
+                        help="bounded reasoning tokens for pointer protocols")
     args = parser.parse_args()
-    build(args.src, args.dst, args.cycles, args.device, args.protocol)
+    build(args.src, args.dst, args.cycles, args.device, args.protocol,
+          args.think_tokens)
 
 
 if __name__ == "__main__":

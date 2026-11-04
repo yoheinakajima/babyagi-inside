@@ -136,8 +136,8 @@ def validate_suite(suite):
         category = item.get("category")
         _require(category in CATEGORIES, f"{item_id}: invalid category")
         observed[category] += 1
-        _require(isinstance(item.get("cycles"), int) and 1 <= item["cycles"] <= 5,
-                 f"{item_id}: cycles must be 1..5")
+        _require(isinstance(item.get("cycles"), int) and 1 <= item["cycles"] <= 8,
+                 f"{item_id}: cycles must be 1..8")
         _require(isinstance(item.get("objective"), str) and item["objective"].strip(),
                  f"{item_id}: objective is required")
         _validate_rubric(item)

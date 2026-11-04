@@ -43,7 +43,8 @@ def native_results(trace):
 
 
 def run_suite(base, suite_path, output_dir, protocol="babyagi_typed", device=None,
-              temperature=0.0, top_p=0.9, seed=0, limit_per_write=240):
+              temperature=0.0, top_p=0.9, seed=0, limit_per_write=240,
+              think_tokens=None):
     suite_path, output_dir = Path(suite_path), Path(output_dir)
     suite = load_suite(suite_path)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -55,7 +56,8 @@ def run_suite(base, suite_path, output_dir, protocol="babyagi_typed", device=Non
     reports = []
     for item in suite["items"]:
         trace = run_native(
-            model, tok, program(tok, item["cycles"], protocol), item["objective"],
+            model, tok, program(tok, item["cycles"], protocol, think_tokens),
+            item["objective"],
             device=device, temperature=temperature, top_p=top_p, seed=seed,
             limit_per_write=limit_per_write)
         trace.update({"base": str(Path(base).resolve()), "cycles": item["cycles"],
@@ -83,6 +85,7 @@ def run_suite(base, suite_path, output_dir, protocol="babyagi_typed", device=Non
         "benchmark": {"path": str(suite_path), "id": suite["benchmark_id"],
                       "status": suite["status"], "sha256": file_sha256(suite_path)},
         "candidate": {"base": str(Path(base).resolve()), "protocol": protocol,
+                      "think_tokens": think_tokens,
                       "program_sha256": hashlib.sha256(
                           Path(__file__).with_name("agent.py").read_bytes()).hexdigest()},
         "decoding": {"temperature": temperature, "top_p": top_p, "seed": seed,
@@ -110,10 +113,12 @@ def main():
     parser.add_argument("--top-p", type=float, default=0.9)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--limit-per-write", type=int, default=240)
+    parser.add_argument("--think-tokens", type=int,
+                        help="bounded reasoning tokens for pointer protocols")
     args = parser.parse_args()
     summary = run_suite(args.base, args.suite, args.output_dir, args.protocol,
                         args.device, args.temperature, args.top_p, args.seed,
-                        args.limit_per_write)
+                        args.limit_per_write, args.think_tokens)
     print(json.dumps({"output": str(args.output_dir / "summary.json"),
                       **summary["counts"]}))
 

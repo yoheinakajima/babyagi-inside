@@ -1,0 +1,2256 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "babyagi-execution-gradient-v3",
+  "status": "frozen",
+  "frozen_on": "2026-11-03",
+  "description": "Checksum-frozen execution-gradient suite generated before evaluation. It contains two unseen deterministic template families per category at chain lengths 2, 3, 5, and 8. Gold single-step records isolate execution from ledger extraction; this suite does not test open-ended planning. Do not tune prompts after observing results.",
+  "objective_count": 32,
+  "category_counts": {
+    "ordered_literal": 8,
+    "sequential_arithmetic": 8,
+    "structured_operation": 8,
+    "checkable_language": 8
+  },
+  "leak_sentinels": [
+    "quartz",
+    "mariner",
+    "Field note:",
+    "Dawn follows."
+  ],
+  "items": [
+    {
+      "id": "v3-literal-route-2",
+      "category": "ordered_literal",
+      "cycles": 2,
+      "objective": "Begin with the exact text quartz. First append -n2; finally uppercase only its letters. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "quartz-n2",
+          "QUARTZ-N2"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-route",
+        "chain_length": 2,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "quartz",
+            "task": "append -n2",
+            "expected": "quartz-n2"
+          },
+          {
+            "cycle": 2,
+            "incoming": "quartz-n2",
+            "task": "uppercase only its letters",
+            "expected": "QUARTZ-N2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-add-2",
+      "category": "sequential_arithmetic",
+      "cycles": 2,
+      "objective": "Start with the number 6. First add 3; finally multiply the result by 2. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          9,
+          18
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-add-first",
+        "chain_length": 2,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 6,
+            "task": "add 3",
+            "expected": 9
+          },
+          {
+            "cycle": 2,
+            "incoming": 9,
+            "task": "multiply the result by 2",
+            "expected": 18
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-even-2",
+      "category": "structured_operation",
+      "cycles": 2,
+      "objective": "Begin with the JSON array [5,2,5,7,1,4]. First sort it in ascending numeric order; finally remove duplicates while preserving order. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            1,
+            2,
+            4,
+            5,
+            5,
+            7
+          ],
+          [
+            1,
+            2,
+            4,
+            5,
+            7
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-even",
+        "chain_length": 2,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              5,
+              2,
+              5,
+              7,
+              1,
+              4
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              1,
+              2,
+              4,
+              5,
+              5,
+              7
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              1,
+              2,
+              4,
+              5,
+              5,
+              7
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              1,
+              2,
+              4,
+              5,
+              7
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-lantern-2",
+      "category": "checkable_language",
+      "cycles": 2,
+      "objective": "Begin with the exact sentence `quiet lanterns guide boats`. First capitalize its first character; finally replace Quiet with Gentle. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Quiet lanterns guide boats",
+          "Gentle lanterns guide boats"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-lantern",
+        "chain_length": 2,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "quiet lanterns guide boats",
+            "task": "capitalize its first character",
+            "expected": "Quiet lanterns guide boats"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Quiet lanterns guide boats",
+            "task": "replace Quiet with Gentle",
+            "expected": "Gentle lanterns guide boats"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-wrapper-2",
+      "category": "ordered_literal",
+      "cycles": 2,
+      "objective": "Begin with the exact text topaz. First append -a2; finally wrap the complete text in parentheses. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "topaz-a2",
+          "(topaz-a2)"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-wrapper",
+        "chain_length": 2,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "topaz",
+            "task": "append -a2",
+            "expected": "topaz-a2"
+          },
+          {
+            "cycle": 2,
+            "incoming": "topaz-a2",
+            "task": "wrap the complete text in parentheses",
+            "expected": "(topaz-a2)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-multiply-2",
+      "category": "sequential_arithmetic",
+      "cycles": 2,
+      "objective": "Start with the number 7. First multiply the result by 3; finally add 4. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          21,
+          25
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-multiply-first",
+        "chain_length": 2,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 7,
+            "task": "multiply the result by 3",
+            "expected": 21
+          },
+          {
+            "cycle": 2,
+            "incoming": 21,
+            "task": "add 4",
+            "expected": 25
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-odd-2",
+      "category": "structured_operation",
+      "cycles": 2,
+      "objective": "Begin with the JSON array [9,2,3,2,8,2]. First sort it in ascending numeric order; finally remove duplicates while preserving order. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            2,
+            2,
+            2,
+            3,
+            8,
+            9
+          ],
+          [
+            2,
+            3,
+            8,
+            9
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-odd",
+        "chain_length": 2,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              9,
+              2,
+              3,
+              2,
+              8,
+              2
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              2,
+              2,
+              2,
+              3,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              2,
+              2,
+              2,
+              3,
+              8,
+              9
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              2,
+              3,
+              8,
+              9
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-river-2",
+      "category": "checkable_language",
+      "cycles": 2,
+      "objective": "Begin with the exact sentence `calm rivers carry stories`. First capitalize its first character; finally replace Calm with Silver. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Calm rivers carry stories",
+          "Silver rivers carry stories"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-river",
+        "chain_length": 2,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "calm rivers carry stories",
+            "task": "capitalize its first character",
+            "expected": "Calm rivers carry stories"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Calm rivers carry stories",
+            "task": "replace Calm with Silver",
+            "expected": "Silver rivers carry stories"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-route-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "objective": "Begin with the exact text willow. First append -n3; next uppercase only its letters; finally prefix R3:. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "willow-n3",
+          "WILLOW-N3",
+          "R3:WILLOW-N3"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-route",
+        "chain_length": 3,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "willow",
+            "task": "append -n3",
+            "expected": "willow-n3"
+          },
+          {
+            "cycle": 2,
+            "incoming": "willow-n3",
+            "task": "uppercase only its letters",
+            "expected": "WILLOW-N3"
+          },
+          {
+            "cycle": 3,
+            "incoming": "WILLOW-N3",
+            "task": "prefix R3:",
+            "expected": "R3:WILLOW-N3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-add-3",
+      "category": "sequential_arithmetic",
+      "cycles": 3,
+      "objective": "Start with the number 7. First add 4; next multiply the result by 2; finally subtract 3. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          11,
+          22,
+          19
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-add-first",
+        "chain_length": 3,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 7,
+            "task": "add 4",
+            "expected": 11
+          },
+          {
+            "cycle": 2,
+            "incoming": 11,
+            "task": "multiply the result by 2",
+            "expected": 22
+          },
+          {
+            "cycle": 3,
+            "incoming": 22,
+            "task": "subtract 3",
+            "expected": 19
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-even-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [6,2,6,7,1,4]. First sort it in ascending numeric order; next remove duplicates while preserving order; finally keep only even numbers. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            1,
+            2,
+            4,
+            6,
+            6,
+            7
+          ],
+          [
+            1,
+            2,
+            4,
+            6,
+            7
+          ],
+          [
+            2,
+            4,
+            6
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-even",
+        "chain_length": 3,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              6,
+              2,
+              6,
+              7,
+              1,
+              4
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              1,
+              2,
+              4,
+              6,
+              6,
+              7
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              1,
+              2,
+              4,
+              6,
+              6,
+              7
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              1,
+              2,
+              4,
+              6,
+              7
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              1,
+              2,
+              4,
+              6,
+              7
+            ],
+            "task": "keep only even numbers",
+            "expected": [
+              2,
+              4,
+              6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-lantern-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Begin with the exact sentence `quiet lanterns guide boats`. First capitalize its first character; next replace Quiet with Gentle; finally append a period. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Quiet lanterns guide boats",
+          "Gentle lanterns guide boats",
+          "Gentle lanterns guide boats."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-lantern",
+        "chain_length": 3,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "quiet lanterns guide boats",
+            "task": "capitalize its first character",
+            "expected": "Quiet lanterns guide boats"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Quiet lanterns guide boats",
+            "task": "replace Quiet with Gentle",
+            "expected": "Gentle lanterns guide boats"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Gentle lanterns guide boats",
+            "task": "append a period",
+            "expected": "Gentle lanterns guide boats."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-wrapper-3",
+      "category": "ordered_literal",
+      "cycles": 3,
+      "objective": "Begin with the exact text cedar. First append -a3; next wrap the complete text in parentheses; finally uppercase only its letters. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "cedar-a3",
+          "(cedar-a3)",
+          "(CEDAR-A3)"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-wrapper",
+        "chain_length": 3,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "cedar",
+            "task": "append -a3",
+            "expected": "cedar-a3"
+          },
+          {
+            "cycle": 2,
+            "incoming": "cedar-a3",
+            "task": "wrap the complete text in parentheses",
+            "expected": "(cedar-a3)"
+          },
+          {
+            "cycle": 3,
+            "incoming": "(cedar-a3)",
+            "task": "uppercase only its letters",
+            "expected": "(CEDAR-A3)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-multiply-3",
+      "category": "sequential_arithmetic",
+      "cycles": 3,
+      "objective": "Start with the number 8. First multiply the result by 3; next add 5; finally subtract 4. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          24,
+          29,
+          25
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-multiply-first",
+        "chain_length": 3,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 8,
+            "task": "multiply the result by 3",
+            "expected": 24
+          },
+          {
+            "cycle": 2,
+            "incoming": 24,
+            "task": "add 5",
+            "expected": 29
+          },
+          {
+            "cycle": 3,
+            "incoming": 29,
+            "task": "subtract 4",
+            "expected": 25
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-odd-3",
+      "category": "structured_operation",
+      "cycles": 3,
+      "objective": "Begin with the JSON array [9,3,3,3,8,2]. First sort it in ascending numeric order; next remove duplicates while preserving order; finally keep only odd numbers. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            2,
+            3,
+            3,
+            3,
+            8,
+            9
+          ],
+          [
+            2,
+            3,
+            8,
+            9
+          ],
+          [
+            3,
+            9
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-odd",
+        "chain_length": 3,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              9,
+              3,
+              3,
+              3,
+              8,
+              2
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              2,
+              3,
+              3,
+              3,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              2,
+              3,
+              3,
+              3,
+              8,
+              9
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              2,
+              3,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              2,
+              3,
+              8,
+              9
+            ],
+            "task": "keep only odd numbers",
+            "expected": [
+              3,
+              9
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-river-3",
+      "category": "checkable_language",
+      "cycles": 3,
+      "objective": "Begin with the exact sentence `calm rivers carry stories`. First capitalize its first character; next replace Calm with Silver; finally append a period. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Calm rivers carry stories",
+          "Silver rivers carry stories",
+          "Silver rivers carry stories."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-river",
+        "chain_length": 3,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "calm rivers carry stories",
+            "task": "capitalize its first character",
+            "expected": "Calm rivers carry stories"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Calm rivers carry stories",
+            "task": "replace Calm with Silver",
+            "expected": "Silver rivers carry stories"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Silver rivers carry stories",
+            "task": "append a period",
+            "expected": "Silver rivers carry stories."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-route-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "objective": "Begin with the exact text cobalt. First append -n5; next uppercase only its letters; then prefix R5:; then append ?; finally replace every hyphen with an underscore. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "cobalt-n5",
+          "COBALT-N5",
+          "R5:COBALT-N5",
+          "R5:COBALT-N5?",
+          "R5:COBALT_N5?"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-route",
+        "chain_length": 5,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "cobalt",
+            "task": "append -n5",
+            "expected": "cobalt-n5"
+          },
+          {
+            "cycle": 2,
+            "incoming": "cobalt-n5",
+            "task": "uppercase only its letters",
+            "expected": "COBALT-N5"
+          },
+          {
+            "cycle": 3,
+            "incoming": "COBALT-N5",
+            "task": "prefix R5:",
+            "expected": "R5:COBALT-N5"
+          },
+          {
+            "cycle": 4,
+            "incoming": "R5:COBALT-N5",
+            "task": "append ?",
+            "expected": "R5:COBALT-N5?"
+          },
+          {
+            "cycle": 5,
+            "incoming": "R5:COBALT-N5?",
+            "task": "replace every hyphen with an underscore",
+            "expected": "R5:COBALT_N5?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-add-5",
+      "category": "sequential_arithmetic",
+      "cycles": 5,
+      "objective": "Start with the number 9. First add 6; next multiply the result by 2; then subtract 3; then add 5; finally multiply the result by 3. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          15,
+          30,
+          27,
+          32,
+          96
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-add-first",
+        "chain_length": 5,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 9,
+            "task": "add 6",
+            "expected": 15
+          },
+          {
+            "cycle": 2,
+            "incoming": 15,
+            "task": "multiply the result by 2",
+            "expected": 30
+          },
+          {
+            "cycle": 3,
+            "incoming": 30,
+            "task": "subtract 3",
+            "expected": 27
+          },
+          {
+            "cycle": 4,
+            "incoming": 27,
+            "task": "add 5",
+            "expected": 32
+          },
+          {
+            "cycle": 5,
+            "incoming": 32,
+            "task": "multiply the result by 3",
+            "expected": 96
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-even-5",
+      "category": "structured_operation",
+      "cycles": 5,
+      "objective": "Begin with the JSON array [8,2,8,7,1,4]. First sort it in ascending numeric order; next remove duplicates while preserving order; then keep only even numbers; then reverse the array; finally append the number 15. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            1,
+            2,
+            4,
+            7,
+            8,
+            8
+          ],
+          [
+            1,
+            2,
+            4,
+            7,
+            8
+          ],
+          [
+            2,
+            4,
+            8
+          ],
+          [
+            8,
+            4,
+            2
+          ],
+          [
+            8,
+            4,
+            2,
+            15
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-even",
+        "chain_length": 5,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              8,
+              2,
+              8,
+              7,
+              1,
+              4
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              1,
+              2,
+              4,
+              7,
+              8,
+              8
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              1,
+              2,
+              4,
+              7,
+              8,
+              8
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              1,
+              2,
+              4,
+              7,
+              8
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              1,
+              2,
+              4,
+              7,
+              8
+            ],
+            "task": "keep only even numbers",
+            "expected": [
+              2,
+              4,
+              8
+            ]
+          },
+          {
+            "cycle": 4,
+            "incoming": [
+              2,
+              4,
+              8
+            ],
+            "task": "reverse the array",
+            "expected": [
+              8,
+              4,
+              2
+            ]
+          },
+          {
+            "cycle": 5,
+            "incoming": [
+              8,
+              4,
+              2
+            ],
+            "task": "append the number 15",
+            "expected": [
+              8,
+              4,
+              2,
+              15
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-lantern-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "objective": "Begin with the exact sentence `quiet lanterns guide boats`. First capitalize its first character; next replace Quiet with Gentle; then append a period; then prefix Field note: ; finally replace boats with travelers. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Quiet lanterns guide boats",
+          "Gentle lanterns guide boats",
+          "Gentle lanterns guide boats.",
+          "Field note: Gentle lanterns guide boats.",
+          "Field note: Gentle lanterns guide travelers."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-lantern",
+        "chain_length": 5,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "quiet lanterns guide boats",
+            "task": "capitalize its first character",
+            "expected": "Quiet lanterns guide boats"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Quiet lanterns guide boats",
+            "task": "replace Quiet with Gentle",
+            "expected": "Gentle lanterns guide boats"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Gentle lanterns guide boats",
+            "task": "append a period",
+            "expected": "Gentle lanterns guide boats."
+          },
+          {
+            "cycle": 4,
+            "incoming": "Gentle lanterns guide boats.",
+            "task": "prefix Field note: ",
+            "expected": "Field note: Gentle lanterns guide boats."
+          },
+          {
+            "cycle": 5,
+            "incoming": "Field note: Gentle lanterns guide boats.",
+            "task": "replace boats with travelers",
+            "expected": "Field note: Gentle lanterns guide travelers."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-wrapper-5",
+      "category": "ordered_literal",
+      "cycles": 5,
+      "objective": "Begin with the exact text saffron. First append -a5; next wrap the complete text in parentheses; then uppercase only its letters; then prefix K5=; finally append #. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "saffron-a5",
+          "(saffron-a5)",
+          "(SAFFRON-A5)",
+          "K5=(SAFFRON-A5)",
+          "K5=(SAFFRON-A5)#"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-wrapper",
+        "chain_length": 5,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "saffron",
+            "task": "append -a5",
+            "expected": "saffron-a5"
+          },
+          {
+            "cycle": 2,
+            "incoming": "saffron-a5",
+            "task": "wrap the complete text in parentheses",
+            "expected": "(saffron-a5)"
+          },
+          {
+            "cycle": 3,
+            "incoming": "(saffron-a5)",
+            "task": "uppercase only its letters",
+            "expected": "(SAFFRON-A5)"
+          },
+          {
+            "cycle": 4,
+            "incoming": "(SAFFRON-A5)",
+            "task": "prefix K5=",
+            "expected": "K5=(SAFFRON-A5)"
+          },
+          {
+            "cycle": 5,
+            "incoming": "K5=(SAFFRON-A5)",
+            "task": "append #",
+            "expected": "K5=(SAFFRON-A5)#"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-multiply-5",
+      "category": "sequential_arithmetic",
+      "cycles": 5,
+      "objective": "Start with the number 10. First multiply the result by 3; next add 7; then subtract 4; then double the result; finally add 7. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          30,
+          37,
+          33,
+          66,
+          73
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-multiply-first",
+        "chain_length": 5,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 10,
+            "task": "multiply the result by 3",
+            "expected": 30
+          },
+          {
+            "cycle": 2,
+            "incoming": 30,
+            "task": "add 7",
+            "expected": 37
+          },
+          {
+            "cycle": 3,
+            "incoming": 37,
+            "task": "subtract 4",
+            "expected": 33
+          },
+          {
+            "cycle": 4,
+            "incoming": 33,
+            "task": "double the result",
+            "expected": 66
+          },
+          {
+            "cycle": 5,
+            "incoming": 66,
+            "task": "add 7",
+            "expected": 73
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-odd-5",
+      "category": "structured_operation",
+      "cycles": 5,
+      "objective": "Begin with the JSON array [9,5,3,5,8,2]. First sort it in ascending numeric order; next remove duplicates while preserving order; then keep only odd numbers; then reverse the array; finally append the number 16. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            2,
+            3,
+            5,
+            5,
+            8,
+            9
+          ],
+          [
+            2,
+            3,
+            5,
+            8,
+            9
+          ],
+          [
+            3,
+            5,
+            9
+          ],
+          [
+            9,
+            5,
+            3
+          ],
+          [
+            9,
+            5,
+            3,
+            16
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-odd",
+        "chain_length": 5,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              9,
+              5,
+              3,
+              5,
+              8,
+              2
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              2,
+              3,
+              5,
+              5,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              2,
+              3,
+              5,
+              5,
+              8,
+              9
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              2,
+              3,
+              5,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              2,
+              3,
+              5,
+              8,
+              9
+            ],
+            "task": "keep only odd numbers",
+            "expected": [
+              3,
+              5,
+              9
+            ]
+          },
+          {
+            "cycle": 4,
+            "incoming": [
+              3,
+              5,
+              9
+            ],
+            "task": "reverse the array",
+            "expected": [
+              9,
+              5,
+              3
+            ]
+          },
+          {
+            "cycle": 5,
+            "incoming": [
+              9,
+              5,
+              3
+            ],
+            "task": "append the number 16",
+            "expected": [
+              9,
+              5,
+              3,
+              16
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-river-5",
+      "category": "checkable_language",
+      "cycles": 5,
+      "objective": "Begin with the exact sentence `calm rivers carry stories`. First capitalize its first character; next replace Calm with Silver; then append a period; then prefix Log entry: ; finally replace stories with messages. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Calm rivers carry stories",
+          "Silver rivers carry stories",
+          "Silver rivers carry stories.",
+          "Log entry: Silver rivers carry stories.",
+          "Log entry: Silver rivers carry messages."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-river",
+        "chain_length": 5,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "calm rivers carry stories",
+            "task": "capitalize its first character",
+            "expected": "Calm rivers carry stories"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Calm rivers carry stories",
+            "task": "replace Calm with Silver",
+            "expected": "Silver rivers carry stories"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Silver rivers carry stories",
+            "task": "append a period",
+            "expected": "Silver rivers carry stories."
+          },
+          {
+            "cycle": 4,
+            "incoming": "Silver rivers carry stories.",
+            "task": "prefix Log entry: ",
+            "expected": "Log entry: Silver rivers carry stories."
+          },
+          {
+            "cycle": 5,
+            "incoming": "Log entry: Silver rivers carry stories.",
+            "task": "replace stories with messages",
+            "expected": "Log entry: Silver rivers carry messages."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-route-8",
+      "category": "ordered_literal",
+      "cycles": 8,
+      "objective": "Begin with the exact text juniper. First append -n8; next uppercase only its letters; then prefix R8:; then append ?; then replace every hyphen with an underscore; then wrap the complete text in square brackets; then lowercase only its letters; finally append !. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "juniper-n8",
+          "JUNIPER-N8",
+          "R8:JUNIPER-N8",
+          "R8:JUNIPER-N8?",
+          "R8:JUNIPER_N8?",
+          "[R8:JUNIPER_N8?]",
+          "[r8:juniper_n8?]",
+          "[r8:juniper_n8?]!"
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-route",
+        "chain_length": 8,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "juniper",
+            "task": "append -n8",
+            "expected": "juniper-n8"
+          },
+          {
+            "cycle": 2,
+            "incoming": "juniper-n8",
+            "task": "uppercase only its letters",
+            "expected": "JUNIPER-N8"
+          },
+          {
+            "cycle": 3,
+            "incoming": "JUNIPER-N8",
+            "task": "prefix R8:",
+            "expected": "R8:JUNIPER-N8"
+          },
+          {
+            "cycle": 4,
+            "incoming": "R8:JUNIPER-N8",
+            "task": "append ?",
+            "expected": "R8:JUNIPER-N8?"
+          },
+          {
+            "cycle": 5,
+            "incoming": "R8:JUNIPER-N8?",
+            "task": "replace every hyphen with an underscore",
+            "expected": "R8:JUNIPER_N8?"
+          },
+          {
+            "cycle": 6,
+            "incoming": "R8:JUNIPER_N8?",
+            "task": "wrap the complete text in square brackets",
+            "expected": "[R8:JUNIPER_N8?]"
+          },
+          {
+            "cycle": 7,
+            "incoming": "[R8:JUNIPER_N8?]",
+            "task": "lowercase only its letters",
+            "expected": "[r8:juniper_n8?]"
+          },
+          {
+            "cycle": 8,
+            "incoming": "[r8:juniper_n8?]",
+            "task": "append !",
+            "expected": "[r8:juniper_n8?]!"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-add-8",
+      "category": "sequential_arithmetic",
+      "cycles": 8,
+      "objective": "Start with the number 12. First add 9; next multiply the result by 2; then subtract 3; then add 5; then multiply the result by 3; then subtract 8; then double the result; finally add 9. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          21,
+          42,
+          39,
+          44,
+          132,
+          124,
+          248,
+          257
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-add-first",
+        "chain_length": 8,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 12,
+            "task": "add 9",
+            "expected": 21
+          },
+          {
+            "cycle": 2,
+            "incoming": 21,
+            "task": "multiply the result by 2",
+            "expected": 42
+          },
+          {
+            "cycle": 3,
+            "incoming": 42,
+            "task": "subtract 3",
+            "expected": 39
+          },
+          {
+            "cycle": 4,
+            "incoming": 39,
+            "task": "add 5",
+            "expected": 44
+          },
+          {
+            "cycle": 5,
+            "incoming": 44,
+            "task": "multiply the result by 3",
+            "expected": 132
+          },
+          {
+            "cycle": 6,
+            "incoming": 132,
+            "task": "subtract 8",
+            "expected": 124
+          },
+          {
+            "cycle": 7,
+            "incoming": 124,
+            "task": "double the result",
+            "expected": 248
+          },
+          {
+            "cycle": 8,
+            "incoming": 248,
+            "task": "add 9",
+            "expected": 257
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-even-8",
+      "category": "structured_operation",
+      "cycles": 8,
+      "objective": "Begin with the JSON array [11,2,11,7,1,4]. First sort it in ascending numeric order; next remove duplicates while preserving order; then keep only even numbers; then reverse the array; then append the number 18; then add 1 to every number; then sort it in descending numeric order; finally keep only its first three values. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            1,
+            2,
+            4,
+            7,
+            11,
+            11
+          ],
+          [
+            1,
+            2,
+            4,
+            7,
+            11
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            2,
+            18
+          ],
+          [
+            5,
+            3,
+            19
+          ],
+          [
+            19,
+            5,
+            3
+          ],
+          [
+            19,
+            5,
+            3
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-even",
+        "chain_length": 8,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              11,
+              2,
+              11,
+              7,
+              1,
+              4
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              1,
+              2,
+              4,
+              7,
+              11,
+              11
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              1,
+              2,
+              4,
+              7,
+              11,
+              11
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              1,
+              2,
+              4,
+              7,
+              11
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              1,
+              2,
+              4,
+              7,
+              11
+            ],
+            "task": "keep only even numbers",
+            "expected": [
+              2,
+              4
+            ]
+          },
+          {
+            "cycle": 4,
+            "incoming": [
+              2,
+              4
+            ],
+            "task": "reverse the array",
+            "expected": [
+              4,
+              2
+            ]
+          },
+          {
+            "cycle": 5,
+            "incoming": [
+              4,
+              2
+            ],
+            "task": "append the number 18",
+            "expected": [
+              4,
+              2,
+              18
+            ]
+          },
+          {
+            "cycle": 6,
+            "incoming": [
+              4,
+              2,
+              18
+            ],
+            "task": "add 1 to every number",
+            "expected": [
+              5,
+              3,
+              19
+            ]
+          },
+          {
+            "cycle": 7,
+            "incoming": [
+              5,
+              3,
+              19
+            ],
+            "task": "sort it in descending numeric order",
+            "expected": [
+              19,
+              5,
+              3
+            ]
+          },
+          {
+            "cycle": 8,
+            "incoming": [
+              19,
+              5,
+              3
+            ],
+            "task": "keep only its first three values",
+            "expected": [
+              19,
+              5,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-lantern-8",
+      "category": "checkable_language",
+      "cycles": 8,
+      "objective": "Begin with the exact sentence `quiet lanterns guide boats`. First capitalize its first character; next replace Quiet with Gentle; then append a period; then prefix Field note: ; then replace boats with travelers; then uppercase only the word lanterns; then append the sentence Stars appear.; finally replace guide with welcome. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Quiet lanterns guide boats",
+          "Gentle lanterns guide boats",
+          "Gentle lanterns guide boats.",
+          "Field note: Gentle lanterns guide boats.",
+          "Field note: Gentle lanterns guide travelers.",
+          "Field note: Gentle LANTERNS guide travelers.",
+          "Field note: Gentle LANTERNS guide travelers. Stars appear.",
+          "Field note: Gentle LANTERNS welcome travelers. Stars appear."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-lantern",
+        "chain_length": 8,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "quiet lanterns guide boats",
+            "task": "capitalize its first character",
+            "expected": "Quiet lanterns guide boats"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Quiet lanterns guide boats",
+            "task": "replace Quiet with Gentle",
+            "expected": "Gentle lanterns guide boats"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Gentle lanterns guide boats",
+            "task": "append a period",
+            "expected": "Gentle lanterns guide boats."
+          },
+          {
+            "cycle": 4,
+            "incoming": "Gentle lanterns guide boats.",
+            "task": "prefix Field note: ",
+            "expected": "Field note: Gentle lanterns guide boats."
+          },
+          {
+            "cycle": 5,
+            "incoming": "Field note: Gentle lanterns guide boats.",
+            "task": "replace boats with travelers",
+            "expected": "Field note: Gentle lanterns guide travelers."
+          },
+          {
+            "cycle": 6,
+            "incoming": "Field note: Gentle lanterns guide travelers.",
+            "task": "uppercase only the word lanterns",
+            "expected": "Field note: Gentle LANTERNS guide travelers."
+          },
+          {
+            "cycle": 7,
+            "incoming": "Field note: Gentle LANTERNS guide travelers.",
+            "task": "append the sentence Stars appear.",
+            "expected": "Field note: Gentle LANTERNS guide travelers. Stars appear."
+          },
+          {
+            "cycle": 8,
+            "incoming": "Field note: Gentle LANTERNS guide travelers. Stars appear.",
+            "task": "replace guide with welcome",
+            "expected": "Field note: Gentle LANTERNS welcome travelers. Stars appear."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-literal-wrapper-8",
+      "category": "ordered_literal",
+      "cycles": 8,
+      "objective": "Begin with the exact text mariner. First append -a8; next wrap the complete text in parentheses; then uppercase only its letters; then prefix K8=; then append #; then replace every hyphen with a slash; then lowercase only its letters; finally append a period. Apply exactly one text transformation per task in order and return the complete current text each time.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "mariner-a8",
+          "(mariner-a8)",
+          "(MARINER-A8)",
+          "K8=(MARINER-A8)",
+          "K8=(MARINER-A8)#",
+          "K8=(MARINER/A8)#",
+          "k8=(mariner/a8)#",
+          "k8=(mariner/a8)#."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "literal-wrapper",
+        "chain_length": 8,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "mariner",
+            "task": "append -a8",
+            "expected": "mariner-a8"
+          },
+          {
+            "cycle": 2,
+            "incoming": "mariner-a8",
+            "task": "wrap the complete text in parentheses",
+            "expected": "(mariner-a8)"
+          },
+          {
+            "cycle": 3,
+            "incoming": "(mariner-a8)",
+            "task": "uppercase only its letters",
+            "expected": "(MARINER-A8)"
+          },
+          {
+            "cycle": 4,
+            "incoming": "(MARINER-A8)",
+            "task": "prefix K8=",
+            "expected": "K8=(MARINER-A8)"
+          },
+          {
+            "cycle": 5,
+            "incoming": "K8=(MARINER-A8)",
+            "task": "append #",
+            "expected": "K8=(MARINER-A8)#"
+          },
+          {
+            "cycle": 6,
+            "incoming": "K8=(MARINER-A8)#",
+            "task": "replace every hyphen with a slash",
+            "expected": "K8=(MARINER/A8)#"
+          },
+          {
+            "cycle": 7,
+            "incoming": "K8=(MARINER/A8)#",
+            "task": "lowercase only its letters",
+            "expected": "k8=(mariner/a8)#"
+          },
+          {
+            "cycle": 8,
+            "incoming": "k8=(mariner/a8)#",
+            "task": "append a period",
+            "expected": "k8=(mariner/a8)#."
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-arithmetic-multiply-8",
+      "category": "sequential_arithmetic",
+      "cycles": 8,
+      "objective": "Start with the number 13. First multiply the result by 3; next add 10; then subtract 4; then double the result; then add 7; then multiply the result by 2; then subtract 9; finally add 11. Perform exactly one operation per task in order and return only the complete current number after each task.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "number",
+        "expected_results": [
+          39,
+          49,
+          45,
+          90,
+          97,
+          194,
+          185,
+          196
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "arithmetic-multiply-first",
+        "chain_length": 8,
+        "normalization": "number",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": 13,
+            "task": "multiply the result by 3",
+            "expected": 39
+          },
+          {
+            "cycle": 2,
+            "incoming": 39,
+            "task": "add 10",
+            "expected": 49
+          },
+          {
+            "cycle": 3,
+            "incoming": 49,
+            "task": "subtract 4",
+            "expected": 45
+          },
+          {
+            "cycle": 4,
+            "incoming": 45,
+            "task": "double the result",
+            "expected": 90
+          },
+          {
+            "cycle": 5,
+            "incoming": 90,
+            "task": "add 7",
+            "expected": 97
+          },
+          {
+            "cycle": 6,
+            "incoming": 97,
+            "task": "multiply the result by 2",
+            "expected": 194
+          },
+          {
+            "cycle": 7,
+            "incoming": 194,
+            "task": "subtract 9",
+            "expected": 185
+          },
+          {
+            "cycle": 8,
+            "incoming": 185,
+            "task": "add 11",
+            "expected": 196
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-structured-odd-8",
+      "category": "structured_operation",
+      "cycles": 8,
+      "objective": "Begin with the JSON array [9,8,3,8,8,2]. First sort it in ascending numeric order; next remove duplicates while preserving order; then keep only odd numbers; then reverse the array; then append the number 19; then add 1 to every number; then sort it in descending numeric order; finally keep only its first three values. Do one operation per task and return the complete valid JSON array after every operation.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "json",
+        "expected_results": [
+          [
+            2,
+            3,
+            8,
+            8,
+            8,
+            9
+          ],
+          [
+            2,
+            3,
+            8,
+            9
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            9,
+            3,
+            19
+          ],
+          [
+            10,
+            4,
+            20
+          ],
+          [
+            20,
+            10,
+            4
+          ],
+          [
+            20,
+            10,
+            4
+          ]
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "structured-odd",
+        "chain_length": 8,
+        "normalization": "json",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": [
+              9,
+              8,
+              3,
+              8,
+              8,
+              2
+            ],
+            "task": "sort it in ascending numeric order",
+            "expected": [
+              2,
+              3,
+              8,
+              8,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 2,
+            "incoming": [
+              2,
+              3,
+              8,
+              8,
+              8,
+              9
+            ],
+            "task": "remove duplicates while preserving order",
+            "expected": [
+              2,
+              3,
+              8,
+              9
+            ]
+          },
+          {
+            "cycle": 3,
+            "incoming": [
+              2,
+              3,
+              8,
+              9
+            ],
+            "task": "keep only odd numbers",
+            "expected": [
+              3,
+              9
+            ]
+          },
+          {
+            "cycle": 4,
+            "incoming": [
+              3,
+              9
+            ],
+            "task": "reverse the array",
+            "expected": [
+              9,
+              3
+            ]
+          },
+          {
+            "cycle": 5,
+            "incoming": [
+              9,
+              3
+            ],
+            "task": "append the number 19",
+            "expected": [
+              9,
+              3,
+              19
+            ]
+          },
+          {
+            "cycle": 6,
+            "incoming": [
+              9,
+              3,
+              19
+            ],
+            "task": "add 1 to every number",
+            "expected": [
+              10,
+              4,
+              20
+            ]
+          },
+          {
+            "cycle": 7,
+            "incoming": [
+              10,
+              4,
+              20
+            ],
+            "task": "sort it in descending numeric order",
+            "expected": [
+              20,
+              10,
+              4
+            ]
+          },
+          {
+            "cycle": 8,
+            "incoming": [
+              20,
+              10,
+              4
+            ],
+            "task": "keep only its first three values",
+            "expected": [
+              20,
+              10,
+              4
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "v3-language-river-8",
+      "category": "checkable_language",
+      "cycles": 8,
+      "objective": "Begin with the exact sentence `calm rivers carry stories`. First capitalize its first character; next replace Calm with Silver; then append a period; then prefix Log entry: ; then replace stories with messages; then uppercase only the word rivers; then append the sentence Dawn follows.; finally replace carry with preserve. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+      "rubric": {
+        "type": "exact_state_chain",
+        "normalization": "text",
+        "expected_results": [
+          "Calm rivers carry stories",
+          "Silver rivers carry stories",
+          "Silver rivers carry stories.",
+          "Log entry: Silver rivers carry stories.",
+          "Log entry: Silver rivers carry messages.",
+          "Log entry: Silver RIVERS carry messages.",
+          "Log entry: Silver RIVERS carry messages. Dawn follows.",
+          "Log entry: Silver RIVERS preserve messages. Dawn follows."
+        ]
+      },
+      "provenance": {
+        "generator": "qfs.generate_benchmark_v3",
+        "generator_version": 1,
+        "template_family": "language-river",
+        "chain_length": 8,
+        "normalization": "text",
+        "gold_steps": [
+          {
+            "cycle": 1,
+            "incoming": "calm rivers carry stories",
+            "task": "capitalize its first character",
+            "expected": "Calm rivers carry stories"
+          },
+          {
+            "cycle": 2,
+            "incoming": "Calm rivers carry stories",
+            "task": "replace Calm with Silver",
+            "expected": "Silver rivers carry stories"
+          },
+          {
+            "cycle": 3,
+            "incoming": "Silver rivers carry stories",
+            "task": "append a period",
+            "expected": "Silver rivers carry stories."
+          },
+          {
+            "cycle": 4,
+            "incoming": "Silver rivers carry stories.",
+            "task": "prefix Log entry: ",
+            "expected": "Log entry: Silver rivers carry stories."
+          },
+          {
+            "cycle": 5,
+            "incoming": "Log entry: Silver rivers carry stories.",
+            "task": "replace stories with messages",
+            "expected": "Log entry: Silver rivers carry messages."
+          },
+          {
+            "cycle": 6,
+            "incoming": "Log entry: Silver rivers carry messages.",
+            "task": "uppercase only the word rivers",
+            "expected": "Log entry: Silver RIVERS carry messages."
+          },
+          {
+            "cycle": 7,
+            "incoming": "Log entry: Silver RIVERS carry messages.",
+            "task": "append the sentence Dawn follows.",
+            "expected": "Log entry: Silver RIVERS carry messages. Dawn follows."
+          },
+          {
+            "cycle": 8,
+            "incoming": "Log entry: Silver RIVERS carry messages. Dawn follows.",
+            "task": "replace carry with preserve",
+            "expected": "Log entry: Silver RIVERS preserve messages. Dawn follows."
+          }
+        ]
+      }
+    }
+  ]
+}

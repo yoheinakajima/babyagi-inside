@@ -114,6 +114,12 @@ def check():
                for stage in ledger_pointer if stage["kind"] == "prioritize")
     ledger_layout = Layout(ledger_pointer, F.H, 4096)
     assert ledger_layout.free_mask is not None and max(ledger_layout.dims) < 4096
+    short_budget = program(tok, 5, "babyagi_ledger_pointer", think_tokens=32)
+    assert all(stage.get("free_span") in (None, 32) for stage in short_budget)
+    assert max(Layout(short_budget, F.H, 4096).dims) < max(ledger_layout.dims)
+    long_chain = program(tok, 8, "babyagi_ledger_pointer", think_tokens=256)
+    assert len(long_chain) == 24
+    assert max(Layout(long_chain, F.H, 4096).dims) < 4096
     assert len(program(tok, 4, "generative")) == 26
     for cycles, protocol in ((6, "babyagi"), (6, "babyagi_json"),
                              (7, "babyagi_typed"), (9, "babyagi_pointer"),

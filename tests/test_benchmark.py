@@ -6,18 +6,21 @@ import tempfile
 
 from qfs.benchmark import (BenchmarkError, extract_output, item_by_id, load_suite,
                            results_from_evaluation, score_item)
+from qfs.execute_budget import gold_entries
 
 
 ROOT = Path(__file__).parents[1]
 FROZEN = ROOT / "benchmarks" / "babyagi-v1.json"
 CONFIRMATION = ROOT / "benchmarks" / "babyagi-v2.json"
 DEVELOPMENT = ROOT / "benchmarks" / "babyagi-v1-dev.json"
+GRADIENT = ROOT / "benchmarks" / "babyagi-v3.json"
 
 
 def check():
     heldout = load_suite(FROZEN)
     confirmation = load_suite(CONFIRMATION)
     development = load_suite(DEVELOPMENT)
+    gradient = load_suite(GRADIENT)
     assert heldout["benchmark_id"] == "babyagi-heldout-v1"
     assert heldout["status"] == "frozen"
     assert heldout["frozen_on"] == "2026-11-03"
@@ -32,6 +35,12 @@ def check():
     assert development["status"] == "mutable"
     assert {item["id"] for item in heldout["items"]}.isdisjoint(
         item["id"] for item in development["items"])
+    assert gradient["benchmark_id"] == "babyagi-execution-gradient-v3"
+    assert gradient["status"] == "frozen" and len(gradient["items"]) == 32
+    assert set(gradient["category_counts"].values()) == {8}
+    assert {item["cycles"] for item in gradient["items"]} == {2, 3, 5, 8}
+    assert len(gold_entries(gradient)) == 144
+    assert len(gold_entries(gradient, max_steps_per_category=3)) == 12
 
     heldout_text = json.dumps(heldout).lower()
     for development_only in ("oak", "pine", "elm-hot", "luma"):
@@ -40,6 +49,8 @@ def check():
     for sentinel in heldout["leak_sentinels"]:
         assert sentinel.lower() not in compiled_prompts
     for sentinel in confirmation["leak_sentinels"]:
+        assert sentinel.lower() not in compiled_prompts
+    for sentinel in gradient["leak_sentinels"]:
         assert sentinel.lower() not in compiled_prompts
 
     literal = item_by_id(heldout, "literal-moss-3")
