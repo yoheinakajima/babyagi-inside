@@ -183,9 +183,21 @@ def results_from_evaluation(report):
             continue
         writes = [call for call in phase.get("calls", [])
                   if call.get("function") == "write_file"
-                  and call.get("parameters", {}).get("name") == "result.txt"]
-        if writes:
-            results.append(extract_output(writes[-1]["parameters"].get("text", "")))
+                  and call.get("parameters", {}).get("name") in
+                  ("result.txt", "result.json")]
+        if not writes:
+            continue
+        parameters = writes[-1]["parameters"]
+        text = parameters.get("text", "")
+        if parameters.get("name") == "result.json":
+            try:
+                value = json.loads(text)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(value, dict) and "result" in value:
+                results.append(value["result"])
+        else:
+            results.append(extract_output(text))
     return results
 
 

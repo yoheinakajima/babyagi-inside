@@ -6,7 +6,7 @@ partitions every emitted token into four disjoint classes:
 * compiled ROM (including a typed stage's forced suffix),
 * qwenFS response tokens,
 * controller transition/HALT tokens, and
-* model-generated tool-call content.
+* model-generated reasoning and tool-call content.
 
 The last class is further split into semantic payload and ordinary tool-call
 closing syntax.  Token provenance and semantic ownership are deliberately
@@ -131,6 +131,7 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
         decision = _decision_for(stage)
         rom_count = len(prefix)
         model_tokens = []
+        reasoning_count = 0
         payload_count = 0
         closure_count = 0
 
@@ -154,6 +155,31 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
                 raise TraceAccountingError(f"stage {index} typed suffix must close the tool call")
             payload_count = decision_count
             chosen = tok.decode(model_tokens)
+        elif stage.get("free_span"):
+            reasoning_count = int(stage["free_span"])
+            reasoning_start = len(prefix)
+            reasoning_end = reasoning_start + reasoning_count
+            reasoning = body[reasoning_start:reasoning_end]
+            if len(reasoning) != reasoning_count:
+                raise TraceAccountingError(f"stage {index} is missing bounded reasoning tokens")
+            vocab_stop = int(stage.get("free_vocab_stop", 0))
+            if vocab_stop and any(token >= vocab_stop for token in reasoning):
+                raise TraceAccountingError(f"stage {index} emitted an illegal reasoning token")
+            if body[reasoning_end:reasoning_end + len(suffix)] != suffix:
+                raise TraceAccountingError(f"stage {index} forced suffix differs from checkpoint")
+            rom_count += len(suffix)
+            answer_start = reasoning_end + len(suffix)
+            try:
+                close = body.index(F.TCEND, answer_start)
+            except ValueError as exc:
+                raise TraceAccountingError(
+                    f"stage {index} has no completed post-reasoning tool call") from exc
+            answer_tokens = body[answer_start:close + 1]
+            closure_count = _closure_length(answer_tokens, tok)
+            payload_count = len(answer_tokens) - closure_count
+            model_tokens = reasoning + answer_tokens
+            response_start = close + 1
+            chosen = None
         elif stage["op"] == "write":
             try:
                 close = body.index(F.TCEND, len(prefix))
@@ -197,6 +223,7 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
             "filesystem_forced": fs_count,
             "controller_control": 1,
             "model_generated": len(model_tokens),
+            "model_reasoning": reasoning_count,
             "model_payload": payload_count,
             "model_tool_closure": closure_count,
         }
@@ -210,6 +237,7 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
             "op": stage["op"],
             "file": stage["file"],
             "semantic_owner": owner,
+            "bounded_reasoning_tokens": reasoning_count,
             **counts,
         })
 
@@ -220,7 +248,7 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
     emitted = len(tokens)
     exact_partition = totals["accounted_tokens"] == emitted
     model_split_exact = (
-        totals["model_payload"] + totals["model_tool_closure"]
+        totals["model_reasoning"] + totals["model_payload"] + totals["model_tool_closure"]
         == totals["model_generated"])
     if not exact_partition or not model_split_exact:
         raise TraceAccountingError("token partition invariant failed")
@@ -247,7 +275,7 @@ def account_data(record, meta, tok, run_label=None, checkpoint_label=None):
             "control_sequence_exact": True,
             "stage_rom_exact": True,
             "token_partition_exact": exact_partition,
-            "model_payload_plus_closure_exact": model_split_exact,
+            "model_reasoning_plus_payload_plus_closure_exact": model_split_exact,
         },
     }
     return result

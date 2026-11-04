@@ -25,9 +25,11 @@ START = PHASE0
 KINDS = ("create", "prioritize", "execute")
 PROTOCOLS = (
     "baseline", "literal", "generative", "babyagi", "babyagi_kshot", "babyagi_json",
-    "babyagi_typed",
+    "babyagi_typed", "babyagi_pointer", "babyagi_ledger_pointer",
 )
 CHOICE_GAIN = 65536.0
+NATIVE_VOCAB_STOP = 248044
+POINTER_THINK_TOKENS = 128
 
 
 def phase_prompts(cycle, cycles, protocol):
@@ -249,6 +251,10 @@ def program(tok, cycles=3, protocol="baseline"):
     """Only static instructions are compiled; objectives/tasks are never baked in."""
     if cycles < 1:
         raise ValueError("cycles must be positive")
+    if protocol == "babyagi_pointer":
+        return pointer_program(tok, cycles)
+    if protocol == "babyagi_ledger_pointer":
+        return ledger_pointer_program(tok, cycles)
     stages = []
     for cycle in range(1, cycles + 1):
         shared, instructions = phase_prompts(cycle, cycles, protocol)
@@ -353,12 +359,231 @@ def program(tok, cycles=3, protocol="baseline"):
     return stages
 
 
+def pointer_program(tok, cycles=3, think_tokens=POINTER_THINK_TOKENS):
+    """An ordered qwenFS task ledger with an unrolled deterministic pointer.
+
+    Qwen extracts the complete queue into separate files before execution.  The
+    controller then reads ``task1.txt``, ``task2.txt``, ... in order.  Execute
+    owns exactly ``think_tokens`` ordinary vocabulary tokens before ROM resumes,
+    closes the think span, and opens the result write.  No host scheduler or
+    semantic selector participates.
+    """
+    if cycles < 1:
+        raise ValueError("cycles must be positive")
+    if think_tokens < 1:
+        raise ValueError("think_tokens must be positive")
+    stages = []
+
+    # Materialize the ledger first.  Separate files make the pointer operation
+    # token-observable without asking the compiled circuit to parse JSON.
+    for cycle in range(1, cycles + 1):
+        homage = (
+            "INITIAL TASK — Create the first task. " if cycle == 1 else
+            f"CREATE TASK {cycle}. "
+        )
+        instruction = (
+            homage
+            + f"Extract operation {cycle} of {cycles} from the objective in the first user "
+              "message. Treat Begin, Start, initial values, and supplied records as input, not "
+              "operations. Preserve every literal value, symbol, order constraint, and requested "
+              "format. Write exactly one short executable task for this operation. Do not perform "
+              "it, explain it, combine it with another operation, or repeat an earlier task. For "
+              "an objective without numbered operations, choose the next distinct action that adds "
+              "to the requested deliverable. The file already begins with its TASK label; finish "
+              "that one line in at most 24 words and close the tool call."
+        )
+        prefix = "<|im_end|>" if stages else ""
+        frame = (
+            "\n<|im_start|>user\n" + instruction
+            + "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+        )
+        filename = f"task{cycle}.txt"
+        text_prefix = f"TASK {cycle}: "
+        write = (
+            "<tool_call>\n<function=write_file>\n<parameter=name>\n" + filename
+            + "\n</parameter>\n<parameter=text>\n" + text_prefix
+        )
+        stages.append({
+            "cycle": cycle, "kind": "create", "op": "write", "file": filename,
+            "text_prefix": text_prefix, "ledger_index": cycle,
+            "semantic_owner": "model_free_text",
+            "rom": tok.encode(prefix + frame + write, add_special_tokens=False),
+        })
+
+    for cycle in range(1, cycles + 1):
+        if cycle > 1:
+            read_result = (
+                "<tool_call>\n<function=read_file>\n<parameter=name>\nresult.json"
+                "\n</parameter>\n</function>\n</tool_call>"
+            )
+            stages.append({
+                "cycle": cycle, "kind": "execute", "op": "read", "file": "result.json",
+                "pointer_index": cycle, "semantic_owner": "deterministic_circuit_content",
+                "rom": tok.encode(read_result, add_special_tokens=False),
+            })
+
+        filename = f"task{cycle}.txt"
+        read_task = (
+            "<tool_call>\n<function=read_file>\n<parameter=name>\n" + filename
+            + "\n</parameter>\n</function>\n</tool_call>"
+        )
+        stages.append({
+            "cycle": cycle, "kind": "prioritize", "op": "read", "file": filename,
+            "pointer_index": cycle, "selection": "deterministic_ledger_pointer",
+            "semantic_owner": "deterministic_circuit_choice",
+            "rom": tok.encode(read_task, add_special_tokens=False),
+        })
+
+        instruction = (
+            f"EXECUTE TASK {cycle}/{cycles}. The task file just read is the sole instruction for "
+            "this cycle. Perform exactly that task and no later task. "
+            + ("There is no prior result; use the objective's supplied initial state. "
+               if cycle == 1 else
+               "The result file read immediately before the task is the current state; preserve it "
+               "except for the requested operation. ")
+            + "Use the private think span to work through the operation. When the controller opens "
+              "the result object, emit one valid JSON value for the complete new state, then `}`, "
+              "then close the text parameter, function, and tool call. Do not add commentary."
+        )
+        prefix = "<|im_end|>" if stages else ""
+        frame = (
+            "\n<|im_start|>user\n" + instruction
+            + "<|im_end|>\n<|im_start|>assistant\n<think>\n"
+        )
+        suffix = (
+            "\n</think>\n\n<tool_call>\n<function=write_file>\n<parameter=name>\nresult.json"
+            "\n</parameter>\n<parameter=text>\n{\"result\":"
+        )
+        stages.append({
+            "cycle": cycle, "kind": "execute", "op": "write", "file": "result.json",
+            "text_prefix": '{"result":', "pointer_index": cycle,
+            "semantic_owner": "model_free_text", "free_span": think_tokens,
+            "free_vocab_stop": NATIVE_VOCAB_STOP,
+            "rom": tok.encode(prefix + frame, add_special_tokens=False),
+            "rom_suffix": tok.encode(suffix, add_special_tokens=False),
+        })
+
+    phase_budget = HALT - PHASE0
+    if len(stages) > phase_budget:
+        raise ValueError(
+            f"babyagi_pointer protocol needs {len(stages)} microstates for {cycles} cycles; "
+            f"the compiled controller reserves {phase_budget} before HALT")
+    return stages
+
+
+def ledger_pointer_program(tok, cycles=3, think_tokens=POINTER_THINK_TOKENS):
+    """One model-written JSON ledger, indexed by a compiled cycle pointer.
+
+    The controller never parses the ledger and the host never sees it.  qwenFS
+    returns the complete ledger to Qwen in each cycle; the static cycle index in
+    the compiled instruction identifies the sole task to execute.
+    """
+    if cycles < 1:
+        raise ValueError("cycles must be positive")
+    if think_tokens < 1:
+        raise ValueError("think_tokens must be positive")
+    stages = []
+    instruction = (
+        "INITIAL TASK — Create the first task, then the complete ordered task ledger. Separate "
+        "the objective's supplied input state from its executable work. `initial` is the exact "
+        "value supplied by Begin with, Start with, or the initial JSON data; use null if there is "
+        "no single input value. Input data is never a task. `tasks` contains only executable "
+        "operation clauses. For an ordered objective, transcribe clauses introduced by First, "
+        f"Next, Then, and Finally into exactly {cycles} short tasks in that order. Do not add an "
+        "initialization task and do not calculate any result. Every task must preserve its clause's "
+        "operation verb and operand exactly: add stays add, subtract stays subtract, multiply stays "
+        "multiply, and so on. Once `initial` is separated, a task must never say Start, Begin, Set, "
+        "or Initialize; it applies its operation to the current result. For an open objective, propose "
+        f"exactly {cycles} distinct atomic actions that build the requested deliverable. Preserve "
+        "all literals and constraints. The file already begins `{`; continue with exactly "
+        f"`\"initial\":...,\"tasks\":[...]}}`, using exactly {cycles} non-empty task strings, "
+        "then close the text parameter, function, and tool call. Emit no explanation."
+    )
+    frame = (
+        "\n<|im_start|>user\n" + instruction
+        + "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+    )
+    write = (
+        "<tool_call>\n<function=write_file>\n<parameter=name>\nledger.json"
+        "\n</parameter>\n<parameter=text>\n{"
+    )
+    stages.append({
+        "cycle": 1, "kind": "create", "op": "write", "file": "ledger.json",
+        "text_prefix": "{", "semantic_owner": "model_free_text",
+        "rom": tok.encode(frame + write, add_special_tokens=False),
+    })
+
+    for cycle in range(1, cycles + 1):
+        if cycle > 1:
+            read_result = (
+                "<tool_call>\n<function=read_file>\n<parameter=name>\nresult.json"
+                "\n</parameter>\n</function>\n</tool_call>"
+            )
+            stages.append({
+                "cycle": cycle, "kind": "create", "op": "read", "file": "result.json",
+                "pointer_index": cycle, "semantic_owner": "deterministic_circuit_content",
+                "rom": tok.encode(read_result, add_special_tokens=False),
+            })
+
+        read_ledger = (
+            "<tool_call>\n<function=read_file>\n<parameter=name>\nledger.json"
+            "\n</parameter>\n</function>\n</tool_call>"
+        )
+        stages.append({
+            "cycle": cycle, "kind": "prioritize", "op": "read", "file": "ledger.json",
+            "pointer_index": cycle, "selection": "deterministic_ledger_pointer",
+            "semantic_owner": "deterministic_circuit_choice",
+            "rom": tok.encode(read_ledger, add_special_tokens=False),
+        })
+
+        instruction = (
+            f"EXECUTE LEDGER TASK {cycle}/{cycles}. The ledger file just read contains `initial` "
+            f"and an ordered `tasks` array. Use exactly array entry {cycle - 1} (the {cycle}th "
+            "task); this index is fixed by the controller, not a choice. Perform that task and no "
+            "other task. "
+            + ("Use the ledger's `initial` value as the incoming state. " if cycle == 1 else
+               "Use the result file read immediately before the ledger as the incoming state. ")
+            + "Use the private think span to work through the operation. When the controller opens "
+              "the result object, emit one valid JSON value for the complete new state, then `}`, "
+              "then close the text parameter, function, and tool call. Do not add commentary."
+        )
+        frame = (
+            "<|im_end|>\n<|im_start|>user\n" + instruction
+            + "<|im_end|>\n<|im_start|>assistant\n<think>\n"
+        )
+        suffix = (
+            "\n</think>\n\n<tool_call>\n<function=write_file>\n<parameter=name>\nresult.json"
+            "\n</parameter>\n<parameter=text>\n{\"result\":"
+        )
+        stages.append({
+            "cycle": cycle, "kind": "execute", "op": "write", "file": "result.json",
+            "text_prefix": '{"result":', "pointer_index": cycle,
+            "semantic_owner": "model_free_text", "free_span": think_tokens,
+            "free_vocab_stop": NATIVE_VOCAB_STOP,
+            "rom": tok.encode(frame, add_special_tokens=False),
+            "rom_suffix": tok.encode(suffix, add_special_tokens=False),
+        })
+
+    phase_budget = HALT - PHASE0
+    if len(stages) > phase_budget:
+        raise ValueError(
+            f"babyagi_ledger_pointer protocol needs {len(stages)} microstates for {cycles} cycles; "
+            f"the compiled controller reserves {phase_budget} before HALT")
+    return stages
+
+
 class Layout:
     """Controller scratch, disjoint from native Qwen and qwenFS dimensions."""
     def __init__(self, stages, start=1024, stop=F.OFF):
         self.stages = stages
         normalized = [stage if isinstance(stage, dict) else {"rom": stage} for stage in stages]
-        spans = [len(stage["rom"]) + int("decision" in stage)
+        for stage in normalized:
+            if "decision" in stage and stage.get("free_span"):
+                raise ValueError("a stage cannot have both a typed decision and a free span")
+        spans = [len(stage["rom"])
+                 + int(stage.get("decision", {}).get("token_count", 1)
+                       if "decision" in stage else 0)
+                 + int(stage.get("free_span", 0))
                  + len(stage.get("rom_suffix", [])) for stage in normalized]
         d = F.Dims(start)
         self.anchor = d.take()
@@ -367,6 +592,7 @@ class Layout:
         self.counter = d.take()
         self.offset = d.take(max(spans) + 1)
         self.choice_mask = d.take() if any("decision" in stage for stage in normalized) else None
+        self.free_mask = d.take() if any(stage.get("free_span") for stage in normalized) else None
         self.dims = list(range(start, d.n))
         if d.n > stop:
             raise ValueError(f"agent scratch needs {d.n - start} dims in [{start}, {stop})")
@@ -398,6 +624,24 @@ def compile_into(model, stages, xs, native_width=1024, scratch_start=1024,
             E[:, a.choice_mask] = 0
             E[list(allowed), a.choice_mask] = 1
             model.model.norm.weight[a.choice_mask] = CHOICE_GAIN - 1
+        free_stages = [stage for stage in stages if stage.get("free_span")]
+        if free_stages:
+            stops = {int(stage.get("free_vocab_stop", NATIVE_VOCAB_STOP))
+                     for stage in free_stages}
+            if len(stops) != 1:
+                raise ValueError("one compiled checkpoint currently supports one free-span mask")
+            free_vocab_stop = next(iter(stops))
+            if not 0 < free_vocab_stop <= E.shape[0]:
+                raise ValueError(f"invalid free_vocab_stop {free_vocab_stop}")
+            # Preserve the native logits between ordinary tokens exactly.  A
+            # positive constant on every legal token is not safe in bf16: at a
+            # large gate value it rounds nearby native logits into ties.  Give
+            # only illegal control tokens a negative embedding coordinate, so
+            # activating the gate subtracts from them while legal rows remain
+            # untouched (and feed no mask value back on the next token).
+            E[:, a.free_mask] = -1
+            E[:free_vocab_stop, a.free_mask] = 0
+            model.model.norm.weight[a.free_mask] = CHOICE_GAIN - 1
 
         delta = F.Delta(layers[0].linear_attn)
         delta.register(2, {a.anchor: 1.0},
@@ -447,12 +691,18 @@ def compile_into(model, stages, xs, native_width=1024, scratch_start=1024,
                                 {d: F.EPS * c for d, c in zip(F.IDC, F.code(token))})
             span = len(prompt)
             if "decision" in stage:
-                exit_mlp.all_of([a.phase[i], a.offset[span]], {a.choice_mask: F.EPS})
-                span += 1
-                for n, token in enumerate(stage.get("rom_suffix", []), start=span):
-                    exit_mlp.all_of([a.phase[i], a.offset[n]],
-                                    {d: F.EPS * c for d, c in zip(F.IDC, F.code(token))})
-                span += len(stage.get("rom_suffix", []))
+                decision_count = int(stage["decision"].get("token_count", 1))
+                for n in range(span, span + decision_count):
+                    exit_mlp.all_of([a.phase[i], a.offset[n]], {a.choice_mask: F.EPS})
+                span += decision_count
+            elif stage.get("free_span"):
+                for n in range(span, span + int(stage["free_span"])):
+                    exit_mlp.all_of([a.phase[i], a.offset[n]], {a.free_mask: F.EPS})
+                span += int(stage["free_span"])
+            for n, token in enumerate(stage.get("rom_suffix", []), start=span):
+                exit_mlp.all_of([a.phase[i], a.offset[n]],
+                                {d: F.EPS * c for d, c in zip(F.IDC, F.code(token))})
+            span += len(stage.get("rom_suffix", []))
             nxt = PHASE0 + i + 1 if i + 1 < len(stages) else HALT
             # A qwenFS response finishes by opening an empty assistant turn.
             # Its final NL2 follows THINKEND, after the whole ROM. At this
@@ -502,6 +752,7 @@ def build(src, dst, cycles=3, device="mps", protocol="baseline"):
         "native_hidden": native_width, "merged_hidden": target_hidden,
         "scratch": [layout.dims[0], layout.dims[-1] + 1],
         "choice_mask_dim": layout.choice_mask, "choice_gain": CHOICE_GAIN,
+        "free_mask_dim": layout.free_mask,
         "phase_tokens": list(range(PHASE0, PHASE0 + len(prompts))),
         "stages": [{k: v for k, v in s.items() if k != "rom"} for s in stages],
         "phases": [s["kind"] for s in stages],

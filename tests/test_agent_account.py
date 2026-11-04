@@ -73,6 +73,31 @@ def typed_check():
     assert report["decisions"][0]["chosen_token_ids"] == [17]
 
 
+def bounded_check():
+    tok = FakeTokenizer()
+    meta = {
+        "protocol": "pointer",
+        "cycles": 1,
+        "halt": 902,
+        "phase_tokens": [900],
+        "rom": [[120]],
+        "stages": [{
+            "cycle": 1, "kind": "execute", "op": "write", "file": "result.json",
+            "text_prefix": '{"result":', "rom_suffix": [130],
+            "free_span": 2, "free_vocab_stop": 100,
+        }],
+    }
+    record = {"tokens": [120, 10, 11, 130, 200, *tok.close, 300, 902]}
+    report = account_data(record, meta, tok)
+    assert report["totals"]["rom_forced"] == 2
+    assert report["totals"]["model_reasoning"] == 2
+    assert report["totals"]["model_payload"] == 1
+    assert report["totals"]["model_tool_closure"] == 2
+    assert report["totals"]["model_generated"] == 5
+    assert report["stages"][0]["bounded_reasoning_tokens"] == 2
+    assert report["invariants"]["model_reasoning_plus_payload_plus_closure_exact"]
+
+
 def recorded_trace_check():
     cases = (
         ("results/m5-2b-homage-5cycle/live-pine-seed0.json", 5284, 4383, 901,
@@ -99,8 +124,10 @@ def recorded_trace_check():
 def check():
     synthetic_check()
     typed_check()
+    bounded_check()
     checked = recorded_trace_check()
-    print({"synthetic": "PASS", "typed": "PASS", "recorded_traces": checked})
+    print({"synthetic": "PASS", "typed": "PASS", "bounded": "PASS",
+           "recorded_traces": checked})
 
 
 if __name__ == "__main__":

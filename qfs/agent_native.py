@@ -48,6 +48,8 @@ class StageView:
     decision_name: str | None
     decision_mode: str | None
     decision_owner: str | None
+    free_span: int
+    free_vocab_stop: int | None
 
 
 def stage_view(stage):
@@ -69,7 +71,8 @@ def stage_view(stage):
     allowed_text = stage.get("allowed_text") or decision.get("allowed_text") or []
     name = stage.get("decision_name") or decision.get("name")
     return StageView(_ids(prefix), _ids(suffix), _ids(allowed), list(allowed_text), name,
-                     decision.get("mode"), decision.get("owner"))
+                     decision.get("mode"), decision.get("owner"),
+                     int(stage.get("free_span", 0)), stage.get("free_vocab_stop"))
 
 
 def visible_response_tokens(tok, function, name, body=None):
@@ -90,7 +93,7 @@ def visible_response_tokens(tok, function, name, body=None):
     return head + payload + [F.NL, F.TRESPEND] + TURN
 
 
-def choose_token(logits, temperature, top_p, generator, allowed=None):
+def choose_token(logits, temperature, top_p, generator, allowed=None, vocab_stop=None):
     """Match the compiled decoder's greedy/nucleus policy, optionally typed."""
     allowed = list(allowed or [])
     if allowed:
@@ -103,6 +106,10 @@ def choose_token(logits, temperature, top_p, generator, allowed=None):
         p *= p.cumsum(0) - p < top_p
         picked = int(order[torch.multinomial(p / p.sum(), 1, generator=generator)])
         return allowed[picked]
+    if vocab_stop is not None:
+        if not 0 < vocab_stop <= logits.shape[0]:
+            raise ValueError(f"invalid vocab_stop {vocab_stop}")
+        logits = logits[:vocab_stop]
     if temperature <= 0:
         return int(logits.argmax())
     probs = (logits / temperature).softmax(-1).cpu()
@@ -142,9 +149,9 @@ class NativeRunner:
         self.pending = []
         return self.feed(tokens)
 
-    def pick(self, logits, allowed=None):
+    def pick(self, logits, allowed=None, vocab_stop=None):
         return choose_token(logits, self.temperature, self.top_p,
-                            self.generator, allowed=allowed)
+                            self.generator, allowed=allowed, vocab_stop=vocab_stop)
 
 
 def _call(stage, tok, call_tokens):
@@ -176,6 +183,7 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
                   "kind": stage.get("kind"), "op": stage.get("op"),
                   "file": stage.get("file"), "forced_prefix_tokens": len(view.prefix),
                   "forced_suffix_tokens": len(view.suffix), "model_tokens": 0,
+                  "bounded_reasoning_tokens": view.free_span,
                   "decision": None, "completed": False}
         forced_rom += len(view.prefix) + len(view.suffix)
 
@@ -199,6 +207,16 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
             if view.suffix:
                 logits = runner.feed(view.suffix)
             call_tokens = view.prefix + generated + view.suffix
+        elif view.free_span:
+            if not view.suffix:
+                raise ValueError("a bounded free span requires a forced suffix")
+            logits = runner.start(view.prefix)
+            for _ in range(view.free_span):
+                token = runner.pick(logits, vocab_stop=view.free_vocab_stop)
+                generated.append(token)
+                logits = runner.feed([token])
+            logits = runner.feed(view.suffix)
+            call_tokens = view.prefix + generated + view.suffix
         else:
             logits = None
             call_tokens = view.prefix
@@ -210,12 +228,13 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
             response = visible_response_tokens(tok, function, name, body)
             # Static reads have not been fed yet. A typed read was fed through its
             # decision and forced suffix so the model itself supplied the filename.
-            runner.queue((view.prefix if not view.allowed else []) + response)
+            runner.queue((view.prefix if not (view.allowed or view.free_span) else []) + response)
             forced_response += len(response)
             report.update({"function": function, "parameters": parameters,
                            "read_found": body is not None, "read_text":
                            tok.decode(body) if body is not None else None,
                            "model_tokens": len(generated),
+                           "model_token_ids": generated,
                            "model_text": tok.decode(generated),
                            "completed": bool(call_tokens and F.TCEND in call_tokens),
                            "seconds": time.monotonic() - phase_begin})
@@ -230,6 +249,15 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
                     logits = runner.feed([token])
                     if token == F.TCEND:
                         break
+        elif view.free_span:
+            answer_tokens = 0
+            while answer_tokens < limit_per_write:
+                token = runner.pick(logits)
+                generated.append(token)
+                answer_tokens += 1
+                logits = runner.feed([token])
+                if token == F.TCEND:
+                    break
         else:
             logits = runner.start(view.prefix)
             while len(generated) < limit_per_write:
@@ -239,8 +267,15 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
                 if token == F.TCEND:
                     break
         model_free += len(generated) - (1 if view.allowed else 0)
-        call_tokens = (view.prefix + generated[:1] + view.suffix + generated[1:]
-                       if view.allowed else view.prefix + generated + view.suffix)
+        if view.allowed:
+            decision_count = int((stage.get("decision") or {}).get("token_count", 1))
+            call_tokens = (view.prefix + generated[:decision_count] + view.suffix
+                           + generated[decision_count:])
+        elif view.free_span:
+            call_tokens = (view.prefix + generated[:view.free_span] + view.suffix
+                           + generated[view.free_span:])
+        else:
+            call_tokens = view.prefix + generated + view.suffix
         function, parameters = _call(stage, tok, call_tokens)
         completed = bool(call_tokens and F.TCEND in call_tokens)
         name, text = parameters.get("name"), parameters.get("text")
@@ -252,7 +287,8 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
         else:
             stopped = {"stage": number, "reason": "write_call_incomplete_or_invalid"}
         report.update({"function": function, "parameters": parameters,
-                       "model_tokens": len(generated), "model_text": tok.decode(generated),
+                       "model_tokens": len(generated), "model_token_ids": generated,
+                       "model_text": tok.decode(generated),
                        "completed": completed and stopped is None,
                        "seconds": time.monotonic() - phase_begin})
         reports.append(report)
@@ -272,7 +308,9 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
         "stopped": stopped, "phases": reports, "latest_files": latest,
         "token_provenance": {"objective_prefill": len(initial), "forced_rom": forced_rom,
                              "forced_visible_responses": forced_response,
-                             "model_free": model_free, "model_typed_choices": model_choices},
+                             "model_free": model_free, "model_typed_choices": model_choices,
+                             "model_bounded_reasoning": sum(
+                                 phase.get("bounded_reasoning_tokens", 0) for phase in reports)},
         "forward_seconds": runner.forward_seconds,
         "wall_seconds": time.monotonic() - wall_begin,
         "limitations": ["host advances phases and simulates visible filesystem responses",

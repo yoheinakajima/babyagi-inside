@@ -38,6 +38,7 @@ def check(checkpoint, device="mps", chunk=64):
                              "\n</parameter>\n</function>\n</tool_call>", add_special_tokens=False)
     expected = {}
     choice_positions = {}
+    free_positions = {}
     files = {}
     for i, (rom, stage) in enumerate(zip(meta["rom"], meta["stages"])):
         for token in rom:
@@ -52,6 +53,15 @@ def check(checkpoint, device="mps", chunk=64):
             for token in stage.get("rom_suffix", []):
                 expected[len(tokens) - 1] = token
                 tokens.append(token)
+        elif stage.get("free_span"):
+            free_token_ids = tok.encode(" test", add_special_tokens=False)
+            assert free_token_ids and free_token_ids[0] < stage["free_vocab_stop"]
+            for _ in range(stage["free_span"]):
+                free_positions[len(tokens) - 1] = stage["free_vocab_stop"]
+                tokens.append(free_token_ids[0])
+            for token in stage.get("rom_suffix", []):
+                expected[len(tokens) - 1] = token
+                tokens.append(token)
         filename = stage["file"]
         if stage["op"] == "read" and decision_body:
             _, parameters = parse_call(tok.decode(rom + decision_body + stage["rom_suffix"]))
@@ -61,8 +71,9 @@ def check(checkpoint, device="mps", chunk=64):
             file_index, version, _ = files.get(filename, (len(files), 0, None))
             version += 1
             semantic_body = decision_body or tok.encode(
-                objective if stage["kind"] == "bootstrap" else
-                f"Sample content for cycle {stage['cycle']} {stage['kind']}.",
+                ('"sample"}' if stage.get("free_span") else
+                 objective if stage["kind"] == "bootstrap" else
+                 f"Sample content for cycle {stage['cycle']} {stage['kind']}."),
                 add_special_tokens=False)
             # A protocol may compile a static field prefix into the open write call.
             # It is already present in the ROM token stream, but it is also part of
@@ -90,7 +101,7 @@ def check(checkpoint, device="mps", chunk=64):
     model = Qwen3_5ForCausalLM.from_pretrained(checkpoint, dtype=torch.bfloat16).to(device).eval()
     disk.attach(model)
     cache = disk.FSCache(model.config)
-    good, bad, choices = 0, [], []
+    good, bad, choices, free_checks = 0, [], [], []
     for start in range(0, len(tokens), chunk):
         out = model(input_ids=torch.tensor([tokens[start:start + chunk]], device=device),
                     past_key_values=cache, use_cache=True)
@@ -113,10 +124,24 @@ def check(checkpoint, device="mps", chunk=64):
                 top = logits.topk(len(allowed)).indices.tolist()
                 choices.append({"position": pos, "allowed": allowed, "top": top,
                                 "margin": margin, "pass": set(top) == set(allowed) and margin > 0})
+            if pos in free_positions:
+                stop = free_positions[pos]
+                logits = out.logits[0, offset].float()
+                allowed_top = float(logits[:stop].max())
+                illegal_top = float(logits[stop:].max())
+                margin = allowed_top - illegal_top
+                free_checks.append({"position": pos, "vocab_stop": stop,
+                                    "margin": margin, "pass": margin > 0})
         print(f"checked {min(start + chunk, len(tokens))}/{len(tokens)} tokens", flush=True)
     result = {"forced_tokens_correct": good, "forced_tokens_total": len(expected),
               "failures": bad[:20], "typed_choices": choices,
-              "pass": not bad and all(choice["pass"] for choice in choices)}
+              "free_span": {"positions": len(free_checks),
+                            "minimum_margin": min((check["margin"] for check in free_checks),
+                                                  default=None),
+                            "failures": [check for check in free_checks
+                                         if not check["pass"]][:20]},
+              "pass": (not bad and all(choice["pass"] for choice in choices)
+                       and all(check["pass"] for check in free_checks))}
     print(json.dumps(result), flush=True)
     assert result["pass"], result
     return result

@@ -24,7 +24,15 @@ def check():
          "rom_suffix": [3, 4]},
     ], F.H, 4096)
     assert typed_layout.choice_mask is not None
+    assert typed_layout.free_mask is None
     assert len(typed_layout.offset) == 6
+    bounded_layout = Layout([
+        {"rom": [1, 2], "free_span": 4, "free_vocab_stop": 100,
+         "rom_suffix": [3, 4]},
+    ], F.H, 4096)
+    assert bounded_layout.choice_mask is None
+    assert bounded_layout.free_mask is not None
+    assert len(bounded_layout.offset) == 9
     shared, (create, prioritize, execute) = phase_prompts(2, 3, "generative")
     text = shared + create + prioritize + execute
     assert "first user message" in shared
@@ -80,9 +88,37 @@ def check():
         1, 5, "babyagi_typed")[1][0]
     assert "previous result was just read" in phase_prompts(
         2, 5, "babyagi_typed")[1][0]
+    pointer_program = program(tok, 5, "babyagi_pointer")
+    pointer_execute = [stage for stage in pointer_program
+                       if stage["kind"] == "execute" and stage["op"] == "write"]
+    pointer_reads = [stage for stage in pointer_program if stage["kind"] == "prioritize"]
+    assert len(pointer_program) == 19
+    assert [stage["file"] for stage in pointer_reads] == [
+        "task1.txt", "task2.txt", "task3.txt", "task4.txt", "task5.txt"]
+    assert all(stage["selection"] == "deterministic_ledger_pointer"
+               for stage in pointer_reads)
+    assert len(pointer_execute) == 5
+    assert all(stage["free_span"] == 128 and stage["rom_suffix"]
+               and stage["file"] == "result.json" for stage in pointer_execute)
+    pointer_layout = Layout(pointer_program, F.H, 4096)
+    assert pointer_layout.free_mask is not None
+    assert max(pointer_layout.dims) < 4096
+    ledger_pointer = program(tok, 5, "babyagi_ledger_pointer")
+    assert len(ledger_pointer) == 15
+    assert sum(stage["op"] == "write" and stage["file"] == "ledger.json"
+               for stage in ledger_pointer) == 1
+    assert [stage["pointer_index"] for stage in ledger_pointer
+            if stage["kind"] == "prioritize"] == [1, 2, 3, 4, 5]
+    assert all(stage["file"] == "ledger.json" and
+               stage["selection"] == "deterministic_ledger_pointer"
+               for stage in ledger_pointer if stage["kind"] == "prioritize")
+    ledger_layout = Layout(ledger_pointer, F.H, 4096)
+    assert ledger_layout.free_mask is not None and max(ledger_layout.dims) < 4096
     assert len(program(tok, 4, "generative")) == 26
     for cycles, protocol in ((6, "babyagi"), (6, "babyagi_json"),
-                             (7, "babyagi_typed"), (5, "generative")):
+                             (7, "babyagi_typed"), (9, "babyagi_pointer"),
+                             (12, "babyagi_ledger_pointer"),
+                             (5, "generative")):
         try:
             program(tok, cycles, protocol)
         except ValueError as exc:

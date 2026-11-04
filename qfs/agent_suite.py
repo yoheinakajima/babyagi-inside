@@ -27,8 +27,18 @@ def native_results(trace):
         if phase.get("kind") != "execute" or phase.get("op") != "write":
             continue
         parameters = phase.get("parameters", {})
-        if parameters.get("name") == "result.txt" and "text" in parameters:
-            values.append(extract_output(parameters["text"]))
+        if parameters.get("name") not in ("result.txt", "result.json") or "text" not in parameters:
+            continue
+        text = parameters["text"]
+        if parameters.get("name") == "result.json":
+            try:
+                value = json.loads(text)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(value, dict) and "result" in value:
+                values.append(value["result"])
+        else:
+            values.append(extract_output(text))
     return values
 
 

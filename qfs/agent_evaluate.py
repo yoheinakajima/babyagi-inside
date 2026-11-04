@@ -29,6 +29,7 @@ def inspect(run_path, checkpoint_override=None):
         body_tokens = tokens[start:end]
         exact = body_tokens[:len(rom)] == rom
         decision_token = None
+        free_tokens = []
         if "decision" in stage_meta:
             decision_at = len(rom)
             decision_token = (body_tokens[decision_at]
@@ -38,6 +39,14 @@ def inspect(run_path, checkpoint_override=None):
             exact = (exact
                      and decision_token in stage_meta["decision"]["allowed_token_ids"]
                      and body_tokens[suffix_at:suffix_at + len(suffix)] == suffix)
+        elif stage_meta.get("free_span"):
+            free_at = len(rom)
+            free_end = free_at + int(stage_meta["free_span"])
+            free_tokens = body_tokens[free_at:free_end]
+            suffix = stage_meta.get("rom_suffix", [])
+            exact = (exact and len(free_tokens) == stage_meta["free_span"]
+                     and all(token < stage_meta["free_vocab_stop"] for token in free_tokens)
+                     and body_tokens[free_end:free_end + len(suffix)] == suffix)
         calls, pos = [], 0
         while F.TCSTART in body_tokens[pos:]:
             a = body_tokens.index(F.TCSTART, pos)
@@ -51,6 +60,7 @@ def inspect(run_path, checkpoint_override=None):
         stages.append({
             "stage": phase_index, **stage_meta, "rom_exact": exact,
             "decision_token": decision_token,
+            "free_span_count": len(free_tokens),
             "response_completed": F.TRESPEND in body_tokens,
             "calls": calls,
             "body": tok.decode(body_tokens),

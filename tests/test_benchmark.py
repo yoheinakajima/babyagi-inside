@@ -53,8 +53,10 @@ def check():
             "name": "result.txt", "text": "Output:  pine-red"}}]},
         {"kind": "execute", "calls": [{"function": "write_file", "parameters": {
             "name": "result.txt", "text": "Output:  pine-red-blue"}}]},
+        {"kind": "execute", "calls": [{"function": "write_file", "parameters": {
+            "name": "result.json", "text": '{"result":[1,2,3]}'}}]},
     ]}
-    assert results_from_evaluation(evaluation) == ["pine-red", "pine-red-blue"]
+    assert results_from_evaluation(evaluation) == ["pine-red", "pine-red-blue", [1, 2, 3]]
 
     arithmetic = item_by_id(heldout, "arithmetic-seven-3")
     assert score_item(arithmetic, ["12.0", "36", "28"])["pass"] is True
