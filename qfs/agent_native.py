@@ -319,16 +319,18 @@ def run_native(model, tok, stages, objective, device="mps", temperature=0.0,
 
 
 def load_and_run(base, objective, cycles=3, protocol="babyagi", device=None,
-                 temperature=0.0, top_p=0.9, seed=0, limit_per_write=240):
+                 temperature=0.0, top_p=0.9, seed=0, limit_per_write=240,
+                 think_tokens=None):
     device = device or ("cuda" if torch.cuda.is_available() else
                         "mps" if torch.backends.mps.is_available() else "cpu")
     tok = AutoTokenizer.from_pretrained(base)
-    stages = program(tok, cycles, protocol)
+    stages = program(tok, cycles, protocol, think_tokens)
     model = Qwen3_5ForCausalLM.from_pretrained(base, dtype=torch.bfloat16).to(device).eval()
     result = run_native(model, tok, stages, objective, device, temperature,
                         top_p, seed, limit_per_write)
     result.update({"base": str(Path(base).resolve()), "cycles": cycles,
-                   "protocol": protocol, "device": device})
+                   "protocol": protocol, "think_tokens": think_tokens,
+                   "device": device})
     return result
 
 
@@ -344,10 +346,12 @@ def main():
     parser.add_argument("--top-p", type=float, default=0.9)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--limit-per-write", type=int, default=240)
+    parser.add_argument("--think-tokens", type=int,
+                        help="bounded reasoning tokens for pointer protocols")
     args = parser.parse_args()
     result = load_and_run(args.base, args.objective, args.cycles, args.protocol,
                           args.device, args.temperature, args.top_p, args.seed,
-                          args.limit_per_write)
+                          args.limit_per_write, args.think_tokens)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2) + "\n")
