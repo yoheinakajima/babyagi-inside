@@ -2,6 +2,8 @@
 
 BabyAGI Inside compiles a bounded BabyAGI-style agent loop into a widened Qwen3.5-2B checkpoint: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency: the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, while their semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck.
 
+Repository: <https://github.com/yoheinakajima/babyagi-inside>
+
 ## The host loop
 
 ```python
@@ -24,9 +26,24 @@ The widened residual stream is partitioned as follows:
 
 Cycle count is fixed at checkpoint construction. The verified set uses separate checkpoints for 2, 3, 5, and 8 cycles.
 
+## Rebuild checkpoints locally
+
+Checkpoint weights are rebuilt locally and are not shipped in this Git repository. After placing Qwen3.5-2B under `models/Qwen3.5-2B`, run:
+
+```sh
+scripts/build_checkpoints.sh
+```
+
+The script invokes the existing `qfs.agent` build command for `babyagi_ledger_pointer`, 256 reasoning tokens, and cycle counts 2, 3, 5, and 8. Each resulting directory is approximately 8.8 GB (`du -sh` on the reference build).
+
+- Expected build time per checkpoint: `TODO(verify)`—no build-duration measurement is preserved in the tracked artifacts.
+- Expected peak memory: `TODO(verify)`—no peak-memory measurement is preserved in the tracked artifacts. Build one checkpoint at a time until this is measured.
+- Qwen3.5-2B source revision: `TODO(verify)`—the exact 2B snapshot hash is not recorded in tracked files or the local Hugging Face cache.
+- qwenFS-derived compiler source: `48f4f45b6269bf8a0f27ea954a05b2caced929a6`; the repository documentation records upstream qwenFS baseline `fe3f5c0dbebe5c827781e98ad839aecebcce32fa`.
+
 ## Reproduce the ten archived live traces
 
-Requirements: Apple Silicon with MPS, the local `models/Qwen3.5-2B` base model, `uv`, and roughly 10 GB free disk per compiled checkpoint. These are the command forms implemented by the repository's existing CLI modules. Historical records confirm greedy decoding, seed 0, a 256-token reasoning span, and the checkpoint settings shown below. `TODO(verify)`: pin the exact historical base-model revision and compiler source commit before claiming byte-for-byte checkpoint reproduction.
+Requirements: Apple Silicon with MPS, the local `models/Qwen3.5-2B` base model, `uv`, and roughly 10 GB free disk per compiled checkpoint. These are the command forms implemented by the repository's existing CLI modules. Historical records confirm greedy decoding, seed 0, a 256-token reasoning span, and the checkpoint settings shown below. The exact historical base-model revision remains `TODO(verify)` before claiming byte-for-byte checkpoint reproduction.
 
 Build the four cycle-specific checkpoints:
 

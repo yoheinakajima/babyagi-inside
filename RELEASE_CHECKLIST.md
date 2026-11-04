@@ -3,14 +3,16 @@
 ## Done in `release-prep`
 
 - [x] Work isolated in the `babyagi-release` worktree on branch `release-prep`.
-- [x] Supplied single-file site copied byte-for-byte to `site/index.html`; SHA-256 `acc3254643aa73e77735e649a0f61e7f7bbb183d8e1fe03d2ba57038db662583`.
+- [x] Supplied single-file site retained at `site/index.html`; only its two repository URL placeholders were filled, and `site/CNAME` was added separately.
 - [x] Public README documents the thesis, three-line host loop, checkpoint layout, exact CLI command forms, evidence boundary, credits, and licensing split.
 - [x] Repository MIT license retains the upstream qwenFS/TheVixhal notice.
 - [x] NOTICE separates MIT repository code from Apache-2.0 Qwen-derived weights.
 - [x] Citation metadata added with `TODO(zenodo)`.
 - [x] Ten completed live traces exported into the public compact schema without rerunning a model or scorer.
 - [x] Structured failures preserved and clearly labeled; the trace set is not presented as an accuracy sample.
-- [x] No push or publication performed.
+- [x] Private repository created at `https://github.com/yoheinakajima/babyagi-inside`.
+- [x] Checkpoint weights excluded; local rebuild script covers 2, 3, 5, and 8 cycles.
+- [x] GitHub Pages workflow and custom-domain file prepared without enabling Pages.
 
 ## Waits on the frozen sweep
 
@@ -22,12 +24,13 @@
 
 ## Decisions for Yohei
 
-- [ ] **Repository name:** recommend `babyagi-inside`; the current Git remotes do not identify a BabyAGI Inside public repository, so both `[REPO URL]` placeholders in the supplied site remain unchanged.
+- [ ] **Public launch:** make repo public → Settings › Pages › Source: GitHub Actions → DNS CNAME babyagi → yoheinakajima.github.io.
 - [ ] **License:** recommend MIT for repository code, preserving the qwenFS notice, with Qwen-derived checkpoints explicitly remaining Apache-2.0. Have counsel confirm before distributing weights if commercial or sublicensing considerations matter.
 - [ ] **Checkpoint hosting:** recommend Hugging Face Hub for immutable, versioned large checkpoints plus manifests/checksums; keep rebuild scripts and small metadata in GitHub. A scripts-to-rebuild-only release is smaller and avoids hosting roughly 9 GB per checkpoint, but is less reproducible because compilation is costly and the exact base revision/compiler commit still needs verification.
 - [ ] **Release scope:** decide whether to publish all four checkpoints (2/3/5/8 cycles), one showcase checkpoint plus rebuild scripts, or scripts/manifests only.
-- [ ] **Provenance:** pin the exact historical Qwen3.5-2B revision and compiler source commit. Current trace metadata verifies settings but not those two immutable identifiers (`TODO(verify)`).
-- [ ] **DOI and canonical URLs:** create the Zenodo record, choose the public repository URL, and decide the canonical site URL before replacing placeholders.
+- [ ] **Provenance:** pin the exact historical Qwen3.5-2B revision (`TODO(verify)`). The qwenFS-derived compiler source is recorded as `48f4f45b6269bf8a0f27ea954a05b2caced929a6`.
+- [ ] **Build resources:** measure and record checkpoint build time and peak memory (`TODO(verify)`).
+- [ ] **DOI:** create the Zenodo record and replace the DOI placeholder.
 - [ ] **Site wording:** the supplied HTML says stage order is reconstructed; the public trace export intentionally does not reconstruct missing flat-token `start`/`end` offsets and uses `null`. Keep the requested byte-identical site for now, but reconcile that wording before publication if it is meant to describe these JSON files.
 - [ ] **Final validation:** perform a link check and browser review after URLs and sweep-dependent numbers are filled.
 

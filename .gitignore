@@ -3,5 +3,11 @@ __pycache__/
 .ruff_cache/
 models/
 build/
-results/
+results/**/raw*
 fs/
+*.safetensors
+*.bin
+*.pt
+
+# Git ignore patterns cannot filter by byte size. The repository-size workflow
+# and scripts/check_tracked_file_sizes.sh reject tracked files over 50 MB.

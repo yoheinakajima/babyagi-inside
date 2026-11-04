@@ -7,6 +7,7 @@ authors:
     given-names: Yohei
 doi: "TODO(zenodo)"
 license: MIT
+repository-code: "https://github.com/yoheinakajima/babyagi-inside"
 preferred-citation:
   type: software
   title: "BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights"

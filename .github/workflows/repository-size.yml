@@ -1,0 +1,17 @@
+name: Repository size guard
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tracked-file-limit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Reject tracked files over 50 MB
+        run: scripts/check_tracked_file_sizes.sh
