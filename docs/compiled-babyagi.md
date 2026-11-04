@@ -2,6 +2,12 @@
 
 **The model-side control loop passed. The semantic agent test failed.**
 
+> M5 follow-up: Qwen3.5-2B with the new objective-agnostic `literal` protocol
+> passed the same three-step semantic objective in one seed-0 run. A separate
+> `generative` protocol produced cumulative story text but still failed exact
+> `Input` state reporting. See [m5-babyagi-followup.md](m5-babyagi-followup.md).
+> The remainder of this document records the original 0.8B experiment.
+
 A Qwen3.5-0.8B checkpoint was augmented using qwenFS's existing constructed
 layers. From one initial objective it completed three create/prioritize/execute
 cycles and emitted its own HALT. The host only supplied the initial chat prefill,

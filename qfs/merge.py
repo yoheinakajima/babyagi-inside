@@ -68,11 +68,25 @@ def base_model(src):
     return model.eval()
 
 
-def merge(src, xs, gain):
+def ballast_scale(hidden_size):
+    """RMS contributed by qwenFS's fixed ballast in a widened residual.
+
+    The original 3072-wide circuit has three 8192 ballast coordinates, so
+    this is exactly 256 there.  A wider model needs the corresponding scale
+    on circuit and controller features; otherwise every supposedly exact
+    register is uniformly mis-normalized.
+    """
+    return F.BAL * math.sqrt(len(F.B_) / hidden_size)
+
+
+def merge(src, xs, gain, target_hidden=None):
     tc = text_config(src)
     n0, d0 = tc["num_hidden_layers"], tc["hidden_size"]
     assert d0 <= F.OFF, d0
-    tc.update(hidden_size=F.H, num_hidden_layers=len(FS_LAYERS) + n0, vocab_size=F.VOCAB,
+    target_hidden = target_hidden or F.H
+    if target_hidden < F.H or target_hidden < d0:
+        raise ValueError(f"target hidden size {target_hidden} cannot hold native/QFS residuals")
+    tc.update(hidden_size=target_hidden, num_hidden_layers=len(FS_LAYERS) + n0, vocab_size=F.VOCAB,
               layer_types=FS_LAYERS + tc["layer_types"])
     tc.pop("full_attention_interval", None)
     cfg = Qwen3_5TextConfig(**tc)
@@ -86,7 +100,7 @@ def merge(src, xs, gain):
             p = params[k2]
             if norm_re.search(k2):                 # decoder and final norms see the wide residual
                 p.fill_(-1)
-                p[:d0] = ((1 + t.float()) * math.sqrt(d0 / F.H) - 1).to(p.dtype)
+                p[:d0] = ((1 + t.float()) * math.sqrt(d0 / target_hidden) - 1).to(p.dtype)
             elif p.shape == t.shape:
                 p.copy_(t)
             else:
@@ -99,6 +113,14 @@ def merge(src, xs, gain):
         # list markers look like "-" (a list bullet), scaled down for the same reason
         E[F.MARK0:F.MARK0 + F.NFILE, :d0] = (ALIAS * E[F.DASH, :d0].float()).to(E.dtype)
         F.fill(model.model.layers[:len(FS_LAYERS)], xs)
+        # F.fill uses the original 3072-wide exact scale.  Preserve the same
+        # normalized 0/1 register values when the 2B agent widens to 4096.
+        fs_scale = ballast_scale(target_hidden)
+        for layer in model.model.layers[:len(FS_LAYERS)]:
+            for norm in (layer.input_layernorm, layer.post_attention_layernorm):
+                norm.weight[F.OFF:F.D.n] = fs_scale - 1
+                # Ballast fixes the denominator but must not itself propagate.
+                norm.weight[F.B_] = -1
         F.code_gain(model.model.norm, gain)
     model.tie_weights()
     return model.eval()
@@ -120,7 +142,8 @@ def main():
             shutil.copy(Path(a.src) / f, dst / f)
     (dst / "fs.json").write_text(json.dumps({
         "base": Path(a.src).name, "fs_layers": len(FS_LAYERS), "fs_dims_offset": F.OFF,
-        "hidden": F.H, "eps": F.EPS, "code_gain": a.gain, "vocab": F.VOCAB}, indent=2))
+        "hidden": model.config.hidden_size, "eps": F.EPS, "code_gain": a.gain,
+        "vocab": F.VOCAB}, indent=2))
     print(f"wrote {dst}")
 
 

@@ -23,14 +23,12 @@ PHASE0 = F.V_QWEN
 HALT = PHASE0 + 32
 START = PHASE0
 KINDS = ("create", "prioritize", "execute")
+PROTOCOLS = ("baseline", "literal", "generative")
 
 
-def program(tok, cycles=3):
-    """Only static instructions are compiled; objectives/tasks are never baked in."""
-    if not 1 <= cycles <= 3:
-        raise ValueError("The bounded circuit supports 1..3 cycles")
-    stages = []
-    for cycle in range(1, cycles + 1):
+def phase_prompts(cycle, cycles, protocol):
+    """Return static semantic instructions; never include a runtime objective."""
+    if protocol == "baseline":
         shared = f"Cycle {cycle}/{cycles}. Work toward the original objective. "
         instructions = (
             "CREATE: Write two short, concrete next tasks for the objective. "
@@ -41,6 +39,62 @@ def program(tok, cycles=3):
             "EXECUTE: Perform the selected task just read. Write its actual result, "
             "not a promise or a plan. State input and output when applicable.",
         )
+    elif protocol in ("literal", "generative"):
+        shared = (
+            f"Cycle {cycle}/{cycles}. Follow the objective in the first user message literally. "
+            "Treat its exact words, strings, symbols, numbers, order, and requested format as "
+            "requirements. Do not reinterpret its subject as a business, brand, or fictional "
+            "project. Do not invent external actions or facts. "
+        )
+        if protocol == "literal":
+            instructions = (
+                "CREATE: Identify the explicit operations still unfinished. Write exactly two "
+                "candidate tasks, one per line. Task 1 must be the earliest unfinished operation. "
+                "Task 2 must be the next unfinished operation, or a final verification if only one "
+                "operation remains. Each task must describe only one operation and preserve all "
+                "literal values. Do not perform either task. Use exactly this format:\n"
+                "1. task\n2. task",
+                "PRIORITIZE: Select the earliest unfinished operation from the task list. Copy only "
+                "that one task without its number. Do not copy the other task, explain, or perform it.",
+                "EXECUTE: Perform exactly the one selected operation. For a text transformation, "
+                "copy the prior value exactly and apply only the requested change. For text creation, "
+                "write the requested text itself, not a claim that it was written. Use exactly two "
+                "plain-text lines:\nInput: actual input\nOutput: actual output",
+            )
+        else:
+            instructions = (
+                "CREATE: Decompose the objective into its explicit incremental operations. The "
+                "overall goal, initial state, and constraints are context, not tasks. Never copy the "
+                "whole objective as one task. If it says First, Next, and Finally, each named clause "
+                "is a separate operation. Write at most the next two unfinished operations and stop; "
+                "write only one if only one remains. Task 1 must be the earliest unfinished operation. "
+                "Renumber candidates from Task 1 in every cycle; do not retain an original step number. "
+                "Each task must produce only one incremental result and preserve all literal values. "
+                "Do not perform a task. Use one line per task: Task 1: operation; Task 2: operation.",
+                "PRIORITIZE: Select the earliest unfinished operation from the task list. Write only "
+                "the operation text after Task 1:. Do not copy a label or another task, explain, or "
+                "perform it.",
+                "EXECUTE: Perform exactly the one selected operation. For a text transformation, "
+                "copy the prior value exactly and apply only the requested change. For text creation, "
+                "write the requested text itself, not a claim that it was written. Use exactly two "
+                "plain-text lines:\nInput: actual input\nOutput: actual output\n"
+                + ("The previous result was just read. Input must be its exact Output, and Output "
+                   "must retain it unchanged before adding only the new content. " if cycle > 1 else
+                   "There is no previous result. Use the objective's explicit initial state as Input. ")
+                + "End after Output. Do not add explanations or another tool parameter.",
+            )
+    else:
+        raise ValueError(f"Unknown protocol {protocol!r}; choose from {PROTOCOLS}")
+    return shared, instructions
+
+
+def program(tok, cycles=3, protocol="baseline"):
+    """Only static instructions are compiled; objectives/tasks are never baked in."""
+    if not 1 <= cycles <= 3:
+        raise ValueError("The bounded circuit supports 1..3 cycles")
+    stages = []
+    for cycle in range(1, cycles + 1):
+        shared, instructions = phase_prompts(cycle, cycles, protocol)
         for kind, filename, read_name, instruction in zip(
                 KINDS, ("tasks.txt", "current.txt", "result.txt"),
                 ("result.txt" if cycle > 1 else None, "tasks.txt", "current.txt"), instructions):
@@ -48,6 +102,13 @@ def program(tok, cycles=3):
                 read = ("<tool_call>\n<function=read_file>\n<parameter=name>\n" + read_name +
                         "\n</parameter>\n</function>\n</tool_call>")
                 stages.append({"cycle": cycle, "kind": kind, "op": "read", "file": read_name,
+                               "rom": tok.encode(read, add_special_tokens=False)})
+            if protocol == "generative" and kind == "execute" and cycle > 1:
+                # Refresh the accumulated state immediately before semantic execution. Small
+                # models otherwise tend to replace a creative result instead of extending it.
+                read = ("<tool_call>\n<function=read_file>\n<parameter=name>\nresult.txt"
+                        "\n</parameter>\n</function>\n</tool_call>")
+                stages.append({"cycle": cycle, "kind": kind, "op": "read", "file": "result.txt",
                                "rom": tok.encode(read, add_special_tokens=False)})
             prefix = "<|im_end|>" if stages else ""
             frame = ("\n<|im_start|>user\n" + shared + instruction +
@@ -61,33 +122,36 @@ def program(tok, cycles=3):
 
 
 class Layout:
-    """Scratch features in the unused 1024..2047 residual band."""
-    def __init__(self, prompts):
+    """Controller scratch, disjoint from native Qwen and qwenFS dimensions."""
+    def __init__(self, prompts, start=1024, stop=F.OFF):
         self.prompts = prompts
-        d = F.Dims(1024)
+        d = F.Dims(start)
         self.anchor = d.take()
         self.phase_in = d.take(len(prompts))
         self.phase = d.take(len(prompts))
         self.counter = d.take()
         self.offset = d.take(max(map(len, prompts)) + 1)
-        self.dims = list(range(1024, d.n))
-        assert d.n < F.OFF, d.n
+        self.dims = list(range(start, d.n))
+        if d.n > stop:
+            raise ValueError(f"agent scratch needs {d.n - start} dims in [{start}, {stop})")
 
 
-def compile_into(model, prompts, xs):
+def compile_into(model, prompts, xs, native_width=1024, scratch_start=1024,
+                 scratch_stop=F.OFF):
     """Install the agent by changing weights only, before serialization."""
-    a = Layout(prompts)
+    a = Layout(prompts, scratch_start, scratch_stop)
     layers = model.model.layers
     E = model.model.embed_tokens.weight
+    norm_scale = M.ballast_scale(model.config.hidden_size)
     with torch.no_grad():
         for layer in layers[:len(F.LAYERS)]:
             for norm in (layer.input_layernorm, layer.post_attention_layernorm):
-                norm.weight[a.dims] = F.SCALE - 1
+                norm.weight[a.dims] = norm_scale - 1
         for i in range(len(prompts)):
             E[PHASE0 + i, a.anchor] = 1
             E[PHASE0 + i, a.phase_in[i]] = 1
         # Control symbols look like a newline to the pretrained language stack.
-        E[PHASE0:HALT + 1, :1024] = 0.25 * E[F.NL, :1024]
+        E[PHASE0:HALT + 1, :native_width] = 0.25 * E[F.NL, :native_width]
 
         delta = F.Delta(layers[0].linear_attn)
         delta.register(2, {a.anchor: 1.0},
@@ -152,16 +216,23 @@ def compile_into(model, prompts, xs):
     return a
 
 
-def build(src, dst, cycles=3, device="mps"):
+def build(src, dst, cycles=3, device="mps", protocol="baseline"):
     tok = AutoTokenizer.from_pretrained(src)
-    stages = program(tok, cycles)
+    stages = program(tok, cycles, protocol)
     prompts = [s["rom"] for s in stages]
     cfg = M.text_config(src)
-    if cfg["hidden_size"] > 1024:
-        raise ValueError("This minimal circuit needs Qwen3.5-0.8B's spare dimensions")
+    native_width = cfg["hidden_size"]
+    if native_width <= 1024:
+        target_hidden, scratch_start, scratch_stop = F.H, 1024, F.OFF
+    elif native_width == F.OFF:
+        # Qwen3.5-2B occupies 0..2047 and qwenFS occupies 2048..3071.
+        # Give the controller a new tail rather than corrupting either one.
+        target_hidden, scratch_start, scratch_stop = 4096, F.H, 4096
+    else:
+        raise ValueError(f"No verified agent layout for native width {native_width}")
     xs = F.calibrate(device)
-    model = M.merge(src, xs, 4096.0)
-    compile_into(model, prompts, xs)
+    model = M.merge(src, xs, 4096.0, target_hidden=target_hidden)
+    layout = compile_into(model, prompts, xs, native_width, scratch_start, scratch_stop)
     model.config.bos_token_id = START
     model.config.eos_token_id = HALT
     model.generation_config.bos_token_id = START
@@ -171,7 +242,10 @@ def build(src, dst, cycles=3, device="mps"):
     model.save_pretrained(dst, max_shard_size="1GB")
     tok.save_pretrained(dst)
     (dst / "agent.json").write_text(json.dumps({
-        "base": str(src), "cycles": cycles, "start": START, "halt": HALT,
+        "base": str(src), "cycles": cycles, "protocol": protocol,
+        "start": START, "halt": HALT,
+        "native_hidden": native_width, "merged_hidden": target_hidden,
+        "scratch": [layout.dims[0], layout.dims[-1] + 1],
         "phase_tokens": list(range(PHASE0, PHASE0 + len(prompts))),
         "stages": [{k: v for k, v in s.items() if k != "rom"} for s in stages],
         "phases": [s["kind"] for s in stages],
@@ -186,8 +260,9 @@ def main():
     parser.add_argument("dst")
     parser.add_argument("--cycles", type=int, default=3)
     parser.add_argument("--device", default="mps")
+    parser.add_argument("--protocol", choices=PROTOCOLS, default="baseline")
     args = parser.parse_args()
-    build(args.src, args.dst, args.cycles, args.device)
+    build(args.src, args.dst, args.cycles, args.device, args.protocol)
 
 
 if __name__ == "__main__":
