@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BabyAGI Inside</title>
 <meta name="description" content="A bounded agent loop compiled into the weights of Qwen3.5-2B. No training. The host only samples tokens until the model halts itself.">
+<meta property="og:title" content="BabyAGI Inside">
+<meta property="og:description" content="A bounded agent loop compiled into the weights of Qwen3.5-2B. No training. The host only samples tokens until the model halts itself.">
+<meta property="og:image" content="https://babyagi.yohei.me/og.png">
+<meta property="og:url" content="https://babyagi.yohei.me">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://babyagi.yohei.me/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -196,6 +204,32 @@ pre.bib{background:var(--panel);border:1px solid var(--rule);border-radius:0;pad
 footer{border-top:1px solid var(--rule);padding:32px 0 48px;font-size:14px;color:var(--muted)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
+
+/* under the hood */
+.hood{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;gap:3px;align-items:stretch;height:250px;margin:6px 0 10px}
+.stack .lbls{display:flex;flex-direction:column;gap:3px;width:92px;flex-shrink:0;font-family:var(--font-mono);font-size:12px}
+.stack .lbls span{display:flex;align-items:center}
+.lyr{flex:1;display:flex;flex-direction:column;gap:3px;min-width:3px}
+.lyr i{display:block}
+.r-q{flex:2048}.r-f{flex:1024}.r-s{flex:137}.r-p{flex:887}
+.lyr .r-q{background:var(--qwen-tint)}.lyr .r-f{background:var(--fs-tint)}.lyr .r-s{background:var(--off)}.lyr .r-p{background:transparent;outline:1px dashed var(--rule);outline-offset:-1px}
+.lyr.c .r-f{background:var(--fs)}.lyr.c .r-s{background:var(--circuit-ink)}
+.lyr.n .r-q{background:var(--qwen-soft)}
+.lyr.on.c .r-f,.lyr.on.c .r-s{opacity:.55}
+.lyr.on.n .r-q{background:var(--qwen)}
+.stack-foot{display:flex;font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-left:95px;gap:8px}
+.gate{position:relative;height:250px;margin:6px 0 10px;border-bottom:1px solid var(--rule);display:flex;align-items:flex-end;gap:6px}
+.gb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
+.gb .b{width:100%;background:var(--circuit);transition:height .6s ease,opacity .6s ease}
+.gb.l .b{background:var(--qwen)}
+.gb .boost{width:100%;background:var(--pick);height:0;transition:height .6s ease}
+.gate.on .gb.l .boost{height:120px}
+.gate.on .gb:not(.l) .b{opacity:.2}
+.gb .t{position:absolute;bottom:-22px;font-family:var(--font-mono);font-size:11px;white-space:nowrap;color:var(--muted)}
+.gate-ctl{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:30px;font-size:14px;color:var(--muted)}
+@media (max-width:640px){.hood{grid-template-columns:minmax(0,1fr)}.stack .lbls{width:70px}.stack-foot{margin-left:73px}}
+
 @media (max-width: 980px){
   .cols{grid-template-columns:minmax(0,1fr)}
   .col{border-right:none;border-bottom:1px solid var(--rule)}
@@ -226,6 +260,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <a href="#replay">Replay</a>
       <a href="#arrow">What's new</a>
       <a href="#cycle">How it works</a>
+      <a href="#hood">Under the hood</a>
       <a href="#results">Results</a>
       <a href="#paper">Paper</a>
     </nav>
@@ -399,10 +434,39 @@ while ids[-1] != HALT:
   </div>
 </section>
 
+
+<section class="s" id="hood">
+  <div class="wrap">
+    <div class="s-head">
+      <div class="s-num">§03 under the hood</div>
+      <div>
+        <h2>Separate lanes, one network</h2>
+        <p>The loop lives in its own lanes of a widened residual stream, so Qwen's computation is left alone. A compiled gate can also restrict Qwen to legal tokens without changing which of them it prefers.</p>
+      </div>
+    </div>
+    <div class="s-body hood">
+      <div class="card">
+        <h3>residual stream · 4,096 dims × 32 layers</h3>
+        <div class="stack" id="stack" aria-label="Residual stream lanes across 8 compiled and 24 Qwen layers">
+          <div class="lbls"><span class="r-q" style="color:var(--qwen)">Qwen 0–2047</span><span class="r-f" style="color:var(--fs)">qwenFS</span><span class="r-s">loop</span><span class="r-p" style="color:var(--muted)">pad</span></div>
+        </div>
+        <div class="stack-foot"><span style="flex:8">8 compiled</span><span style="flex:24">Qwen's 24 layers, weights unchanged</span></div>
+        <p>Each part writes only to its own lanes. With the loop inactive, the merged model matches stock Qwen on tested prefixes (top-1 4/4, KL ≤ 0.002).</p>
+      </div>
+      <div class="card">
+        <h3>typed choice gate · v17 protocol</h3>
+        <div class="gate" id="gate" aria-label="Next-token scores before and after the gate"></div>
+        <div class="gate-ctl"><span id="gate-cap">Qwen's raw next-token scores</span><button type="button" class="btn" id="gate-btn" style="min-height:36px">Gate on</button></div>
+        <p>One residual coordinate adds the same boost to "1" and "2". Qwen's own scores still decide between them; every other token loses by at least 1,893 logits. Bars not to scale.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="s" id="trace">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§03 inside a run</div>
+      <div class="s-num">§04 inside a run</div>
       <div>
         <h2>One cycle, token by token</h2>
         <p>Abridged excerpt of cycle 2 of the five-cycle multiply-first run. Each row is labeled by who emitted it. Token text is shown schematically; full traces are in the repository.</p>
@@ -426,7 +490,7 @@ while ids[-1] != HALT:
 <section class="s" id="wrong-plan">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§04 a revealing failure</div>
+      <div class="s-num">§05 a revealing failure</div>
       <div>
         <h2>A wrong plan, executed faithfully</h2>
         <p>On two eight-cycle structured tasks, the loop did everything it was built to do. The plan Qwen wrote was wrong, and the loop carried it out for eight cycles. Because orchestration is fixed, the failure is visible at the point where it happens.</p>
@@ -460,7 +524,7 @@ while ids[-1] != HALT:
 <section class="s" id="results">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§05 results</div>
+      <div class="s-num">§06 results</div>
       <div>
         <h2>It runs as built</h2>
         <p>Ten live traces on the compiled checkpoint, two to eight cycles, Apple M5 (MPS, bf16). The four add-first traces were chosen by a preregistered rule; the other six were chosen afterwards for diagnosis.</p>
@@ -498,7 +562,7 @@ while ids[-1] != HALT:
 <section class="s" id="scope">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§06 scope</div>
+      <div class="s-num">§07 scope</div>
       <div><h2>What this is, and what it isn't</h2></div>
     </div>
     <div class="s-body isnt">
@@ -525,7 +589,7 @@ while ids[-1] != HALT:
 <section class="s" id="paper">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§07 paper and code</div>
+      <div class="s-num">§08 paper and code</div>
       <div>
         <h2>BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights</h2>
         <p>Yohei Nakajima, 2026. Built on <a href="https://github.com/vixhal-baraiya/qwenFS">qwenFS</a> by Vixhal Baraiya, whose compiler lineage traces to <a href="https://github.com/divagr18/qwenputer">Qwenputer</a> by Divyansh Agrawal. Inspired by <a href="https://github.com/yoheinakajima/babyagi">BabyAGI</a> (2023).</p>
@@ -533,7 +597,7 @@ while ids[-1] != HALT:
     </div>
     <div class="s-body">
       <div class="cta" style="margin-top:0;margin-bottom:24px">
-        <a class="btn primary" href="[ZENODO DOI URL]">Paper (PDF, DOI)</a>
+        <a class="btn primary" href="paper.pdf">Paper (PDF)</a>
         <a class="btn" href="https://github.com/yoheinakajima/babyagi-inside">Code and traces</a>
       </div>
       <div class="copy-row"><span class="cap" style="margin:0">cite</span><button type="button" class="btn" id="btn-copy" style="min-height:36px">Copy BibTeX</button></div>
@@ -699,6 +763,23 @@ while ids[-1] != HALT:
       navigator.clipboard.writeText(text).then(function(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy BibTeX'; }, 1600); }, function(){ btn.textContent = 'Select and copy'; });
     } catch (e) { btn.textContent = 'Select and copy'; }
   });
+
+  // under the hood
+  (function(){
+    var st=document.getElementById('stack');
+    var cols=[];
+    for(var i=0;i<32;i++){var d=document.createElement('div');d.className='lyr '+(i<8?'c':'n');
+      ['r-q','r-f','r-s','r-p'].forEach(function(c){var x=document.createElement('i');x.className=c;d.appendChild(x);});
+      st.appendChild(d);cols.push(d);}
+    var reduce2=false;try{reduce2=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+    if(!reduce2){var k=0;setInterval(function(){cols.forEach(function(c,j){c.classList.toggle('on',j===k);});k=(k+1)%40;},140);}
+    var toks=[['Task',119],['The',98],['↵',84],['{',63],['1',77],['2',56],['Append',70],['I',49],['Let',46],['"',32],['3',28]];
+    var g=document.getElementById('gate');
+    toks.forEach(function(t){var b=document.createElement('div');b.className='gb'+((t[0]==='1'||t[0]==='2')?' l':'');
+      b.innerHTML='<div class="boost"></div><div class="b" style="height:'+t[1]+'px"></div><span class="t"></span>';b.lastChild.textContent=t[0];g.appendChild(b);});
+    var btn=document.getElementById('gate-btn'),cap=document.getElementById('gate-cap'),on=false;
+    btn.addEventListener('click',function(){on=!on;g.classList.toggle('on',on);btn.textContent=on?'Gate off':'Gate on';cap.textContent=on?'"1" and "2" boosted equally':'Qwen\'s raw next-token scores';});
+  })();
 })();
 </script>
 </body>
