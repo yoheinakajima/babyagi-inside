@@ -19,6 +19,16 @@ class EquivalenceError(ValueError):
     """A trace cannot be aligned to its checkpoint program."""
 
 
+def _native_trace(record):
+    """Accept either a bare native trace or an end-to-end result wrapper."""
+    if "trace" not in record:
+        return record
+    trace = record["trace"]
+    if not isinstance(trace, dict):
+        raise EquivalenceError("native result wrapper has a non-object trace")
+    return trace
+
+
 def _compiled_stage_tokens(record, meta):
     tokens = list(record["tokens"])
     phase_tokens = set(meta["phase_tokens"])
@@ -69,7 +79,7 @@ def _compiled_stage_tokens(record, meta):
 def compare(compiled_path, native_path, checkpoint=None):
     compiled_path, native_path = Path(compiled_path), Path(native_path)
     compiled = json.loads(compiled_path.read_text())
-    native = json.loads(native_path.read_text())
+    native = _native_trace(json.loads(native_path.read_text()))
     checkpoint = Path(checkpoint or compiled["checkpoint"])
     meta = json.loads((checkpoint / "agent.json").read_text())
     tok = AutoTokenizer.from_pretrained(checkpoint)
