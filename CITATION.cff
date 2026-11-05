@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Nakajima
     given-names: Yohei
-doi: "TODO(zenodo)"
+doi: "10.5281/zenodo.23966217"
 license: MIT
 repository-code: "https://github.com/yoheinakajima/babyagi-inside"
 preferred-citation:
@@ -15,5 +15,5 @@ preferred-citation:
     - family-names: Nakajima
       given-names: Yohei
   year: 2026
-  doi: "TODO(zenodo)"
+  doi: "10.5281/zenodo.23966217"
 

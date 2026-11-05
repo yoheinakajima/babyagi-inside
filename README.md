@@ -1,5 +1,7 @@
 # BabyAGI Inside
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966217.svg)](https://doi.org/10.5281/zenodo.23966217)
+
 BabyAGI Inside compiles a bounded BabyAGI-style agent loop into a widened Qwen3.5-2B checkpoint: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency: the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, while their semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck.
 
 Repository: <https://github.com/yoheinakajima/babyagi-inside>
