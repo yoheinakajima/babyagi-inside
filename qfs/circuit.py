@@ -826,18 +826,19 @@ def fill(layers, xs):
         m.write(layer.mlp)
 
 
-def config():
+def config(value_heads=16):
+    """The standalone FS model's config; value_heads=32 is Qwen3.5-4B's DeltaNet layout."""
     return Qwen3_5TextConfig(
         vocab_size=VOCAB, hidden_size=H, intermediate_size=2 * NMAX + 800,
         num_hidden_layers=len(LAYERS), layer_types=LAYERS, num_attention_heads=1,
         num_key_value_heads=1, head_dim=HD, attn_output_gate=True,
-        linear_num_key_heads=16, linear_num_value_heads=16, linear_key_head_dim=DK, linear_value_head_dim=DK,
+        linear_num_key_heads=16, linear_num_value_heads=value_heads, linear_key_head_dim=DK, linear_value_head_dim=DK,
         linear_conv_kernel_dim=4, tie_word_embeddings=True, rms_norm_eps=1e-6, hidden_act="silu")
 
 
-def build(dev="mps", xs=None):
+def build(dev="mps", xs=None, value_heads=16):
     """The standalone FS model (no Qwen); without xs the data thermometer is left empty."""
-    model = Qwen3_5ForCausalLM(config())
+    model = Qwen3_5ForCausalLM(config(value_heads))
     with torch.no_grad():
         for p in model.parameters():
             p.zero_()
