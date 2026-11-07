@@ -3,7 +3,9 @@
 The FS layers (qfs.circuit) go in front of Qwen's 24, the residual is widened to
 3072 (Qwen's matrices are zero-padded; its decoder and final norm gains are scaled by
 sqrt(source_width/3072), so its text computation is unchanged up to bf16 rounding of those gains), and
-the FS tokens are appended to the vocabulary. The FS exit clears every FS dim except the output
+the FS tokens are appended to the vocabulary. (The compiled agent widens further, to 4096; a
+native residual wider than qwenFS's offset, such as Qwen3.5-4B's 2560, continues above qwenFS:
+see native_dims.) The FS exit clears every FS dim except the output
 code, which it leaves EPS-sized in the id dims: Qwen's layers barely see it, and the final norm
 scales it up so that a forced token (an ack, a read-back) wins over Qwen's own prediction. Where
 nothing is forced the code is 0 and Qwen's logits are untouched.
