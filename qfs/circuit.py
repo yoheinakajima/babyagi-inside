@@ -267,6 +267,10 @@ class Delta:
     def __init__(self, net):
         self.n = net
         self.kd = net.key_dim
+        # Gated DeltaNet repeats each key head over num_v_heads // num_k_heads value heads
+        # (repeat_interleave), so head h's value side is value head h * ratio: 1 on
+        # Qwen3.5-2B (16/16), 2 on Qwen3.5-4B (16/32). The other value heads stay zero.
+        self.ratio = net.num_v_heads // net.num_k_heads
 
     def q(self, h, row, lin, tap=-1):
         self._chan(h * DK + row, lin, tap)
@@ -275,7 +279,7 @@ class Delta:
         self._chan(self.kd + h * DK + row, lin, tap)
 
     def v(self, h, col, lin, tap=-1):
-        self._chan(2 * self.kd + h * DK + col, lin, tap)
+        self._chan(2 * self.kd + h * self.ratio * DK + col, lin, tap)
 
     def _chan(self, c, lin, tap):
         self.n.in_proj_qkv.weight[c, :] = 0
@@ -287,18 +291,18 @@ class Delta:
     def z(self, h, lin):
         for c in range(DK):
             for d, w in lin.items():
-                self.n.in_proj_z.weight[h * DK + c, d] = w
+                self.n.in_proj_z.weight[h * self.ratio * DK + c, d] = w
 
     def beta(self, h, lin):
         for d, w in lin.items():
-            self.n.in_proj_b.weight[h, d] = w
+            self.n.in_proj_b.weight[h * self.ratio, d] = w
 
     def decay(self, h, lin):
         for d, w in lin.items():
-            self.n.in_proj_a.weight[h, d] = w
+            self.n.in_proj_a.weight[h * self.ratio, d] = w
 
     def out(self, h, col, dim, w):
-        self.n.out_proj.weight[dim, h * DK + col] = w
+        self.n.out_proj.weight[dim, h * self.ratio * DK + col] = w
 
     def register(self, h, key, fields, tap=-1, n_set=None):
         """A one-row register written where the key form is on and read at every token.

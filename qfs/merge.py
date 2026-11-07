@@ -36,23 +36,27 @@ def text_config(src):
     return tc
 
 
-def qwen_tensors(src):
-    """Qwen's text weights, keyed as in Qwen3_5ForCausalLM ("model.layers.N...")."""
+def iter_qwen_tensors(src):
+    """Qwen's text weights one at a time, keyed as in Qwen3_5ForCausalLM ("model.layers.N...")."""
     src = Path(src)
     index = json.loads((src / "model.safetensors.index.json").read_text())["weight_map"]
-    out = {}
     for f in sorted(set(index.values())):
         with safe_open(str(src / f), "pt") as sf:
             for k in sf.keys():
                 if k.startswith(PREFIX):
-                    out["model." + k[len(PREFIX):]] = sf.get_tensor(k)
-    return out
+                    yield "model." + k[len(PREFIX):], sf.get_tensor(k)
+
+
+def qwen_tensors(src):
+    return dict(iter_qwen_tensors(src))
 
 
 def empty_model(cfg):
     with torch.device("meta"):
         model = Qwen3_5ForCausalLM(cfg)
-    model = model.to_empty(device="cpu").to(torch.bfloat16)
+    # Allocate in bf16 directly. Allocating in fp32 and then casting needs twice the
+    # memory: about 33 GB for the widened Qwen3.5-4B agent, more than a 32 GB machine has.
+    model = model.to(torch.bfloat16).to_empty(device="cpu")
     with torch.no_grad():
         for p in model.parameters():
             p.zero_()
@@ -61,6 +65,30 @@ def empty_model(cfg):
     # the module off the meta device, as from_pretrained does. Not serialized.
     model.model.rotary_emb = type(model.model.rotary_emb)(cfg)
     return model
+
+
+def native_dims(width):
+    """Where a native residual of this width sits in the merged residual.
+
+    Up to F.OFF wide (Qwen3.5-2B and smaller) it stays at 0..width. A wider one
+    (Qwen3.5-4B, 2560) keeps 0..F.OFF and continues above qwenFS from F.H, so the qwenFS
+    layout and every circuit dimension stay where they are.
+    """
+    if width <= F.OFF:
+        return slice(0, width)
+    return list(range(F.OFF)) + list(range(F.H, F.H + width - F.OFF))
+
+
+def native_stop(width):
+    """One past the highest merged dimension the native residual occupies."""
+    return width if width <= F.OFF else F.H + width - F.OFF
+
+
+def place(p, t, d0, dims):
+    """Copy native tensor t into the leading block of p, with its residual axis at dims."""
+    grown = [a for a, (s, n) in enumerate(zip(t.shape, p.shape)) if s != n and s == d0]
+    assert len(grown) <= 1, (t.shape, p.shape)
+    p[tuple(dims if a in grown else slice(0, s) for a, s in enumerate(t.shape))] = t
 
 
 def base_model(src):
@@ -86,9 +114,9 @@ def ballast_scale(hidden_size):
 def merge(src, xs, gain, target_hidden=None):
     tc = text_config(src)
     n0, d0 = tc["num_hidden_layers"], tc["hidden_size"]
-    assert d0 <= F.OFF, d0
+    dims = native_dims(d0)
     target_hidden = target_hidden or F.H
-    if target_hidden < F.H or target_hidden < d0:
+    if target_hidden < F.H or target_hidden < native_stop(d0):
         raise ValueError(f"target hidden size {target_hidden} cannot hold native/QFS residuals")
     tc.update(hidden_size=target_hidden, num_hidden_layers=len(FS_LAYERS) + n0, vocab_size=F.VOCAB,
               layer_types=FS_LAYERS + tc["layer_types"])
@@ -99,23 +127,23 @@ def merge(src, xs, gain, target_hidden=None):
     shift = re.compile(r"^model\.layers\.(\d+)\.")
     norm_re = re.compile(r"(input_layernorm|post_attention_layernorm)\.weight$|^model\.norm\.weight$")
     with torch.no_grad():
-        for k, t in qwen_tensors(src).items():
+        for k, t in iter_qwen_tensors(src):
             k2 = shift.sub(lambda m: f"model.layers.{int(m[1]) + len(FS_LAYERS)}.", k)
             p = params[k2]
             if norm_re.search(k2):                 # decoder and final norms see the wide residual
                 p.fill_(-1)
-                p[:d0] = ((1 + t.float()) * math.sqrt(d0 / target_hidden) - 1).to(p.dtype)
+                p[dims] = ((1 + t.float()) * math.sqrt(d0 / target_hidden) - 1).to(p.dtype)
             elif p.shape == t.shape:
                 p.copy_(t)
             else:
-                p[tuple(slice(0, s) for s in t.shape)] = t
+                place(p, t, d0, dims)
         E = model.model.embed_tokens.weight
         F.embeddings(E)
         # ack tokens look like a newline to Qwen's layers (RMSNorm undoes the scale); scaled
         # down, their Qwen logit stays below the newline's, so Qwen never writes one itself
-        E[F.ACKW0:F.NONE + 1, :d0] = (ALIAS * E[F.NL, :d0].float()).to(E.dtype)
+        E[F.ACKW0:F.NONE + 1, dims] = (ALIAS * E[F.NL, dims].float()).to(E.dtype)
         # list markers look like "-" (a list bullet), scaled down for the same reason
-        E[F.MARK0:F.MARK0 + F.NFILE, :d0] = (ALIAS * E[F.DASH, :d0].float()).to(E.dtype)
+        E[F.MARK0:F.MARK0 + F.NFILE, dims] = (ALIAS * E[F.DASH, dims].float()).to(E.dtype)
         F.fill(model.model.layers[:len(FS_LAYERS)], xs)
         # F.fill uses the original 3072-wide exact scale.  Preserve the same
         # normalized 0/1 register values when the 2B agent widens to 4096.
@@ -125,7 +153,11 @@ def merge(src, xs, gain, target_hidden=None):
                 norm.weight[F.OFF:F.D.n] = fs_scale - 1
                 # Ballast fixes the denominator but must not itself propagate.
                 norm.weight[F.B_] = -1
+        native_gain = model.model.norm.weight[dims].clone()
         F.code_gain(model.model.norm, gain)
+        # code_gain silences every dimension from F.OFF up, which includes a wide native
+        # residual's dimensions above qwenFS; give those back their gains.
+        model.model.norm.weight[dims] = native_gain
     model.tie_weights()
     return model.eval()
 
