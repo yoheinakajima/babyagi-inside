@@ -64,13 +64,23 @@ def artifact_paths(trace_id, source_root, sweep=False):
 
 
 def export_trace(trace_id, source_root, benchmark_items, sweep=False):
-    run, evaluation, accounting = map(load, artifact_paths(trace_id, source_root, sweep))
+    paths = artifact_paths(trace_id, source_root, sweep)
+    run, evaluation, accounting = map(load, paths)
     item = benchmark_items[trace_id]
+    for path, value in zip(paths[1:], (evaluation, accounting)):
+        if "error" in value:
+            raise SystemExit(f"{trace_id}: {path} records an error: {value['error']}")
 
     ledger_text = evaluation["latest_files"]["ledger.json"]["text"]
     ledger = json.loads(ledger_text)
-    results = result_values(evaluation)
     expected = item["rubric"]["expected_results"]
+    if sweep:
+        # The sweep's own scored results and verdict (qfs.benchmark normalizes values).
+        score = load(paths[0].parent / "score.json")
+        results, passed = score["actual_results"], score["automated_pass"]
+    else:
+        results = result_values(evaluation)
+        passed = len(results) == len(expected) and results == expected
     totals = accounting["totals"]
     stages = [{
         "cycle": stage["cycle"],
@@ -87,7 +97,7 @@ def export_trace(trace_id, source_root, benchmark_items, sweep=False):
         "ledger": ledger,
         "results": results,
         "expected": expected,
-        "pass": len(results) == len(expected) and results == expected,
+        "pass": passed,
         "tokens": {
             "total": totals["emitted_tokens"],
             "forced": totals["forced_total"],

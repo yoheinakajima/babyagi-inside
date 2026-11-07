@@ -40,10 +40,13 @@ frozen at `78961097d7e6cfc30db6f13bcec68c5d29019b36` before this sweep was prere
 - Run order: ascending cycle count, then frozen suite order
 - Frozen plain comparison: 32 plain Qwen3.5-4B records, 15/32 exact chains (records
   digest `93cdc89604278cb71b5d12321e7f0f2c08108c3a7801d576adce8495057751f9`). They come
-  from the lab's model-scale screen and were produced by the same plain-arm runner
-  (`qfs.end_to_end`, SHA-256 `8c1e55f6…`) and settings as the 2B sweep's plain records
-  (5/32), which that screen reproduced 32/32 on 2B. Like the 2B plain records, they are
-  not in this repository.
+  from the lab's model-scale screen, which ran the `qfs.end_to_end` plain arm (runner
+  digest `8c1e55f6…`) at the 2B sweep's plain settings. The 2B sweep's plain records
+  (5/32) came from an earlier runner (`aa833883…`); the same screen's fresh 2B plain run
+  with `8c1e55f6…` reproduced their verdicts and results 32/32. Like the 2B plain records,
+  they are not in this repository. (Corrected on 2026-11-07, after the sweep started: this
+  entry first said both record sets came from the same runner. The frozen records and
+  their digest are unchanged.)
 - Sweep sources: `qfs.compiled_sweep` hashes its runner, decoder, evaluator, accountant,
   scorer, statistics, and plan scorer into the sweep manifest. At this commit they hash
   identically to the 2B sweep manifest's `source_sha256`.
