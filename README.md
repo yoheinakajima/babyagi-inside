@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966217.svg)](https://doi.org/10.5281/zenodo.23966217)
 
-BabyAGI Inside compiles a bounded BabyAGI-style agent loop into widened Qwen3.5-2B and Qwen3.5-4B checkpoints: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency. On 2B, the live traces verify exact controller, filesystem, HALT, and token-accounting behavior, while their semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck. On 4B, the same compiled loop runs every phase of all 32 frozen objectives exactly and completes 28 of them, against 15 for plain Qwen3.5-4B.
+BabyAGI Inside compiles a bounded BabyAGI-style agent loop into widened Qwen3.5-2B and Qwen3.5-4B checkpoints: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency. On 2B, the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, 30 of the full 32-item sweep's runs pass every system check, and the semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck. On 4B, the same compiled loop runs every phase of all 32 frozen objectives exactly and completes 28 of them, against 15 for plain Qwen3.5-4B.
 
 Repository: <https://github.com/yoheinakajima/babyagi-inside>
 
@@ -50,8 +50,8 @@ scripts/build_checkpoints.sh 4b   # Qwen3.5-4B
 
 The script invokes the existing `qfs.agent` build command for `babyagi_ledger_pointer`, 256 reasoning tokens, and cycle counts 2, 3, 5, and 8. Each resulting directory is approximately 8.8 GB for 2B and 15 GB for 4B (`du -sh`).
 
-- Build time per checkpoint on an Apple M5 (32 GB): about 30–40 s for 2B and about 40 s for 4B.
-- Peak memory: maximum resident set size 13.8–16.1 GB for 2B and 12.6–15.0 GB for 4B; macOS reports a peak memory footprint of about 18.9 GB for 2B and about 26.4 GB for 4B. Builds allocate the widened model directly in bf16. Before that change a 2B build peaked at about 24 GB RSS, and a 4B build would have needed about 33 GB.
+- Build time per checkpoint on an Apple M5 (32 GB): 31–36 s for 2B and 40–58 s for 4B.
+- Peak memory: macOS reports a peak memory footprint of 18.9 GB for a 2B build (one 5-cycle build measured) and 25.3–26.4 GB for 4B; maximum resident set size is lower, 13.8–16.1 GB for 2B and 12.6–15.0 GB for 4B. Builds allocate the widened model directly in bf16. Before that change a 2B build peaked at a 23–24 GB footprint (max RSS 11–12 GB), and the fp32 allocation of the widened 4B model alone would be about 33 GB (an estimate; it was never run).
 - Builds are deterministic: rebuilding from the same inputs reproduces each checkpoint's tree SHA-256. The digests are in the [2B](docs/babyagi-v3-full-live-compiled-preregistration.md) and [4B](docs/qwen35-4b-full-live-compiled-preregistration.md) sweep preregistrations.
 - Qwen3.5-2B content pin: [`provenance/qwen3.5-2b.sha256`](provenance/qwen3.5-2b.sha256) records SHA-256 for the exact weights, config, tokenizer, and tokenizer config used locally. The upstream revision ID was not recorded.
 - Qwen3.5-4B content pin: [`provenance/qwen3.5-4b.sha256`](provenance/qwen3.5-4b.sha256) records SHA-256 for the weights, weight index, config, tokenizer, tokenizer config, and chat template, from Hugging Face revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`.
@@ -109,11 +109,11 @@ The `|| true` keeps the batch running after the scorer returns status 1 for eith
 
 ## Reproduce the Qwen3.5-4B sweep
 
-With Qwen3.5-4B under `models/Qwen3.5-4B` matching [`provenance/qwen3.5-4b.sha256`](provenance/qwen3.5-4b.sha256), build the four checkpoints with `scripts/build_checkpoints.sh 4b` (about 15 GB each, about 66 GB for all four) and run `qfs.compiled_sweep` as shown in the [4B results](docs/qwen35-4b-full-live-compiled-results.md#reproduction). On an Apple M5 the sweep takes about 4.6 hours at about 6 tokens per second.
+With Qwen3.5-4B under `models/Qwen3.5-4B` matching [`provenance/qwen3.5-4b.sha256`](provenance/qwen3.5-4b.sha256), build the four checkpoints with `scripts/build_checkpoints.sh 4b` (16.4 GB each, 65.6 GB for all four) and run `qfs.compiled_sweep` as shown in the [4B results](docs/qwen35-4b-full-live-compiled-results.md#reproduction). On an Apple M5 the sweep takes about 4.6 hours at about 6 tokens per second.
 
 ## What is verified
 
-Two frozen 32-item live-compiled sweeps on the v3 suite (four task families, two objectives per family at 2, 3, 5, and 8 cycles), one per base model, with the same runner, decoder, evaluator, token accountant, scorer, and settings: greedy decoding, seed 0, a 256-token reasoning span, and a 7,000-token external bound.
+Two frozen 32-item live-compiled sweeps on the v3 suite (four task families, two objectives per family at 2, 3, 5, and 8 cycles), one per base model, with the same runner, decoder, evaluator, token accountant, scorer, and settings: greedy decoding, seed 0, a 256-token reasoning span, and a 7,000-token external bound. The plain rows are one thinking-enabled turn of the same base model with a length-matched token budget, from two versions of the plain-arm runner (2B `aa833883…`; 4B `8c1e55f6…`, which reproduces the 2B plain records 32/32).
 
 | | Qwen3.5-2B | Qwen3.5-4B |
 | --- | ---: | ---: |
@@ -124,7 +124,7 @@ Two frozen 32-item live-compiled sweeps on the v3 suite (four task families, two
 | Paired compiled minus plain (item bootstrap 95% CI; exact McNemar) | +9.4 points [0.0, +21.9]; p = 0.25 | +40.6 points [+25.0, +59.4]; p = 0.00024 |
 
 - **Qwen3.5-2B.** All eight sequential arithmetic chains pass and the other 24 fail; outside arithmetic, no 2B ledger matches its task even under the exploratory operation-signature score. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode, a parser behavior inherited from qwenFS, so those runs' file reads were not exact. The paired result against plain chat is inconclusive.
-- **Qwen3.5-4B.** 8/8 arithmetic, 8/8 structured-operation, 6/8 checkable-language, and 6/8 ordered-literal chains. All four failures are Qwen's exact-string edits (casing and punctuation placement) at five and eight cycles, inside runs that pass every system check. The improvement over plain Qwen3.5-4B was preregistered and holds with no item regressed. Agent-inactive parity against stock Qwen3.5-4B: maximum KL 3.8e-5 nats over four prompts, top-1 4/4. Details: [preregistration](docs/qwen35-4b-full-live-compiled-preregistration.md) and [results](docs/qwen35-4b-full-live-compiled-results.md).
+- **Qwen3.5-4B.** 8/8 arithmetic, 8/8 structured-operation, 6/8 checkable-language, and 6/8 ordered-literal chains. All four failures are Qwen's exact-string edits (casing and punctuation placement) at five and eight cycles, inside runs that pass every system check. The improvement over plain Qwen3.5-4B was preregistered and holds with no item regressed. Every plain 4B run reached its token budget, and 10 of the 13 items the compiled loop gains are ones where plain Qwen gave no parseable answer, so much of the gain is plain Qwen running out of budget before it answers. Agent-inactive parity against stock Qwen3.5-4B: maximum KL 3.8e-5 nats over four prompts, top-1 4/4. Details: [preregistration](docs/qwen35-4b-full-live-compiled-preregistration.md) and [results](docs/qwen35-4b-full-live-compiled-results.md).
 - The host provides nothing after the objective; the checkpoints run greedily until their compiled HALT token.
 - Traces: the ten archived 2B diagnostics are in [`traces/`](traces/README.md), selected for diagnosis before the 2B sweep and not an accuracy sample. All 32 4B sweep runs are in [`traces/qwen3.5-4b/`](traces/qwen3.5-4b/).
 

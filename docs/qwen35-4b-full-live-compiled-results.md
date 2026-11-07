@@ -31,8 +31,9 @@ transformers 5.22.1:
 | 8 | 41.1 s, 14.0 GB | yes, `913f236d…` | 2,592/2,592 | 3.8e-5 | 4/4 |
 
 - **Rebuild identical:** a second build from the same inputs had the same tree SHA-256.
-  Full digests are in the preregistration. macOS reports a peak memory footprint of about
-  26.4 GB for each build, above the RSS figure and below 32 GB.
+  Full digests are in the preregistration. The table gives the first build; the rebuilds
+  took 41.6–57.7 s with max RSS 13.9–15.0 GB. macOS reports a peak memory footprint of
+  25.3–26.4 GB across the eight builds, above the RSS figures and below 32 GB.
 - **Oracle:** `tests.test_agent_circuit`. The totals equal the 2B release's, and there
   were no typed-choice or free-span failures.
 - **Parity:** `tests.test_agent_parity` (four prompts, agent inactive) against stock
@@ -96,6 +97,13 @@ Paired comparisons over the same 32 items (compiled 4B minus each; item-bootstra
 The 2B sweep's paired result against plain 2B was +9.4 points [0.0, +21.9] (p = 0.25),
 which was inconclusive.
 
+The plain arm is one thinking-enabled turn with a token budget matched to the item's
+length (256 per cycle plus 256 for the answer). Every plain 4B run reached that budget,
+and 13 of 32 gave no parseable answer. Ten of the 13 items the compiled loop gains are
+among those 13. Much of the measured gain is therefore plain Qwen running out of budget
+before it answers, where the compiled loop spends the same reasoning budget one step at
+a time and writes each result to qwenFS.
+
 ### Against the host simulation
 
 Before the port, a host simulation of the same protocol with stock Qwen3.5-4B completed
@@ -118,7 +126,7 @@ system check, and in each the controller executed the ledger Qwen wrote.
 
 | Item | Steps | First failed step | What happened |
 | --- | ---: | ---: | --- |
-| `v3-literal-route-5` | 2/5 | 3 | Appended `?` one step early (`R5:COBALT-N5?` for `R5:COBALT-N5`), and the error carried forward. Identical in the host simulation |
+| `v3-literal-route-5` | 2/5 | 3 | Qwen's ledger listed precomputed states instead of operations, and its third state already ended in `?` (`R5:COBALT-N5?` for `R5:COBALT-N5`); step 4 then added a stray `-`. Identical in the host simulation |
 | `v3-literal-route-8` | 7/8 | 8 | Put the final `!` inside the bracket (`[r8:juniper_n8?!]` for `[r8:juniper_n8?]!`) |
 | `v3-language-lantern-8` | 5/8 | 6 | "uppercase only the word lanterns" produced `Lanterns`, not `LANTERNS`. Identical in the host simulation |
 | `v3-language-river-8` | 5/8 | 6 | The same uppercase-one-word step failed. Identical in the host simulation |
@@ -136,14 +144,16 @@ it completes all 8 structured-operation chains with 0 exact structured ledgers.
 
 - The compiled machinery carries over to a larger base unchanged in kind: the same
   forced-token totals, exact HALT, exact reads, and exact accounting. qwenFS's layout and
-  circuit constants did not move. Only the native residual's placement and the DeltaNet
-  head map changed.
+  circuit constants did not move. Only the native residual's placement, the controller
+  block's position (from 3072 to 3584), and the DeltaNet head map changed.
 - On this suite, compiling the loop into Qwen3.5-4B improves over plain Qwen3.5-4B, with
-  no item regressed. On 2B, the same compiled loop's paired result against plain chat was
-  inconclusive. The ledgers point to planning as the difference between the bases: 4B
-  writes steps it can execute, often paraphrased, in every category, while 2B's ledgers
-  were executable only for arithmetic (8/32 by the exploratory signature score, against
-  21/32 for 4B).
+  no item regressed, though much of that gain is plain Qwen exhausting its single-turn
+  budget (see Capability). On 2B, the same compiled loop's paired result against plain
+  chat was inconclusive. The ledgers point to planning as the difference between the
+  bases: 4B's ledgers name executable steps on 21 of 32 items, across all four
+  categories and often paraphrased, while 2B's were executable only for arithmetic (8/32
+  by the exploratory signature score). Some 4B ledgers list states rather than operations
+  (`v3-literal-route-5`).
 - The residual errors are exact-string edits (casing and punctuation placement) at five
   and eight cycles, not loop or filesystem errors.
 
@@ -153,8 +163,9 @@ it completes all 8 structured-operation chains with 0 exact structured ledgers.
   bounded sequential execution and task extraction, not open-ended planning or tool use.
 - One run per item, greedy, on one machine (Apple M5, MPS, bf16). There is no CUDA
   oracle or timing yet.
-- The plain baseline is one thinking-enabled turn with a length-matched token budget. In
-  the screen that produced it, every plain run reached its token ceiling.
+- The plain baseline is one thinking-enabled turn with a length-matched token budget.
+  Every plain 4B run reached that budget, and 10 of the 13 compiled gains are items where
+  plain Qwen gave no parseable answer. A plain baseline with a larger budget was not run.
 - Cycle count is fixed per checkpoint, as in the 2B release.
 - Agent-inactive parity is a four-prompt smoke check, not a broad equivalence test.
 
