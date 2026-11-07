@@ -1,0 +1,216 @@
+{
+  "trace_id": "v3-language-river-8",
+  "cycles": 8,
+  "objective": "Begin with the exact sentence `calm rivers carry stories`. First capitalize its first character; next replace Calm with Silver; then append a period; then prefix Log entry: ; then replace stories with messages; then uppercase only the word rivers; then append the sentence Dawn follows.; finally replace carry with preserve. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+  "ledger": {
+    "initial": "calm rivers carry stories",
+    "tasks": [
+      "First capitalize its first character",
+      "Next replace Calm with Silver",
+      "Then append a period",
+      "Then prefix Log entry: ",
+      "Then replace stories with messages",
+      "Then uppercase only the word rivers",
+      "Then append the sentence Dawn follows.",
+      "Finally replace carry with preserve"
+    ]
+  },
+  "results": [
+    "Calm rivers carry stories",
+    "Silver rivers carry stories",
+    "Silver rivers carry stories.",
+    "Log entry: Silver rivers carry stories.",
+    "Log entry: Silver rivers carry messages.",
+    "Log entry: Silver Rivers carry messages.",
+    "Log entry: Silver Rivers carry messages. Dawn follows.",
+    "Log entry: Silver Rivers preserve messages. Dawn follows."
+  ],
+  "expected": [
+    "Calm rivers carry stories",
+    "Silver rivers carry stories",
+    "Silver rivers carry stories.",
+    "Log entry: Silver rivers carry stories.",
+    "Log entry: Silver rivers carry messages.",
+    "Log entry: Silver RIVERS carry messages.",
+    "Log entry: Silver RIVERS carry messages. Dawn follows.",
+    "Log entry: Silver RIVERS preserve messages. Dawn follows."
+  ],
+  "pass": false,
+  "tokens": {
+    "total": 5558,
+    "forced": 3258,
+    "qwenfs": 1233,
+    "qwen_reasoning": 2048,
+    "qwen_payload": 252
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

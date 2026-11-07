@@ -3,7 +3,8 @@
 This is a CPU-only transformation over completed JSON artifacts. It does not
 load a checkpoint, import a model framework, decode tokens, or rerun scoring.
 With --sweep, the same ten items are read from a qfs.compiled_sweep output
-directory (items/<id>/) instead of the archived result layout.
+directory (items/<id>/) instead of the archived result layout; --all exports
+every suite item from the sweep.
 """
 from __future__ import annotations
 
@@ -118,12 +119,16 @@ def main():
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--sweep", action="store_true",
                         help="source_root is a qfs.compiled_sweep output directory")
+    parser.add_argument("--all", action="store_true",
+                        help="with --sweep, export every suite item, not only the ten")
     args = parser.parse_args()
+    if args.all and not args.sweep:
+        parser.error("--all needs --sweep")
 
     benchmark = load(args.benchmark)
     items = {item["id"]: item for item in benchmark["items"]}
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    for trace_id in TRACE_LOCATIONS:
+    for trace_id in (items if args.all else TRACE_LOCATIONS):
         value = export_trace(trace_id, args.source_root, items, args.sweep)
         output = args.output_dir / f"{trace_id}.json"
         output.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
