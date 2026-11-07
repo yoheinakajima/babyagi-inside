@@ -56,6 +56,10 @@ def empty_model(cfg):
     with torch.no_grad():
         for p in model.parameters():
             p.zero_()
+    # to_empty leaves non-persistent buffers uninitialized (zeros in practice), so the
+    # rotary frequencies would be 0 and full attention would see no positions. Rebuild
+    # the module off the meta device, as from_pretrained does. Not serialized.
+    model.model.rotary_emb = type(model.model.rotary_emb)(cfg)
     return model
 
 
