@@ -2,6 +2,8 @@
 
 This is a CPU-only transformation over completed JSON artifacts. It does not
 load a checkpoint, import a model framework, decode tokens, or rerun scoring.
+With --sweep, the same ten items are read from a qfs.compiled_sweep output
+directory (items/<id>/) instead of the archived result layout.
 """
 from __future__ import annotations
 
@@ -51,12 +53,18 @@ def emitter(stage):
     return "controller"
 
 
-def export_trace(trace_id, source_root, benchmark_items):
-    directory = Path(source_root) / TRACE_LOCATIONS[trace_id]
-    prefix = directory / trace_id
-    run = load(f"{prefix}-run.json")
-    evaluation = load(f"{prefix}-evaluation.json")
-    accounting = load(f"{prefix}-account.json")
+def artifact_paths(trace_id, source_root, sweep=False):
+    if sweep:
+        directory = Path(source_root) / "items" / trace_id
+        return (directory / "run.json", directory / "evaluation.json",
+                directory / "account.json")
+    prefix = Path(source_root) / TRACE_LOCATIONS[trace_id] / trace_id
+    return (Path(f"{prefix}-run.json"), Path(f"{prefix}-evaluation.json"),
+            Path(f"{prefix}-account.json"))
+
+
+def export_trace(trace_id, source_root, benchmark_items, sweep=False):
+    run, evaluation, accounting = map(load, artifact_paths(trace_id, source_root, sweep))
     item = benchmark_items[trace_id]
 
     ledger_text = evaluation["latest_files"]["ledger.json"]["text"]
@@ -94,16 +102,19 @@ def export_trace(trace_id, source_root, benchmark_items):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source_root", type=Path,
-                        help="finished end-to-end-v3-b256 result root")
+                        help="finished end-to-end-v3-b256 result root, or a sweep "
+                             "directory with --sweep")
     parser.add_argument("benchmark", type=Path)
     parser.add_argument("output_dir", type=Path)
+    parser.add_argument("--sweep", action="store_true",
+                        help="source_root is a qfs.compiled_sweep output directory")
     args = parser.parse_args()
 
     benchmark = load(args.benchmark)
     items = {item["id"]: item for item in benchmark["items"]}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for trace_id in TRACE_LOCATIONS:
-        value = export_trace(trace_id, args.source_root, items)
+        value = export_trace(trace_id, args.source_root, items, args.sweep)
         output = args.output_dir / f"{trace_id}.json"
         output.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
         print(f"{trace_id}: {'pass' if value['pass'] else 'fail'}")
