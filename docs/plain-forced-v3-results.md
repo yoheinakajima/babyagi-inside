@@ -58,7 +58,10 @@ cannot detect small effects, and it says nothing about tasks a single turn canno
 
 The records were produced by the lab runner (record identity `runner_sha256`
 `8e191ee0…`). [`qfs/plain_forced.py`](../qfs/plain_forced.py) carries the same prompt,
-caps, forcing, parsing, and scoring:
+caps, forcing, parsing, and scoring. Run on the same Apple M5 (torch 2.15.0,
+transformers 5.22.1), it regenerated four records token for token: 2B F1 on
+`v3-arithmetic-add-2` and `v3-language-lantern-2`, and 4B F2 on `v3-arithmetic-add-2` and
+`v3-literal-route-2`. The other 188 were not regenerated.
 
 ```bash
 uv run python -m qfs.plain_forced run models/Qwen3.5-4B benchmarks/babyagi-v3.json \
