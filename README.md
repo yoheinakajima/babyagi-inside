@@ -24,7 +24,7 @@ The widened residual stream is partitioned as follows:
 | ---: | --- | --- |
 | 0–2047 | Qwen | Native Qwen3.5-2B model state |
 | 2048–3071 | qwenFS | Compiled filesystem state and operations |
-| 3072–3208 | Agent | Controller and bounded-agent scratch state |
+| 3072–3547 | Agent | Controller and bounded-agent scratch state (3072–3511 at 2 cycles, 3072–3547 at 8) |
 
 The Qwen3.5-4B checkpoints use the same 4,096-dimension residual and keep qwenFS where it is. Qwen3.5-4B's native residual is 2,560 dimensions wide, so it continues above qwenFS, and the agent moves up:
 
