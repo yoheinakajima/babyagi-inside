@@ -2,6 +2,14 @@
 
 ## Result
 
+> **Update (2026-11-08).** The plain comparison below is superseded. Every one-turn plain
+> run stopped at its token ceiling before Qwen closed its thinking, so the +40.6 points
+> measured truncation. In a preregistered follow-up at token budgets matched to the
+> compiled loop's, with thinking closed at a cap and an answer budget of its own, plain
+> Qwen3.5-4B completes **29/32**: compiled minus plain is −3.1 points (95% CI [−9.4, 0.0];
+> 0 improved, 1 regressed; p = 1.0). See the [budget-forced results](plain-forced-v3-results.md).
+> The systems results in this document are unaffected.
+
 The bounded BabyAGI-style loop compiles into Qwen3.5-4B with the same exactness as the
 2B release, and the compiled 4B checkpoints complete **28 of the 32** frozen v3
 objectives. Plain Qwen3.5-4B completes 15. Every one of the 32 live runs executed every
@@ -90,7 +98,8 @@ Paired comparisons over the same 32 items (compiled 4B minus each; item-bootstra
 
 | Comparison | Difference | 95% CI | Improved / regressed | McNemar p |
 | --- | ---: | --- | ---: | ---: |
-| Plain 4B (preregistered primary) | **+40.6 points** | [+25.0, +59.4] | 13 / 0 | 0.00024 |
+| Plain 4B, one turn (preregistered primary; truncated) | +40.6 points | [+25.0, +59.4] | 13 / 0 | 0.00024 |
+| Plain 4B, budget-forced F2 (later preregistration) | **−3.1 points** | [−9.4, 0.0] | 0 / 1 | 1.0 |
 | Compiled 2B (descriptive) | +62.5 points | [+46.9, +78.1] | 20 / 0 | 1.9 × 10⁻⁶ |
 | 4B host simulation (descriptive) | +3.1 points | [0.0, +9.4] | 1 / 0 | 1.0 |
 

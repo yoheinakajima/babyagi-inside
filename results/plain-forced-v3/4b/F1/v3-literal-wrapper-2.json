@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E14",
+    "model": "4b",
+    "arm": "F1",
+    "item_id": "v3-literal-wrapper-2",
+    "think_cap": 512,
+    "answer_cap": 256,
+    "suite_sha256": "e880e043f7ac412aaab938036cccd5f79305aed4cd0c13a7204e09fe07c1dff4",
+    "runner_sha256": "8e191ee062dc2d4ba1c35546cb8bd6036c5eda4200f00c3e7a3cf6f24e19f7b1"
+  },
+  "item_id": "v3-literal-wrapper-2",
+  "category": "ordered_literal",
+  "cycles": 2,
+  "generation": {
+    "text": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Initial Text:** \"topaz\"\n    *   **Task 1:** Append \"-a2\" to the current text.\n    *   **Task 2:** Wrap the complete text in parentheses.\n    *   **Output Format:**\n        *   Each step must be a JSON string (since the input is text).\n        *   Preserve the result after every successive operation.\n        *   Do not include the initial state as a result.\n        *   End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`.\n        *   The `results` array must have exactly 2 entries in task order.\n        *   No text after the object.\n    *   **Constraint:** \"Begin with the exact text topaz.\" (This seems to be the starting point for the transformation tasks).\n    *   **Constraint:** \"Apply exactly one text transformation per task in order and return the complete current text each time.\"\n    *   **Constraint:** \"Solve the entire objective in one response.\"\n    *   **Constraint:** \"End with `FINAL_JSON: ` followed by exactly one valid JSON object...\"\n\n2.  **Step-by-Step Execution:**\n\n    *   **Start:** \"topaz\"\n    *   **Task 1:** Append \"-a2\".\n        *   Current text: \"topaz\"\n        *   Operation: \"topaz\" + \"-a2\" = \"topaz-a2\"\n        *   Result 1: \"topaz-a2\"\n    *   **Task 2:** Wrap the complete text in parentheses.\n        *   Current text: \"topaz-a2\"\n        *   Operation: \"(\" + \"topaz-a2\" + \")\" = \"(topaz-a2)\"\n        *   Result 2: \"(topaz-a2)\"\n\n3.  **Formatting the Output:**\n\n    *   The prompt asks to \"return the complete current text each time\" but also says \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 2 entries in task order.\"\n    *   It also says \"Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a\n</think>\n\ntopaz-a2\nFINAL_JSON: {\"results\":[\"topaz-a2\",\"(topaz-a2)\"]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "topaz-a2\nFINAL_JSON: {\"results\":[\"topaz-a2\",\"(topaz-a2)\"]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 512,
+    "answer_tokens": 26,
+    "model_tokens": 538,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 47.83619024977088
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "actual_results": [
+    "topaz-a2",
+    "(topaz-a2)"
+  ],
+  "score": {
+    "item_id": "v3-literal-wrapper-2",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": "topaz-a2",
+        "actual": "topaz-a2"
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": "(topaz-a2)",
+        "actual": "(topaz-a2)"
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  }
+}

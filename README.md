@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966217.svg)](https://doi.org/10.5281/zenodo.23966217)
 
-BabyAGI Inside compiles a bounded BabyAGI-style agent loop into widened Qwen3.5-2B and Qwen3.5-4B checkpoints: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency. On 2B, the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, 30 of the full 32-item sweep's runs pass every system check, and the semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck. On 4B, the same compiled loop runs every phase of all 32 frozen objectives exactly and completes 28 of them, against 15 for plain Qwen3.5-4B.
+BabyAGI Inside compiles a bounded BabyAGI-style agent loop into widened Qwen3.5-2B and Qwen3.5-4B checkpoints: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency. On 2B, the ten archived live traces verify exact controller, filesystem, HALT, and token-accounting behavior, 30 of the full 32-item sweep's runs pass every system check, and the semantic results show reliable sequential arithmetic and an unresolved structured-planning bottleneck. On 4B, the same compiled loop runs every phase of all 32 frozen objectives exactly and completes 28 of them. Plain Qwen3.5-4B, given the same token budget and made to answer, completes 29: the loop adds control, not measured capability, on this suite ([budget-forced results](docs/plain-forced-v3-results.md)).
 
 Repository: <https://github.com/yoheinakajima/babyagi-inside>
 
@@ -113,24 +113,26 @@ With Qwen3.5-4B under `models/Qwen3.5-4B` matching [`provenance/qwen3.5-4b.sha25
 
 ## What is verified
 
-Two frozen 32-item live-compiled sweeps on the v3 suite (four task families, two objectives per family at 2, 3, 5, and 8 cycles), one per base model, with the same runner, decoder, evaluator, token accountant, scorer, and settings: greedy decoding, seed 0, a 256-token reasoning span, and a 7,000-token external bound. The plain rows are one thinking-enabled turn of the same base model with a length-matched token budget, from two versions of the plain-arm runner (2B `aa833883…`; 4B `8c1e55f6…`, which reproduces the 2B plain records 32/32).
+Two frozen 32-item live-compiled sweeps on the v3 suite (four task families, two objectives per family at 2, 3, 5, and 8 cycles), one per base model, with the same runner, decoder, evaluator, token accountant, scorer, and settings: greedy decoding, seed 0, a 256-token reasoning span, and a 7,000-token external bound. The primary plain rows are budget-forced: plain Qwen's thinking is closed at a cap and it then answers under its own cap, at the compiled loop's model-token allowance (F2, preregistered; [results](docs/plain-forced-v3-results.md)). The one-turn rows are a single thinking-enabled turn with a length-matched ceiling, from two versions of the plain-arm runner (2B `aa833883…`; 4B `8c1e55f6…`, which reproduces the 2B plain records 32/32); every one-turn run reached its ceiling before Qwen closed its thinking, so those rows measure truncation.
 
 | | Qwen3.5-2B | Qwen3.5-4B |
 | --- | ---: | ---: |
 | Forced-token oracle at 2, 3, 5, and 8 cycles | 840, 1,132, 1,716, 2,592: all exact | the same totals, all exact |
 | Runs passing every system check (HALT, controller, qwenFS reads, cycles, accounting) | 30/32 | 32/32 |
 | Exact chains, compiled checkpoint | 8/32 (Wilson 95% [13.3, 42.1]) | 28/32 (Wilson 95% [71.9, 95.0]) |
-| Exact chains, plain Qwen | 5/32 | 15/32 |
-| Paired compiled minus plain (item bootstrap 95% CI; exact McNemar) | +9.4 points [0.0, +21.9]; p = 0.25 | +40.6 points [+25.0, +59.4]; p = 0.00024 |
+| Exact chains, plain Qwen at the loop's token budget (F2) | 12/32 | 29/32 |
+| Paired compiled minus F2 plain (item bootstrap 95% CI; exact McNemar) | −12.5 points [−25.0, −3.1]; p = 0.125 | −3.1 points [−9.4, 0.0]; p = 1.0 |
+| Exact chains, plain Qwen in one turn (truncated before answering) | 5/32 | 15/32 |
+| Paired compiled minus one-turn plain | +9.4 points [0.0, +21.9]; p = 0.25 | +40.6 points [+25.0, +59.4]; p = 0.00024 |
 
-- **Qwen3.5-2B.** All eight sequential arithmetic chains pass and the other 24 fail; outside arithmetic, no 2B ledger matches its task even under the exploratory operation-signature score. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode, a parser behavior inherited from qwenFS, so those runs' file reads were not exact. The paired result against plain chat is inconclusive.
-- **Qwen3.5-4B.** 8/8 arithmetic, 8/8 structured-operation, 6/8 checkable-language, and 6/8 ordered-literal chains. All four failures are Qwen's exact-string edits (casing and punctuation placement) at five and eight cycles, inside runs that pass every system check. The improvement over plain Qwen3.5-4B was preregistered and holds with no item regressed. Every plain 4B run reached its token budget, and 10 of the 13 items the compiled loop gains are ones where plain Qwen gave no parseable answer, so much of the gain is plain Qwen running out of budget before it answers. Agent-inactive parity against stock Qwen3.5-4B: maximum KL 3.8e-5 nats over four prompts, top-1 4/4. Details: [preregistration](docs/qwen35-4b-full-live-compiled-preregistration.md) and [results](docs/qwen35-4b-full-live-compiled-results.md).
+- **Qwen3.5-2B.** All eight sequential arithmetic chains pass and the other 24 fail; outside arithmetic, no 2B ledger matches its task even under the exploratory operation-signature score. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode, a parser behavior inherited from qwenFS, so those runs' file reads were not exact. At the loop's token budget plain Qwen3.5-2B completes 12 chains to the loop's 8, winning four items and losing none: plain is ahead by the preregistered interval reading, though the exact test is not significant.
+- **Qwen3.5-4B.** 8/8 arithmetic, 8/8 structured-operation, 6/8 checkable-language, and 6/8 ordered-literal chains. All four failures are Qwen's exact-string edits (casing and punctuation placement) at five and eight cycles, inside runs that pass every system check. Budget-forced plain Qwen3.5-4B completes 29 under each of three preregistered budgets, reaching the compiled loop's verdict on 31 items; the loop wins no item plain Qwen loses. The earlier +40.6-point gain over the one-turn arm was preregistered, but every one-turn run stopped before Qwen closed its thinking, so it measured truncation, not capability. Agent-inactive parity against stock Qwen3.5-4B: maximum KL 3.8e-5 nats over four prompts, top-1 4/4. Details: [preregistration](docs/qwen35-4b-full-live-compiled-preregistration.md) and [results](docs/qwen35-4b-full-live-compiled-results.md).
 - The host provides nothing after the objective; the checkpoints run greedily until their compiled HALT token.
 - Traces: the ten archived 2B diagnostics are in [`traces/`](traces/README.md), selected for diagnosis before the 2B sweep and not an accuracy sample. All 32 4B sweep runs are in [`traces/qwen3.5-4b/`](traces/qwen3.5-4b/).
 
 ## What remains exploratory
 
-- Capability beyond this suite. The v3 suite is 32 short chains with deterministic, checkable answers; it does not test open-ended planning or tool use.
+- Capability beyond this suite. The v3 suite is 32 short chains with deterministic, checkable answers; it does not test open-ended planning or tool use. Whether the loop's structure helps on longer or open-ended tasks, where a single turn must carry every intermediate state, is untested.
 - Post-hoc operation-signature plan fidelity. Frozen exact task strings remain the primary plan metric.
 - Runtime comparisons and the compiled circuit-oracle check on CUDA.
 - Runtime-variable cycle count; the current controller uses one checkpoint per fixed cycle count.
