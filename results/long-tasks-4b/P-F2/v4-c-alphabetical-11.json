@@ -1,0 +1,565 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-c-alphabetical-11",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 3416,
+    "answer_cap": 2651
+  },
+  "item_id": "v4-c-alphabetical-11",
+  "horizon": "worklist",
+  "category": "structured_operation",
+  "cycles": 11,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to simulate a job queue processing system based on a specific set of rules and a starting state.\n\n**Initial State:**\n`{\"done\": [], \"queue\": [\"umber\"]}`\n\n**Rules:**\n1.  **Job Table (Dependencies):**\n    *   `dahlia` -> nothing\n    *   `fern` -> `lilac`, `nutmeg`, `quince`\n    *   `ginger` -> `zinnia`, `umber`\n    *   `lilac` -> `sorrel`, `tulip`\n    *   `mango` -> `raven`\n    *   `nutmeg` -> nothing\n    *   `olive` -> `fern`, `dahlia`\n    *   `quince` -> `raven`\n    *   `raven` -> nothing\n    *   `robin` -> `raven`\n    *   `sorrel` -> nothing\n    *   `tulip` -> `mango`\n    *   `umber` -> `olive`\n    *   `zinnia` -> `mango`, `olive`\n\n2.  **Process:**\n    *   Repeat until the queue is empty.\n    *   Step 1: Remove the alphabetically first job from the queue.\n    *   Step 2: Append it to the `done` list.\n    *   Step 3: Add its follow-up jobs to the queue.\n    *   Step 4: Skip follow-up jobs if they are already in `done` or `queue`.\n    *   Step 5: Keep the queue in alphabetical order.\n    *   Step 6: Return the complete JSON state after every step.\n\n3.  **Output Format:**\n    *   Start with the initial state (do not include in results).\n    *   Return the state after every operation.\n    *   End with `FINAL_JSON: ` followed by `{\"results\":[...]}`.\n    *   The `results` array contains the JSON state objects after each step.\n\n**Let's trace the execution:**\n\n**Start:**\n`{\"done\": [], \"queue\": [\"umber\"]}`\n\n**Iteration 1:**\n*   **Queue:** `[\"umber\"]`\n*   **Alphabetically first:** `umber`\n*   **Action:** Remove `umber` from queue, add to `done`.\n*   **New State:** `done: [\"umber\"]`, `queue: []`\n*   **Follow-ups for `umber`:** `olive`\n*   **Check `olive`:** Not in `done` (contains `umber`), not in `queue` (empty).\n*   **Add to queue:** `olive`\n*   **Sort queue:** `[\"olive\"]`\n*   **Result State 1:** `{\"done\": [\"umber\"], \"queue\": [\"olive\"]}`\n\n**Iteration 2:**\n*   **Queue:** `[\"olive\"]`\n*   **Alphabetically first:** `olive`\n*   **Action:** Remove `olive` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\"]`, `queue: []`\n*   **Follow-ups for `olive`:** `fern`, `dahlia`\n*   **Check `fern`:** Not in `done`, not in `queue`. Add.\n*   **Check `dahlia`:** Not in `done`, not in `queue`. Add.\n*   **Add to queue:** `fern`, `dahlia`\n*   **Sort queue:** `[\"dahlia\", \"fern\"]`\n*   **Result State 2:** `{\"done\": [\"umber\", \"olive\"], \"queue\": [\"dahlia\", \"fern\"]}`\n\n**Iteration 3:**\n*   **Queue:** `[\"dahlia\", \"fern\"]`\n*   **Alphabetically first:** `dahlia`\n*   **Action:** Remove `dahlia` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\"]`, `queue: [\"fern\"]`\n*   **Follow-ups for `dahlia`:** nothing.\n*   **Add to queue:** None.\n*   **Sort queue:** `[\"fern\"]`\n*   **Result State 3:** `{\"done\": [\"umber\", \"olive\", \"dahlia\"], \"queue\": [\"fern\"]}`\n\n**Iteration 4:**\n*   **Queue:** `[\"fern\"]`\n*   **Alphabetically first:** `fern`\n*   **Action:** Remove `fern` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\"]`, `queue: []`\n*   **Follow-ups for `fern`:** `lilac`, `nutmeg`, `quince`\n*   **Check `lilac`:** Not in `done`, not in `queue`. Add.\n*   **Check `nutmeg`:** Not in `done`, not in `queue`. Add.\n*   **Check `quince`:** Not in `done`, not in `queue`. Add.\n*   **Add to queue:** `lilac`, `nutmeg`, `quince`\n*   **Sort queue:** `[\"lilac\", \"nutmeg\", \"quince\"]`\n*   **Result State 4:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\"], \"queue\": [\"lilac\", \"nutmeg\", \"quince\"]}`\n\n**Iteration 5:**\n*   **Queue:** `[\"lilac\", \"nutmeg\", \"quince\"]`\n*   **Alphabetically first:** `lilac`\n*   **Action:** Remove `lilac` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\"]`, `queue: [\"nutmeg\", \"quince\"]`\n*   **Follow-ups for `lilac`:** `sorrel`, `tulip`\n*   **Check `sorrel`:** Not in `done`, not in `queue`. Add.\n*   **Check `tulip`:** Not in `done`, not in `queue`. Add.\n*   **Add to queue:** `nutmeg`, `quince`, `sorrel`, `tulip`\n*   **Sort queue:** `[\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]`\n*   **Result State 5:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\"], \"queue\": [\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]}`\n\n**Iteration 6:**\n*   **Queue:** `[\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]`\n*   **Alphabetically first:** `nutmeg`\n*   **Action:** Remove `nutmeg` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\"]`, `queue: [\"quince\", \"sorrel\", \"tulip\"]`\n*   **Follow-ups for `nutmeg`:** nothing.\n*   **Add to queue:** None.\n*   **Sort queue:** `[\"quince\", \"sorrel\", \"tulip\"]`\n*   **Result State 6:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\"], \"queue\": [\"quince\", \"sorrel\", \"tulip\"]}`\n\n**Iteration 7:**\n*   **Queue:** `[\"quince\", \"sorrel\", \"tulip\"]`\n*   **Alphabetically first:** `quince`\n*   **Action:** Remove `quince` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\"]`, `queue: [\"sorrel\", \"tulip\"]`\n*   **Follow-ups for `quince`:** `raven`\n*   **Check `raven`:** Not in `done`, not in `queue`. Add.\n*   **Add to queue:** `raven`, `sorrel`, `tulip`\n*   **Sort queue:** `[\"raven\", \"sorrel\", \"tulip\"]`\n*   **Result State 7:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\"], \"queue\": [\"raven\", \"sorrel\", \"tulip\"]}`\n\n**Iteration 8:**\n*   **Queue:** `[\"raven\", \"sorrel\", \"tulip\"]`\n*   **Alphabetically first:** `raven`\n*   **Action:** Remove `raven` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\"]`, `queue: [\"sorrel\", \"tulip\"]`\n*   **Follow-ups for `raven`:** nothing.\n*   **Add to queue:** None.\n*   **Sort queue:** `[\"sorrel\", \"tulip\"]`\n*   **Result State 8:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\"], \"queue\": [\"sorrel\", \"tulip\"]}`\n\n**Iteration 9:**\n*   **Queue:** `[\"sorrel\", \"tulip\"]`\n*   **Alphabetically first:** `sorrel`\n*   **Action:** Remove `sorrel` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\"]`, `queue: [\"tulip\"]`\n*   **Follow-ups for `sorrel`:** nothing.\n*   **Add to queue:** None.\n*   **Sort queue:** `[\"tulip\"]`\n*   **Result State 9:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\"], \"queue\": [\"tulip\"]}`\n\n**Iteration 10:**\n*   **Queue:** `[\"tulip\"]`\n*   **Alphabetically first:** `tulip`\n*   **Action:** Remove `tulip` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\"]`, `queue: []`\n*   **Follow-ups for `tulip`:** `mango`\n*   **Check `mango`:** Not in `done`, not in `queue`. Add.\n*   **Add to queue:** `mango`\n*   **Sort queue:** `[\"mango\"]`\n*   **Result State 10:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\"], \"queue\": [\"mango\"]}`\n\n**Iteration 11:**\n*   **Queue:** `[\"mango\"]`\n*   **Alphabetically first:** `mango`\n*   **Action:** Remove `mango` from queue, add to `done`.\n*   **New State:** `done: [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\", \"mango\"]`, `queue: []`\n*   **Follow-ups for `mango`:** `raven`\n*   **Check `raven`:** Already in `done`. Skip.\n*   **Add to queue:** None.\n*   **Sort queue:** `[]`\n*   **Result State 11:** `{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\", \"mango\"], \"queue\": []}`\n\n**Iteration 12:**\n*   **Queue:** `[]`\n*   Stop.\n\n**Wait, I need to check the `done` list order.**\nThe prompt says: \"append it to the end of the done list\".\nSo `done` is a list where items are added in the order they are processed.\nMy trace above maintains this order.\n\nLet's double check the `done` list content.\n1. `umber`\n2. `olive`\n3. `dahlia`\n4. `fern`\n5. `lilac`\n6. `nutmeg`\n7. `quince`\n8. `raven`\n9. `sorrel`\n10. `tulip`\n11. `mango`\n\nLet's double check the `queue` logic.\nStart: `[\"umber\"]`\n1. Pop `umber`. Add `olive`. Queue: `[\"olive\"]`.\n2. Pop `olive`. Add `fern`, `dahlia`. Queue: `[\"dahlia\", \"fern\"]`.\n3. Pop `dahlia`. Add nothing. Queue: `[\"fern\"]`.\n4. Pop `fern`. Add `lilac`, `nutmeg`, `quince`. Queue: `[\"lilac\", \"nutmeg\", \"quince\"]`.\n5. Pop `lilac`. Add `sorrel`, `tulip`. Queue: `[\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]`.\n6. Pop `nutmeg`. Add nothing. Queue: `[\"quince\", \"sorrel\", \"tulip\"]`.\n7. Pop `quince`. Add `raven`. Queue: `[\"raven\", \"sorrel\", \"tulip\"]`.\n8. Pop `raven`. Add nothing. Queue: `[\"sorrel\", \"tulip\"]`.\n9. Pop `sorrel`. Add nothing. Queue: `[\"tulip\"]`.\n10. Pop `tulip`. Add `mango`. Queue: `[\"mango\"]`.\n11. Pop `mango`. Add `raven` (already in done). Queue: `[]`.\n\nWait, I need to check if `raven` was in `done` or `queue` when processing `mango`.\n`raven` was added to `done` in step 8 (when processing `quince`).\nSo when processing `mango` in step 11, `raven` is in `done`.\nThe rule says: \"skipping any job that is already in the done list or already in the queue\".\nSo `raven` is skipped.\nQueue becomes empty.\n\nWait, I missed something in the trace.\nIn step 10, `tulip` is processed. `tulip` -> `mango`.\n`mango` is added to queue.\nIn step 11,\n</think>\n\n```json\n{\"done\": [\"umber\"], \"queue\": [\"olive\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\"], \"queue\": [\"dahlia\", \"fern\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\"], \"queue\": [\"fern\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\"], \"queue\": [\"lilac\", \"nutmeg\", \"quince\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\"], \"queue\": [\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\"], \"queue\": [\"quince\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\"], \"queue\": [\"raven\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\"], \"queue\": [\"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\"], \"queue\": [\"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\"], \"queue\": [\"mango\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\", \"mango\"], \"queue\": []}\n```\nFINAL_JSON: `{\"results\":[{\"done\":[\"umber\"],\"queue\":[\"olive\"]},{\"done\":[\"umber\",\"olive\"],\"queue\":[\"dahlia\",\"fern\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\"],\"queue\":[\"fern\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\"],\"queue\":[\"lilac\",\"nutmeg\",\"quince\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\"],\"queue\":[\"nutmeg\",\"quince\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\"],\"queue\":[\"quince\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\"],\"queue\":[\"raven\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\"],\"queue\":[\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\"],\"queue\":[\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\",\"tulip\"],\"queue\":[\"mango\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\",\"tulip\",\"mango\"],\"queue\":[]}]}`<|im_end|>\n<|endoftext|>",
+    "answer_text": "```json\n{\"done\": [\"umber\"], \"queue\": [\"olive\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\"], \"queue\": [\"dahlia\", \"fern\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\"], \"queue\": [\"fern\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\"], \"queue\": [\"lilac\", \"nutmeg\", \"quince\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\"], \"queue\": [\"nutmeg\", \"quince\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\"], \"queue\": [\"quince\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\"], \"queue\": [\"raven\", \"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\"], \"queue\": [\"sorrel\", \"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\"], \"queue\": [\"tulip\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\"], \"queue\": [\"mango\"]}\n```\n```json\n{\"done\": [\"umber\", \"olive\", \"dahlia\", \"fern\", \"lilac\", \"nutmeg\", \"quince\", \"raven\", \"sorrel\", \"tulip\", \"mango\"], \"queue\": []}\n```\nFINAL_JSON: `{\"results\":[{\"done\":[\"umber\"],\"queue\":[\"olive\"]},{\"done\":[\"umber\",\"olive\"],\"queue\":[\"dahlia\",\"fern\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\"],\"queue\":[\"fern\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\"],\"queue\":[\"lilac\",\"nutmeg\",\"quince\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\"],\"queue\":[\"nutmeg\",\"quince\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\"],\"queue\":[\"quince\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\"],\"queue\":[\"raven\",\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\"],\"queue\":[\"sorrel\",\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\"],\"queue\":[\"tulip\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\",\"tulip\"],\"queue\":[\"mango\"]},{\"done\":[\"umber\",\"olive\",\"dahlia\",\"fern\",\"lilac\",\"nutmeg\",\"quince\",\"raven\",\"sorrel\",\"tulip\",\"mango\"],\"queue\":[]}]}`<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 3416,
+    "answer_tokens": 772,
+    "model_tokens": 4188,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 382.2577330004424
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    {
+      "done": [
+        "umber"
+      ],
+      "queue": [
+        "olive"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive"
+      ],
+      "queue": [
+        "dahlia",
+        "fern"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia"
+      ],
+      "queue": [
+        "fern"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern"
+      ],
+      "queue": [
+        "lilac",
+        "nutmeg",
+        "quince"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac"
+      ],
+      "queue": [
+        "nutmeg",
+        "quince",
+        "sorrel",
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg"
+      ],
+      "queue": [
+        "quince",
+        "sorrel",
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg",
+        "quince"
+      ],
+      "queue": [
+        "raven",
+        "sorrel",
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg",
+        "quince",
+        "raven"
+      ],
+      "queue": [
+        "sorrel",
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg",
+        "quince",
+        "raven",
+        "sorrel"
+      ],
+      "queue": [
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg",
+        "quince",
+        "raven",
+        "sorrel",
+        "tulip"
+      ],
+      "queue": [
+        "mango"
+      ]
+    },
+    {
+      "done": [
+        "umber",
+        "olive",
+        "dahlia",
+        "fern",
+        "lilac",
+        "nutmeg",
+        "quince",
+        "raven",
+        "sorrel",
+        "tulip",
+        "mango"
+      ],
+      "queue": []
+    }
+  ],
+  "score": {
+    "item_id": "v4-c-alphabetical-11",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber"
+          ],
+          "queue": [
+            "olive"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber"
+          ],
+          "queue": [
+            "olive"
+          ]
+        }
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive"
+          ],
+          "queue": [
+            "dahlia",
+            "fern"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive"
+          ],
+          "queue": [
+            "dahlia",
+            "fern"
+          ]
+        }
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia"
+          ],
+          "queue": [
+            "fern"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia"
+          ],
+          "queue": [
+            "fern"
+          ]
+        }
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern"
+          ],
+          "queue": [
+            "lilac",
+            "nutmeg",
+            "quince"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern"
+          ],
+          "queue": [
+            "lilac",
+            "nutmeg",
+            "quince"
+          ]
+        }
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac"
+          ],
+          "queue": [
+            "nutmeg",
+            "quince",
+            "sorrel",
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac"
+          ],
+          "queue": [
+            "nutmeg",
+            "quince",
+            "sorrel",
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg"
+          ],
+          "queue": [
+            "quince",
+            "sorrel",
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg"
+          ],
+          "queue": [
+            "quince",
+            "sorrel",
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince"
+          ],
+          "queue": [
+            "raven",
+            "sorrel",
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince"
+          ],
+          "queue": [
+            "raven",
+            "sorrel",
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven"
+          ],
+          "queue": [
+            "sorrel",
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven"
+          ],
+          "queue": [
+            "sorrel",
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel"
+          ],
+          "queue": [
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel"
+          ],
+          "queue": [
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel",
+            "tulip"
+          ],
+          "queue": [
+            "mango"
+          ]
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel",
+            "tulip"
+          ],
+          "queue": [
+            "mango"
+          ]
+        }
+      },
+      {
+        "name": "cycle:11",
+        "pass": true,
+        "expected": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel",
+            "tulip",
+            "mango"
+          ],
+          "queue": []
+        },
+        "actual": {
+          "done": [
+            "umber",
+            "olive",
+            "dahlia",
+            "fern",
+            "lilac",
+            "nutmeg",
+            "quince",
+            "raven",
+            "sorrel",
+            "tulip",
+            "mango"
+          ],
+          "queue": []
+        }
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}
