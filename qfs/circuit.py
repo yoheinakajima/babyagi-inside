@@ -267,6 +267,10 @@ class Delta:
     def __init__(self, net):
         self.n = net
         self.kd = net.key_dim
+        # Gated DeltaNet repeats each key head over num_v_heads // num_k_heads value heads
+        # (repeat_interleave), so head h's value side is value head h * ratio: 1 on
+        # Qwen3.5-2B (16/16), 2 on Qwen3.5-4B (16/32). The other value heads stay zero.
+        self.ratio = net.num_v_heads // net.num_k_heads
 
     def q(self, h, row, lin, tap=-1):
         self._chan(h * DK + row, lin, tap)
@@ -275,7 +279,7 @@ class Delta:
         self._chan(self.kd + h * DK + row, lin, tap)
 
     def v(self, h, col, lin, tap=-1):
-        self._chan(2 * self.kd + h * DK + col, lin, tap)
+        self._chan(2 * self.kd + h * self.ratio * DK + col, lin, tap)
 
     def _chan(self, c, lin, tap):
         self.n.in_proj_qkv.weight[c, :] = 0
@@ -287,18 +291,18 @@ class Delta:
     def z(self, h, lin):
         for c in range(DK):
             for d, w in lin.items():
-                self.n.in_proj_z.weight[h * DK + c, d] = w
+                self.n.in_proj_z.weight[h * self.ratio * DK + c, d] = w
 
     def beta(self, h, lin):
         for d, w in lin.items():
-            self.n.in_proj_b.weight[h, d] = w
+            self.n.in_proj_b.weight[h * self.ratio, d] = w
 
     def decay(self, h, lin):
         for d, w in lin.items():
-            self.n.in_proj_a.weight[h, d] = w
+            self.n.in_proj_a.weight[h * self.ratio, d] = w
 
     def out(self, h, col, dim, w):
-        self.n.out_proj.weight[dim, h * DK + col] = w
+        self.n.out_proj.weight[dim, h * self.ratio * DK + col] = w
 
     def register(self, h, key, fields, tap=-1, n_set=None):
         """A one-row register written where the key form is on and read at every token.
@@ -822,18 +826,19 @@ def fill(layers, xs):
         m.write(layer.mlp)
 
 
-def config():
+def config(value_heads=16):
+    """The standalone FS model's config; value_heads=32 is Qwen3.5-4B's DeltaNet layout."""
     return Qwen3_5TextConfig(
         vocab_size=VOCAB, hidden_size=H, intermediate_size=2 * NMAX + 800,
         num_hidden_layers=len(LAYERS), layer_types=LAYERS, num_attention_heads=1,
         num_key_value_heads=1, head_dim=HD, attn_output_gate=True,
-        linear_num_key_heads=16, linear_num_value_heads=16, linear_key_head_dim=DK, linear_value_head_dim=DK,
+        linear_num_key_heads=16, linear_num_value_heads=value_heads, linear_key_head_dim=DK, linear_value_head_dim=DK,
         linear_conv_kernel_dim=4, tie_word_embeddings=True, rms_norm_eps=1e-6, hidden_act="silu")
 
 
-def build(dev="mps", xs=None):
+def build(dev="mps", xs=None, value_heads=16):
     """The standalone FS model (no Qwen); without xs the data thermometer is left empty."""
-    model = Qwen3_5ForCausalLM(config())
+    model = Qwen3_5ForCausalLM(config(value_heads))
     with torch.no_grad():
         for p in model.parameters():
             p.zero_()

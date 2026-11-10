@@ -1,0 +1,504 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-c-fifo-10",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 3160,
+    "answer_cap": 2410
+  },
+  "item_id": "v4-c-fifo-10",
+  "horizon": "worklist",
+  "category": "structured_operation",
+  "cycles": 10,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to simulate a job queue processing system based on a specific set of rules and a starting state.\n\n**Initial State:**\n`{\"done\":[],\"queue\":[\"pepper\",\"moss\"]}`\n\n**Job Dependencies (Follow-up jobs):**\n- `almond` -> `heather`\n- `badger` -> `holly`\n- `clover` -> `falcon`\n- `dahlia` -> `pepper`, `raven`\n- `falcon` -> `oak`, `almond`, `robin`\n- `heather` -> `pine`\n- `holly` -> (nothing)\n- `moss` -> `pine`\n- `oak` -> (nothing)\n- `pepper` -> `heather`, `badger`\n- `pine` -> `oak`, `falcon`\n- `raven` -> `pepper`\n- `robin` -> (nothing)\n\n**Rules:**\n1.  **Start:** `{\"done\":[],\"queue\":[\"pepper\",\"moss\"]}`\n2.  **Loop:** While the queue is not empty:\n    a.  Remove the job at the front of the queue.\n    b.  Append it to the `done` list.\n    c.  Get the follow-up jobs for that job.\n    d.  For each follow-up job (in order):\n        i.  If it is NOT in `done` and NOT in `queue`, add it to the end of the `queue`.\n    e.  Record the state of the system (JSON object) after this operation.\n3.  **Output:** A JSON object `{\"results\":[...]}` where each entry in the array is the state after each step.\n\n**Step-by-Step Execution:**\n\n**Step 1:**\n- Current State: `{\"done\":[],\"queue\":[\"pepper\",\"moss\"]}`\n- Action: Pop `pepper` from queue.\n- `done` becomes `[\"pepper\"]`.\n- `queue` becomes `[\"moss\"]`.\n- Follow-ups for `pepper`: `heather`, `badger`.\n- Check `heather`: Not in `done` (empty), not in `queue` (only `moss`). Add to queue.\n- Check `badger`: Not in `done`, not in `queue`. Add to queue.\n- New `queue`: `[\"moss\", \"heather\", \"badger\"]`.\n- New State: `{\"done\":[\"pepper\"],\"queue\":[\"moss\",\"heather\",\"badger\"]}`.\n\n**Step 2:**\n- Current State: `{\"done\":[\"pepper\"],\"queue\":[\"moss\",\"heather\",\"badger\"]}`\n- Action: Pop `moss` from queue.\n- `done` becomes `[\"pepper\", \"moss\"]`.\n- `queue` becomes `[\"heather\", \"badger\"]`.\n- Follow-ups for `moss`: `pine`.\n- Check `pine`: Not in `done`, not in `queue`. Add to queue.\n- New `queue`: `[\"heather\", \"badger\", \"pine\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\"],\"queue\":[\"heather\",\"badger\",\"pine\"]}`.\n\n**Step 3:**\n- Current State: `{\"done\":[\"pepper\",\"moss\"],\"queue\":[\"heather\",\"badger\",\"pine\"]}`\n- Action: Pop `heather` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\"]`.\n- `queue` becomes `[\"badger\", \"pine\"]`.\n- Follow-ups for `heather`: `pine`.\n- Check `pine`: Already in `queue` (from Step 2). Do not add.\n- New `queue`: `[\"badger\", \"pine\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\"],\"queue\":[\"badger\",\"pine\"]}`.\n\n**Step 4:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\"],\"queue\":[\"badger\",\"pine\"]}`\n- Action: Pop `badger` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\"]`.\n- `queue` becomes `[\"pine\"]`.\n- Follow-ups for `badger`: `holly`.\n- Check `holly`: Not in `done`, not in `queue`. Add to queue.\n- New `queue`: `[\"pine\", \"holly\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\"],\"queue\":[\"pine\",\"holly\"]}`.\n\n**Step 5:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\"],\"queue\":[\"pine\",\"holly\"]}`\n- Action: Pop `pine` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\"]`.\n- `queue` becomes `[\"holly\"]`.\n- Follow-ups for `pine`: `oak`, `falcon`.\n- Check `oak`: Not in `done`, not in `queue`. Add to queue.\n- Check `falcon`: Not in `done`, not in `queue`. Add to queue.\n- New `queue`: `[\"holly\", \"oak\", \"falcon\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\"],\"queue\":[\"holly\",\"oak\",\"falcon\"]}`.\n\n**Step 6:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\"],\"queue\":[\"holly\",\"oak\",\"falcon\"]}`\n- Action: Pop `holly` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\", \"holly\"]`.\n- `queue` becomes `[\"oak\", \"falcon\"]`.\n- Follow-ups for `holly`: (nothing).\n- New `queue`: `[\"oak\", \"falcon\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\"],\"queue\":[\"oak\",\"falcon\"]}`.\n\n**Step 7:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\"],\"queue\":[\"oak\",\"falcon\"]}`\n- Action: Pop `oak` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\", \"holly\", \"oak\"]`.\n- `queue` becomes `[\"falcon\"]`.\n- Follow-ups for `oak`: (nothing).\n- New `queue`: `[\"falcon\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\"],\"queue\":[\"falcon\"]}`.\n\n**Step 8:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\"],\"queue\":[\"falcon\"]}`\n- Action: Pop `falcon` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\", \"holly\", \"oak\", \"falcon\"]`.\n- `queue` becomes `[]`.\n- Follow-ups for `falcon`: `oak`, `almond`, `robin`.\n- Check `oak`: Already in `done`. Skip.\n- Check `almond`: Not in `done`, not in `queue`. Add to queue.\n- Check `robin`: Not in `done`, not in `queue`. Add to queue.\n- New `queue`: `[\"almond\", \"robin\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\"],\"queue\":[\"almond\",\"robin\"]}`.\n\n**Step 9:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\"],\"queue\":[\"almond\",\"robin\"]}`\n- Action: Pop `almond` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\", \"holly\", \"oak\", \"falcon\", \"almond\"]`.\n- `queue` becomes `[\"robin\"]`.\n- Follow-ups for `almond`: `heather`.\n- Check `heather`: Already in `done`. Skip.\n- New `queue`: `[\"robin\"]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\"],\"queue\":[\"robin\"]}`.\n\n**Step 10:**\n- Current State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\"],\"queue\":[\"robin\"]}`\n- Action: Pop `robin` from queue.\n- `done` becomes `[\"pepper\", \"moss\", \"heather\", \"badger\", \"pine\", \"holly\", \"oak\", \"falcon\", \"almond\", \"robin\"]`.\n- `queue` becomes `[]`.\n- Follow-ups for `robin`: (nothing).\n- New `queue`: `[]`.\n- New State: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\",\"robin\"],\"queue\":[]}`.\n\nQueue is empty. Stop.\n\n**Verification of Steps:**\n1.  **Start:** `{\"done\":[],\"queue\":[\"pepper\",\"moss\"]}`\n2.  **Pop pepper:** `done`=[pepper], `queue`=[moss, heather, badger].\n    - `pepper` -> `heather`, `badger`.\n    - `heather` not in done/queue. Add.\n    - `badger` not in done/queue. Add.\n    - Result: `{\"done\":[\"pepper\"],\"queue\":[\"moss\",\"heather\",\"badger\"]}`\n3.  **Pop moss:** `done`=[pepper, moss], `queue`=[heather, badger, pine].\n    - `moss` -> `pine`.\n    - `pine` not in done/queue. Add.\n    - Result: `{\"done\":[\"pepper\",\"moss\"],\"queue\":[\"heather\",\"badger\",\"pine\"]}`\n4.  **Pop heather:** `done`=[pepper, moss, heather], `queue`=[badger, pine].\n    - `heather` -> `pine`.\n    - `pine` is in queue. Skip.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\"],\"queue\":[\"badger\",\"pine\"]}`\n5.  **Pop badger:** `done`=[pepper, moss, heather, badger], `queue`=[pine, holly].\n    - `badger` -> `holly`.\n    - `holly` not in done/queue. Add.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\"],\"queue\":[\"pine\",\"holly\"]}`\n6.  **Pop pine:** `done`=[pepper, moss, heather, badger, pine], `queue`=[holly, oak, falcon].\n    - `pine` -> `oak`, `falcon`.\n    - `oak` not in done/queue. Add.\n    - `falcon` not in done/queue. Add.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\"],\"queue\":[\"holly\",\"oak\",\"falcon\"]}`\n7.  **Pop holly:** `done`=[pepper, moss, heather, badger, pine, holly], `queue`=[oak, falcon].\n    - `holly` -> nothing.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\"],\"queue\":[\"oak\",\"falcon\"]}`\n8.  **Pop oak:** `done`=[pepper, moss, heather, badger, pine, holly, oak], `queue`=[falcon].\n    - `oak` -> nothing.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\"],\"queue\":[\"falcon\"]}`\n9.  **Pop falcon:** `done`=[pepper, moss, heather, badger, pine, holly, oak, falcon], `queue`=[almond, robin].\n    - `falcon` -> `oak`, `almond`, `robin`.\n    - `oak` in done. Skip.\n    - `almond` not in done/queue. Add.\n    - `robin` not in done/queue. Add.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\"],\"queue\":[\"almond\",\"robin\"]}`\n10. **Pop almond:** `done`=[pepper, moss, heather, badger, pine, holly, oak, falcon, almond], `queue`=[robin].\n    - `almond` -> `heather`.\n    - `heather` in done. Skip.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\"],\"queue\":[\"robin\"]}`\n11. **Pop robin:** `done`=[pepper, moss, heather, badger, pine, holly, oak, falcon, almond, robin], `queue`=[].\n    - `robin` -> nothing.\n    - Result: `{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\n</think>\n\nFINAL_JSON: {\"results\":[{\"done\":[\"pepper\"],\"queue\":[\"moss\",\"heather\",\"badger\"]},{\"done\":[\"pepper\",\"moss\"],\"queue\":[\"heather\",\"badger\",\"pine\"]},{\"done\":[\"pepper\",\"moss\",\"heather\"],\"queue\":[\"badger\",\"pine\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\"],\"queue\":[\"pine\",\"holly\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\"],\"queue\":[\"holly\",\"oak\",\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\"],\"queue\":[\"oak\",\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\"],\"queue\":[\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\"],\"queue\":[\"almond\",\"robin\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\"],\"queue\":[\"robin\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\",\"robin\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "FINAL_JSON: {\"results\":[{\"done\":[\"pepper\"],\"queue\":[\"moss\",\"heather\",\"badger\"]},{\"done\":[\"pepper\",\"moss\"],\"queue\":[\"heather\",\"badger\",\"pine\"]},{\"done\":[\"pepper\",\"moss\",\"heather\"],\"queue\":[\"badger\",\"pine\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\"],\"queue\":[\"pine\",\"holly\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\"],\"queue\":[\"holly\",\"oak\",\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\"],\"queue\":[\"oak\",\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\"],\"queue\":[\"falcon\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\"],\"queue\":[\"almond\",\"robin\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\"],\"queue\":[\"robin\"]},{\"done\":[\"pepper\",\"moss\",\"heather\",\"badger\",\"pine\",\"holly\",\"oak\",\"falcon\",\"almond\",\"robin\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 3160,
+    "answer_tokens": 273,
+    "model_tokens": 3433,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 311.5209360830486
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    {
+      "done": [
+        "pepper"
+      ],
+      "queue": [
+        "moss",
+        "heather",
+        "badger"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss"
+      ],
+      "queue": [
+        "heather",
+        "badger",
+        "pine"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather"
+      ],
+      "queue": [
+        "badger",
+        "pine"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger"
+      ],
+      "queue": [
+        "pine",
+        "holly"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine"
+      ],
+      "queue": [
+        "holly",
+        "oak",
+        "falcon"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine",
+        "holly"
+      ],
+      "queue": [
+        "oak",
+        "falcon"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine",
+        "holly",
+        "oak"
+      ],
+      "queue": [
+        "falcon"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine",
+        "holly",
+        "oak",
+        "falcon"
+      ],
+      "queue": [
+        "almond",
+        "robin"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine",
+        "holly",
+        "oak",
+        "falcon",
+        "almond"
+      ],
+      "queue": [
+        "robin"
+      ]
+    },
+    {
+      "done": [
+        "pepper",
+        "moss",
+        "heather",
+        "badger",
+        "pine",
+        "holly",
+        "oak",
+        "falcon",
+        "almond",
+        "robin"
+      ],
+      "queue": []
+    }
+  ],
+  "score": {
+    "item_id": "v4-c-fifo-10",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper"
+          ],
+          "queue": [
+            "moss",
+            "heather",
+            "badger"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper"
+          ],
+          "queue": [
+            "moss",
+            "heather",
+            "badger"
+          ]
+        }
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss"
+          ],
+          "queue": [
+            "heather",
+            "badger",
+            "pine"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss"
+          ],
+          "queue": [
+            "heather",
+            "badger",
+            "pine"
+          ]
+        }
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather"
+          ],
+          "queue": [
+            "badger",
+            "pine"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather"
+          ],
+          "queue": [
+            "badger",
+            "pine"
+          ]
+        }
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger"
+          ],
+          "queue": [
+            "pine",
+            "holly"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger"
+          ],
+          "queue": [
+            "pine",
+            "holly"
+          ]
+        }
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine"
+          ],
+          "queue": [
+            "holly",
+            "oak",
+            "falcon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine"
+          ],
+          "queue": [
+            "holly",
+            "oak",
+            "falcon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly"
+          ],
+          "queue": [
+            "oak",
+            "falcon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly"
+          ],
+          "queue": [
+            "oak",
+            "falcon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak"
+          ],
+          "queue": [
+            "falcon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak"
+          ],
+          "queue": [
+            "falcon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon"
+          ],
+          "queue": [
+            "almond",
+            "robin"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon"
+          ],
+          "queue": [
+            "almond",
+            "robin"
+          ]
+        }
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon",
+            "almond"
+          ],
+          "queue": [
+            "robin"
+          ]
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon",
+            "almond"
+          ],
+          "queue": [
+            "robin"
+          ]
+        }
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon",
+            "almond",
+            "robin"
+          ],
+          "queue": []
+        },
+        "actual": {
+          "done": [
+            "pepper",
+            "moss",
+            "heather",
+            "badger",
+            "pine",
+            "holly",
+            "oak",
+            "falcon",
+            "almond",
+            "robin"
+          ],
+          "queue": []
+        }
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}

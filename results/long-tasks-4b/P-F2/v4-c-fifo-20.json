@@ -1,0 +1,1354 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-c-fifo-20",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 5720,
+    "answer_cap": 4820
+  },
+  "item_id": "v4-c-fifo-20",
+  "horizon": "worklist",
+  "category": "structured_operation",
+  "cycles": 20,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to simulate a job queue processing system based on a specific set of rules and a dependency graph.\n\n**Initial State:**\n`{\"done\": [], \"queue\": [\"indigo\", \"raven\"]}`\n\n**Rules:**\n1.  **Job Table (Dependencies):**\n    *   `aster` -> `fern`, `sage`\n    *   `dahlia` -> (nothing)\n    *   `elm` -> (nothing)\n    *   `falcon` -> `zinnia`, `fennel`\n    *   `fennel` -> (nothing)\n    *   `fern` -> `dahlia`\n    *   `ginger` -> `olive`\n    *   `hazel` -> `poppy`, `fennel`\n    *   `indigo` -> `spruce`, `zinnia`\n    *   `iris` -> (nothing)\n    *   `kiwi` -> `falcon`, `sage`\n    *   `lemon` -> (nothing)\n    *   `nutmeg` -> (nothing)\n    *   `oak` -> `otter`, `spruce`\n    *   `olive` -> `elm`\n    *   `otter` -> `lemon`\n    *   `poppy` -> `ginger`\n    *   `raven` -> `oak`, `nutmeg`, `zinnia`\n    *   `sage` -> (nothing)\n    *   `spruce` -> (nothing)\n    *   `thistle` -> `aster`, `iris`, `ginger`\n    *   `violet` -> `thistle`\n    *   `yarrow` -> `elm`\n    *   `zinnia` -> `hazel`, `dahlia`, `thistle`\n\n2.  **Process:**\n    *   Repeat until queue is empty.\n    *   Step 1: Remove job from front of queue.\n    *   Step 2: Append job to `done` list.\n    *   Step 3: Get follow-up jobs for that job.\n    *   Step 4: For each follow-up job (in order):\n        *   If not in `done` and not in `queue`, add to end of `queue`.\n    *   Step 5: Return the *complete JSON state* after this step.\n    *   Step 6: Continue until queue is empty.\n    *   Step 7: Final output format: `FINAL_JSON: {\"results\": [state1, state2, ...]}`.\n\n**Constraint Checklist & Confidence Score:**\n1.  Begin with specific JSON state? Yes.\n2.  Job table logic? Yes.\n3.  Repeat until queue empty? Yes.\n4.  Remove front, append to done? Yes.\n5.  Add follow-ups to queue (check done/queue)? Yes.\n6.  Return complete JSON state after *every* step? Yes.\n7.  Do not include initial state? Yes.\n8.  End with `FINAL_JSON: ` followed by `{\"results\":[...]}`? Yes.\n9.  One response? Yes.\n10. No text after object? Yes.\n\nConfidence Score: 100%.\n\n**Execution Plan:**\nI will simulate the queue processing step-by-step, maintaining the `done` list and `queue` list, and recording the state after each operation.\n\n**Initial State:**\n`{\"done\": [], \"queue\": [\"indigo\", \"raven\"]}`\n\n**Step 1:**\n*   Pop `indigo`.\n*   `done` becomes `[\"indigo\"]`.\n*   `indigo` -> `spruce`, `zinnia`.\n*   Check `spruce`: Not in done, not in queue. Add to queue.\n*   Check `zinnia`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"raven\", \"spruce\", \"zinnia\"]`.\n*   State: `{\"done\": [\"indigo\"], \"queue\": [\"raven\", \"spruce\", \"zinnia\"]}`.\n\n**Step 2:**\n*   Pop `raven`.\n*   `done` becomes `[\"indigo\", \"raven\"]`.\n*   `raven` -> `oak`, `nutmeg`, `zinnia`.\n*   Check `oak`: Not in done, not in queue. Add to queue.\n*   Check `nutmeg`: Not in done, not in queue. Add to queue.\n*   Check `zinnia`: Already in queue (from Step 1). Skip.\n*   Queue: `[\"spruce\", \"zinnia\", \"oak\", \"nutmeg\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\"], \"queue\": [\"spruce\", \"zinnia\", \"oak\", \"nutmeg\"]}`.\n\n**Step 3:**\n*   Pop `spruce`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\"]`.\n*   `spruce` -> (nothing).\n*   Queue: `[\"zinnia\", \"oak\", \"nutmeg\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\"], \"queue\": [\"zinnia\", \"oak\", \"nutmeg\"]}`.\n\n**Step 4:**\n*   Pop `zinnia`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\"]`.\n*   `zinnia` -> `hazel`, `dahlia`, `thistle`.\n*   Check `hazel`: Not in done, not in queue. Add to queue.\n*   Check `dahlia`: Not in done, not in queue. Add to queue.\n*   Check `thistle`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\"], \"queue\": [\"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"]}`.\n\n**Step 5:**\n*   Pop `oak`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\"]`.\n*   `oak` -> `otter`, `spruce`.\n*   Check `otter`: Not in done, not in queue. Add to queue.\n*   Check `spruce`: Already in done. Skip.\n*   Queue: `[\"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\"], \"queue\": [\"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"]}`.\n\n**Step 6:**\n*   Pop `nutmeg`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\"]`.\n*   `nutmeg` -> (nothing).\n*   Queue: `[\"hazel\", \"dahlia\", \"thistle\", \"otter\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\"], \"queue\": [\"hazel\", \"dahlia\", \"thistle\", \"otter\"]}`.\n\n**Step 7:**\n*   Pop `hazel`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\"]`.\n*   `hazel` -> `poppy`, `fennel`.\n*   Check `poppy`: Not in done, not in queue. Add to queue.\n*   Check `fennel`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\"], \"queue\": [\"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"]}`.\n\n**Step 8:**\n*   Pop `dahlia`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\"]`.\n*   `dahlia` -> (nothing).\n*   Queue: `[\"thistle\", \"otter\", \"poppy\", \"fennel\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\"], \"queue\": [\"thistle\", \"otter\", \"poppy\", \"fennel\"]}`.\n\n**Step 9:**\n*   Pop `thistle`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"]`.\n*   `thistle` -> `aster`, `iris`, `ginger`.\n*   Check `aster`: Not in done, not in queue. Add to queue.\n*   Check `iris`: Not in done, not in queue. Add to queue.\n*   Check `ginger`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"], \"queue\": [\"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\"]}`.\n\n**Step 10:**\n*   Pop `otter`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"]`.\n*   `otter` -> `lemon`.\n*   Check `lemon`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"], \"queue\": [\"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]}`.\n\n**Step 11:**\n*   Pop `poppy`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\"]`.\n*   `poppy` -> `ginger`.\n*   Check `ginger`: Already in queue (from Step 9). Skip.\n*   Queue: `[\"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\"], \"queue\": [\"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]}`.\n\n**Step 12:**\n*   Pop `fennel`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"]`.\n*   `fennel` -> (nothing).\n*   Queue: `[\"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"], \"queue\": [\"aster\", \"iris\", \"ginger\", \"lemon\"]}`.\n\n**Step 13:**\n*   Pop `aster`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\"]`.\n*   `aster` -> `fern`, `sage`.\n*   Check `fern`: Not in done, not in queue. Add to queue.\n*   Check `sage`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\"], \"queue\": [\"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\"]}`.\n\n**Step 14:**\n*   Pop `iris`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\"]`.\n*   `iris` -> (nothing).\n*   Queue: `[\"ginger\", \"lemon\", \"fern\", \"sage\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\"], \"queue\": [\"ginger\", \"lemon\", \"fern\", \"sage\"]}`.\n\n**Step 15:**\n*   Pop `ginger`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\"]`.\n*   `ginger` -> `olive`.\n*   Check `olive`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"lemon\", \"fern\", \"sage\", \"olive\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\"], \"queue\": [\"lemon\", \"fern\", \"sage\", \"olive\"]}`.\n\n**Step 16:**\n*   Pop `lemon`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n*   `lemon` -> (nothing).\n*   Queue: `[\"fern\", \"sage\", \"olive\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"], \"queue\": [\"fern\", \"sage\", \"olive\"]}`.\n\n**Step 17:**\n*   Pop `fern`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\"]`.\n*   `fern` -> `dahlia`.\n*   Check `dahlia`: Already in done. Skip.\n*   Queue: `[\"sage\", \"olive\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\"], \"queue\": [\"sage\", \"olive\"]}`.\n\n**Step 18:**\n*   Pop `sage`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\"]`.\n*   `sage` -> (nothing).\n*   Queue: `[\"olive\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\"], \"queue\": [\"olive\"]}`.\n\n**Step 19:**\n*   Pop `olive`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\", \"olive\"]`.\n*   `olive` -> `elm`.\n*   Check `elm`: Not in done, not in queue. Add to queue.\n*   Queue: `[\"elm\"]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\", \"olive\"], \"queue\": [\"elm\"]}`.\n\n**Step 20:**\n*   Pop `elm`.\n*   `done` becomes `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\", \"olive\", \"elm\"]`.\n*   `elm` -> (nothing).\n*   Queue: `[]`.\n*   State: `{\"done\": [\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\", \"olive\", \"elm\"], \"queue\": []}`.\n\nQueue is empty. Stop.\n\n**Final Output Construction:**\nI need to format the `results` array with the JSON states for each step.\nThe prompt asks for `FINAL_JSON: ` followed by `{\"results\":[...]}`.\nEach entry in `results` must be a JSON object representing the state after that operation.\n\nLet's double check the `done` list and `queue` logic.\nInitial: `{\"done\":[],\"queue\":[\"indigo\",\"raven\"]}`\n1. Pop `indigo`. Done: `[\"indigo\"]`. Queue: `[\"raven\", \"spruce\", \"zinnia\"]`.\n2. Pop `raven`. Done: `[\"indigo\", \"raven\"]`. Queue: `[\"spruce\", \"zinnia\", \"oak\", \"nutmeg\"]`. (zinnia skipped)\n3. Pop `spruce`. Done: `[\"indigo\", \"raven\", \"spruce\"]`. Queue: `[\"zinnia\", \"oak\", \"nutmeg\"]`.\n4. Pop `zinnia`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\"]`. Queue: `[\"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"]`.\n5. Pop `oak`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\"]`. Queue: `[\"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"]`. (spruce skipped)\n6. Pop `nutmeg`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\"]`. Queue: `[\"hazel\", \"dahlia\", \"thistle\", \"otter\"]`.\n7. Pop `hazel`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\"]`. Queue: `[\"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"]`.\n8. Pop `dahlia`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\"]`. Queue: `[\"thistle\", \"otter\", \"poppy\", \"fennel\"]`.\n9. Pop `thistle`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\"]`. Queue: `[\"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\"]`.\n10. Pop `otter`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\"]`. Queue: `[\"poppy\", \"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n11. Pop `poppy`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\"]`. Queue: `[\"fennel\", \"aster\", \"iris\", \"ginger\", \"lemon\"]`. (ginger skipped - in queue)\n12. Pop `fennel`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\"]`. Queue: `[\"aster\", \"iris\", \"ginger\", \"lemon\"]`.\n13. Pop `aster`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\"]`. Queue: `[\"iris\", \"ginger\", \"lemon\", \"fern\", \"sage\"]`.\n14. Pop `iris`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\"]`. Queue: `[\"ginger\", \"lemon\", \"fern\", \"sage\"]`.\n15. Pop `ginger`. Done: `[\"indigo\", \"raven\", \"spruce\", \"zinnia\", \"oak\", \"nutmeg\", \"hazel\", \"dahlia\", \"thistle\", \"otter\", \"poppy\", \"fennel\", \"aster\", \"iris\", \"ging\n</think>\n\nFINAL_JSON: {\"results\":[{\"done\":[\"indigo\"],\"queue\":[\"raven\",\"spruce\",\"zinnia\"]},{\"done\":[\"indigo\",\"raven\"],\"queue\":[\"spruce\",\"zinnia\",\"oak\",\"nutmeg\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\"],\"queue\":[\"zinnia\",\"oak\",\"nutmeg\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\"],\"queue\":[\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\"],\"queue\":[\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\"],\"queue\":[\"hazel\",\"dahlia\",\"thistle\",\"otter\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\"],\"queue\":[\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\"],\"queue\":[\"thistle\",\"otter\",\"poppy\",\"fennel\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\"],\"queue\":[\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\"],\"queue\":[\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\"],\"queue\":[\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\"],\"queue\":[\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\"],\"queue\":[\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\"],\"queue\":[\"ginger\",\"lemon\",\"fern\",\"sage\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\"],\"queue\":[\"lemon\",\"fern\",\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"],\"queue\":[\"fern\",\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\"],\"queue\":[\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\"],\"queue\":[\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\",\"olive\"],\"queue\":[\"elm\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\",\"olive\",\"elm\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "FINAL_JSON: {\"results\":[{\"done\":[\"indigo\"],\"queue\":[\"raven\",\"spruce\",\"zinnia\"]},{\"done\":[\"indigo\",\"raven\"],\"queue\":[\"spruce\",\"zinnia\",\"oak\",\"nutmeg\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\"],\"queue\":[\"zinnia\",\"oak\",\"nutmeg\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\"],\"queue\":[\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\"],\"queue\":[\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\"],\"queue\":[\"hazel\",\"dahlia\",\"thistle\",\"otter\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\"],\"queue\":[\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\"],\"queue\":[\"thistle\",\"otter\",\"poppy\",\"fennel\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\"],\"queue\":[\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\"],\"queue\":[\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\"],\"queue\":[\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\"],\"queue\":[\"aster\",\"iris\",\"ginger\",\"lemon\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\"],\"queue\":[\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\"],\"queue\":[\"ginger\",\"lemon\",\"fern\",\"sage\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\"],\"queue\":[\"lemon\",\"fern\",\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\"],\"queue\":[\"fern\",\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\"],\"queue\":[\"sage\",\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\"],\"queue\":[\"olive\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\",\"olive\"],\"queue\":[\"elm\"]},{\"done\":[\"indigo\",\"raven\",\"spruce\",\"zinnia\",\"oak\",\"nutmeg\",\"hazel\",\"dahlia\",\"thistle\",\"otter\",\"poppy\",\"fennel\",\"aster\",\"iris\",\"ginger\",\"lemon\",\"fern\",\"sage\",\"olive\",\"elm\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 5720,
+    "answer_tokens": 953,
+    "model_tokens": 6673,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 624.4209535000846
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    {
+      "done": [
+        "indigo"
+      ],
+      "queue": [
+        "raven",
+        "spruce",
+        "zinnia"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven"
+      ],
+      "queue": [
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce"
+      ],
+      "queue": [
+        "zinnia",
+        "oak",
+        "nutmeg"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia"
+      ],
+      "queue": [
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak"
+      ],
+      "queue": [
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg"
+      ],
+      "queue": [
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel"
+      ],
+      "queue": [
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia"
+      ],
+      "queue": [
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle"
+      ],
+      "queue": [
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter"
+      ],
+      "queue": [
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy"
+      ],
+      "queue": [
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel"
+      ],
+      "queue": [
+        "aster",
+        "iris",
+        "ginger",
+        "lemon"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster"
+      ],
+      "queue": [
+        "iris",
+        "ginger",
+        "lemon",
+        "fern",
+        "sage"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris"
+      ],
+      "queue": [
+        "ginger",
+        "lemon",
+        "fern",
+        "sage"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger"
+      ],
+      "queue": [
+        "lemon",
+        "fern",
+        "sage",
+        "olive"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon"
+      ],
+      "queue": [
+        "fern",
+        "sage",
+        "olive"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon",
+        "fern"
+      ],
+      "queue": [
+        "sage",
+        "olive"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon",
+        "fern",
+        "sage"
+      ],
+      "queue": [
+        "olive"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon",
+        "fern",
+        "sage",
+        "olive"
+      ],
+      "queue": [
+        "elm"
+      ]
+    },
+    {
+      "done": [
+        "indigo",
+        "raven",
+        "spruce",
+        "zinnia",
+        "oak",
+        "nutmeg",
+        "hazel",
+        "dahlia",
+        "thistle",
+        "otter",
+        "poppy",
+        "fennel",
+        "aster",
+        "iris",
+        "ginger",
+        "lemon",
+        "fern",
+        "sage",
+        "olive",
+        "elm"
+      ],
+      "queue": []
+    }
+  ],
+  "score": {
+    "item_id": "v4-c-fifo-20",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo"
+          ],
+          "queue": [
+            "raven",
+            "spruce",
+            "zinnia"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo"
+          ],
+          "queue": [
+            "raven",
+            "spruce",
+            "zinnia"
+          ]
+        }
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven"
+          ],
+          "queue": [
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven"
+          ],
+          "queue": [
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ]
+        }
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce"
+          ],
+          "queue": [
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce"
+          ],
+          "queue": [
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ]
+        }
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia"
+          ],
+          "queue": [
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia"
+          ],
+          "queue": [
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle"
+          ]
+        }
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak"
+          ],
+          "queue": [
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak"
+          ],
+          "queue": [
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ]
+        }
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ],
+          "queue": [
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg"
+          ],
+          "queue": [
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ]
+        }
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel"
+          ],
+          "queue": [
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel"
+          ],
+          "queue": [
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ]
+        }
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia"
+          ],
+          "queue": [
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia"
+          ],
+          "queue": [
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ]
+        }
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle"
+          ],
+          "queue": [
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle"
+          ],
+          "queue": [
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger"
+          ]
+        }
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ],
+          "queue": [
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter"
+          ],
+          "queue": [
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:11",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy"
+          ],
+          "queue": [
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy"
+          ],
+          "queue": [
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:12",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ],
+          "queue": [
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel"
+          ],
+          "queue": [
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ]
+        }
+      },
+      {
+        "name": "cycle:13",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster"
+          ],
+          "queue": [
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster"
+          ],
+          "queue": [
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ]
+        }
+      },
+      {
+        "name": "cycle:14",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris"
+          ],
+          "queue": [
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris"
+          ],
+          "queue": [
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ]
+        }
+      },
+      {
+        "name": "cycle:15",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger"
+          ],
+          "queue": [
+            "lemon",
+            "fern",
+            "sage",
+            "olive"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger"
+          ],
+          "queue": [
+            "lemon",
+            "fern",
+            "sage",
+            "olive"
+          ]
+        }
+      },
+      {
+        "name": "cycle:16",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ],
+          "queue": [
+            "fern",
+            "sage",
+            "olive"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon"
+          ],
+          "queue": [
+            "fern",
+            "sage",
+            "olive"
+          ]
+        }
+      },
+      {
+        "name": "cycle:17",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern"
+          ],
+          "queue": [
+            "sage",
+            "olive"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern"
+          ],
+          "queue": [
+            "sage",
+            "olive"
+          ]
+        }
+      },
+      {
+        "name": "cycle:18",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ],
+          "queue": [
+            "olive"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage"
+          ],
+          "queue": [
+            "olive"
+          ]
+        }
+      },
+      {
+        "name": "cycle:19",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage",
+            "olive"
+          ],
+          "queue": [
+            "elm"
+          ]
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage",
+            "olive"
+          ],
+          "queue": [
+            "elm"
+          ]
+        }
+      },
+      {
+        "name": "cycle:20",
+        "pass": true,
+        "expected": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage",
+            "olive",
+            "elm"
+          ],
+          "queue": []
+        },
+        "actual": {
+          "done": [
+            "indigo",
+            "raven",
+            "spruce",
+            "zinnia",
+            "oak",
+            "nutmeg",
+            "hazel",
+            "dahlia",
+            "thistle",
+            "otter",
+            "poppy",
+            "fennel",
+            "aster",
+            "iris",
+            "ginger",
+            "lemon",
+            "fern",
+            "sage",
+            "olive",
+            "elm"
+          ],
+          "queue": []
+        }
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}

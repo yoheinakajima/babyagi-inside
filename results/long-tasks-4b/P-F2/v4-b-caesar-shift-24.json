@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-b-caesar-shift-24",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 6744,
+    "answer_cap": 5784
+  },
+  "item_id": "v4-b-caesar-shift-24",
+  "horizon": "rule_until",
+  "category": "ordered_literal",
+  "cycles": 24,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Start:** `stone`\n    *   **Rule:** Caesar cipher shift +1 (a->b, b->c, ..., z->a).\n    *   **Condition:** Stop when the text begins with the letter `q`.\n    *   **Output:** Return the complete text *after each application* of the rule.\n    *   **Format:** JSON string inside a specific structure.\n    *   **Specific Constraint:** Begin with the exact text `stone`. Apply rule repeatedly. Check if text begins with `q`. Stop as soon as it is true. Return the complete current text after each application.\n    *   **Final Output Format:** `FINAL_JSON: ` followed by exactly one valid JSON object `{\"results\":[...]}`.\n    *   **Constraint:** Do not include the initial state (`stone`) as a result.\n    *   **Constraint:** Each entry must be the complete result after that operation.\n    *   **Constraint:** End with `FINAL_JSON: ` followed by the object. Do not put text after the object.\n\n2.  **Step-by-Step Execution:**\n\n    *   **Initial Text:** `stone`\n    *   **Operation 1:** Shift `stone` by +1.\n        *   s -> t\n        *   t -> u\n        *   o -> p\n        *   n -> o\n        *   e -> f\n        *   Result: `tupof`\n        *   Check: Does it start with `q`? No.\n        *   Store: `tupof`\n\n    *   **Operation 2:** Shift `tupof` by +1.\n        *   t -> u\n        *   u -> v\n        *   p -> q\n        *   o -> p\n        *   f -> g\n        *   Result: `uvqpg`\n        *   Check: Does it start with `q`? No.\n        *   Store: `uvqpg`\n\n    *   **Operation 3:** Shift `uvqpg` by +1.\n        *   u -> v\n        *   v -> w\n        *   q -> r\n        *   p -> q\n        *   g -> h\n        *   Result: `vwrqh`\n        *   Check: Does it start with `q`? No.\n        *   Store: `vwrqh`\n\n    *   **Operation 4:** Shift `vwrqh` by +1.\n        *   v -> w\n        *   w -> x\n        *   r -> s\n        *   q -> r\n        *   h -> i\n        *   Result: `wxrsi`\n        *   Check: Does it start with `q`? No.\n        *   Store: `wxrsi`\n\n    *   **Operation 5:** Shift `wxrsi` by +1.\n        *   w -> x\n        *   x -> y\n        *   r -> s\n        *   s -> t\n        *   i -> j\n        *   Result: `xystj`\n        *   Check: Does it start with `q`? No.\n        *   Store: `xystj`\n\n    *   **Operation 6:** Shift `xystj` by +1.\n        *   x -> y\n        *   y -> z\n        *   s -> t\n        *   t -> u\n        *   j -> k\n        *   Result: `yztuk`\n        *   Check: Does it start with `q`? No.\n        *   Store: `yztuk`\n\n    *   **Operation 7:** Shift `yztuk` by +1.\n        *   y -> z\n        *   z -> a\n        *   t -> u\n        *   u -> v\n        *   k -> l\n        *   Result: `zauvl`\n        *   Check: Does it start with `q`? No.\n        *   Store: `zauvl`\n\n    *   **Operation 8:** Shift `zauvl` by +1.\n        *   z -> a\n        *   a -> b\n        *   u -> v\n        *   v -> w\n        *   l -> m\n        *   Result: `abvwm`\n        *   Check: Does it start with `q`? No.\n        *   Store: `abvwm`\n\n    *   **Operation 9:** Shift `abvwm` by +1.\n        *   a -> b\n        *   b -> c\n        *   v -> w\n        *   w -> x\n        *   m -> n\n        *   Result: `bcwxn`\n        *   Check: Does it start with `q`? No.\n        *   Store: `bcwxn`\n\n    *   **Operation 10:** Shift `bcwxn` by +1.\n        *   b -> c\n        *   c -> d\n        *   w -> x\n        *   x -> y\n        *   n -> o\n        *   Result: `cdxyo`\n        *   Check: Does it start with `q`? No.\n        *   Store: `cdxyo`\n\n    *   **Operation 11:** Shift `cdxyo` by +1.\n        *   c -> d\n        *   d -> e\n        *   x -> y\n        *   y -> z\n        *   o -> p\n        *   Result: `deyzp`\n        *   Check: Does it start with `q`? No.\n        *   Store: `deyzp`\n\n    *   **Operation 12:** Shift `deyzp` by +1.\n        *   d -> e\n        *   e -> f\n        *   y -> z\n        *   z -> a\n        *   p -> q\n        *   Result: `efzaq`\n        *   Check: Does it start with `q`? No.\n        *   Store: `efzaq`\n\n    *   **Operation 13:** Shift `efzaq` by +1.\n        *   e -> f\n        *   f -> g\n        *   z -> a\n        *   a -> b\n        *   q -> r\n        *   Result: `fgabr`\n        *   Check: Does it start with `q`? No.\n        *   Store: `fgabr`\n\n    *   **Operation 14:** Shift `fgabr` by +1.\n        *   f -> g\n        *   g -> h\n        *   a -> b\n        *   b -> c\n        *   r -> s\n        *   Result: `ghbcs`\n        *   Check: Does it start with `q`? No.\n        *   Store: `ghbcs`\n\n    *   **Operation 15:** Shift `ghbcs` by +1.\n        *   g -> h\n        *   h -> i\n        *   b -> c\n        *   c -> d\n        *   s -> t\n        *   Result: `hicdt`\n        *   Check: Does it start with `q`? No.\n        *   Store: `hicdt`\n\n    *   **Operation 16:** Shift `hicdt` by +1.\n        *   h -> i\n        *   i -> j\n        *   c -> d\n        *   d -> e\n        *   t -> u\n        *   Result: `ijdue`\n        *   Check: Does it start with `q`? No.\n        *   Store: `ijdue`\n\n    *   **Operation 17:** Shift `ijdue` by +1.\n        *   i -> j\n        *   j -> k\n        *   d -> e\n        *   u -> v\n        *   e -> f\n        *   Result: `jkevf`\n        *   Check: Does it start with `q`? No.\n        *   Store: `jkevf`\n\n    *   **Operation 18:** Shift `jkevf` by +1.\n        *   j -> k\n        *   k -> l\n        *   e -> f\n        *   v -> w\n        *   f -> g\n        *   Result: `klfwg`\n        *   Check: Does it start with `q`? No.\n        *   Store: `klfwg`\n\n    *   **Operation 19:** Shift `klfwg` by +1.\n        *   k -> l\n        *   l -> m\n        *   f -> g\n        *   w -> x\n        *   g -> h\n        *   Result: `lmghx`\n        *   Check: Does it start with `q`? No.\n        *   Store: `lmghx`\n\n    *   **Operation 20:** Shift `lmghx` by +1.\n        *   l -> m\n        *   m -> n\n        *   g -> h\n        *   h -> i\n        *   x -> y\n        *   Result: `mnhiy`\n        *   Check: Does it start with `q`? No.\n        *   Store: `mnhiy`\n\n    *   **Operation 21:** Shift `mnhiy` by +1.\n        *   m -> n\n        *   n -> o\n        *   h -> i\n        *   i -> j\n        *   y -> z\n        *   Result: `noijz`\n        *   Check: Does it start with `q`? No.\n        *   Store: `noijz`\n\n    *   **Operation 22:** Shift `noijz` by +1.\n        *   n -> o\n        *   o -> p\n        *   i -> j\n        *   j -> k\n        *   z -> a\n        *   Result: `opjka`\n        *   Check: Does it start with `q`? No.\n        *   Store: `opjka`\n\n    *   **Operation 23:** Shift `opjka` by +1.\n        *   o -> p\n        *   p -> q\n        *   j -> k\n        *   k -> l\n        *   a -> b\n        *   Result: `pqklb`\n        *   Check: Does it start with `q`? Yes.\n        *   Stop.\n        *   Store: `pqklb`\n\n3.  **Compile Results:**\n    The results array should contain the text after each operation.\n    1.  `tupof`\n    2.  `uvqpg`\n    3.  `vwrqh`\n    4.  `wxrsi`\n    5.  `xystj`\n    6.  `yztuk`\n    7.  `zauvl`\n    8.  `abvwm`\n    9.  `bcwxn`\n    10. `cdxyo`\n    11. `deyzp`\n    12. `efzaq`\n    13. `fgabr`\n    14. `ghbcs`\n    15. `hicdt`\n    16. `ijdue`\n    17. `jkevf`\n    18. `klfwg`\n    19. `lmghx`\n    20. `mnhiy`\n    21. `noijz`\n    22. `opjka`\n    23. `pqklb`\n\n    Wait, I need to double check the logic.\n    Start: `stone`\n    Op 1: `tupof` (starts with t)\n    Op 2: `uvqpg` (starts with u)\n    Op 3: `vwrqh` (starts with v)\n    Op 4: `wxrsi` (starts with w)\n    Op 5: `xystj` (starts with x)\n    Op 6: `yztuk` (starts with y)\n    Op 7: `zauvl` (starts with z)\n    Op 8: `abvwm` (starts with a)\n    Op 9: `bcwxn` (starts with b)\n    Op 10: `cdxyo` (starts with c)\n    Op 11: `deyzp` (starts with d)\n    Op 12: `efzaq` (starts with e)\n    Op 13: `fgabr` (starts with f)\n    Op 14: `ghbcs` (starts with g)\n    Op 15: `hicdt` (starts with h)\n    Op 16: `ijdue` (starts with i)\n    Op 17: `jkevf` (starts with j)\n    Op 18: `klfwg` (starts with k)\n    Op 19: `lmghx` (starts with l)\n    Op 20: `mnhiy` (starts with m)\n    Op 21: `noijz` (starts with n)\n    Op 22: `opjka` (starts with o)\n    Op 23: `pqklb` (starts with p -> q)\n    Wait, `opjka` -> `pqklb`.\n    o -> p\n    p -> q\n    j -> k\n    k -> l\n    a -> b\n    Result: `pqklb`.\n    Does it start with `q`? Yes, the second letter is `q`. The first letter is `p`.\n    Wait, the condition is \"check whether the text begins with the letter q\".\n    So `pqklb` starts with `p`. It does not start with `q`.\n    I need to continue until the *first* letter is `q`.\n\n    Let's re-calculate from `opjka`.\n    Op 22: `opjka` (starts with o).\n    Op 23: `pqklb` (starts with p).\n    Op 24: `qrmlc` (starts with q).\n    Let's check Op 23 again.\n    `opjka` -> `pqklb`.\n    o -> p\n    p -> q\n    j -> k\n    k -> l\n    a -> b\n    Text: `pqklb`. Starts with `p`. Not `q`.\n    So I must continue.\n\n    Op 24: Shift `pqklb` by +1.\n    p -> q\n    q -> r\n    k -> l\n    l -> m\n    b -> c\n    Result: `qrlmc`\n    Check: Does it start with `q`? Yes.\n    Stop.\n    Store: `qrlmc`\n\n    So the list of results is:\n    1. `tupof`\n    2. `uvqpg`\n    3. `vwrqh`\n    4. `wxrsi`\n    5. `xystj`\n    6. `yztuk`\n    7. `zauvl`\n    8. `abvwm`\n    9. `bcwxn`\n    10. `cdxyo`\n    11. `deyzp`\n    12. `efzaq`\n    13. `fgabr`\n    14. `ghbcs`\n    15. `hicdt`\n    16. `ijdue`\n    17. `jkevf`\n    18. `klfwg`\n    19. `lmghx`\n    20. `mnhiy`\n    21. `noijz`\n    22. `opjka`\n    23. `pqklb`\n    24. `qrlmc`\n\n    Let's verify the shift logic again.\n    s(19) -> t(20)\n    t(20) -> u(21)\n    o(15) -> p(16)\n    n(14) -> o(15)\n    e(5) -> f(6)\n    `tupof` (Correct)\n\n    t -> u\n    u -> v\n    p -> q\n    o -> p\n    f -> g\n    `uvqpg` (Correct)\n\n    u -> v\n    v -> w\n    q -> r\n    p -> q\n    g -> h\n    `vwrqh` (Correct)\n\n    v -> w\n    w -> x\n    r -> s\n    q -> r\n    h -> i\n    `wxrsi` (Correct)\n\n    w -> x\n    x -> y\n    r -> s\n    s -> t\n    i -> j\n    `xystj` (Correct)\n\n    x -> y\n    y -> z\n    s -> t\n    t -> u\n    j -> k\n    `yztuk` (Correct)\n\n    y -> z\n    z -> a\n    t -> u\n    u -> v\n    k -> l\n    `zauvl` (Correct)\n\n    z -> a\n    a -> b\n    u -> v\n    v -> w\n    l -> m\n    `abvwm` (Correct)\n\n    a -> b\n    b -> c\n    v -> w\n    w -> x\n    m -> n\n    `bcwxn` (Correct)\n\n    b -> c\n    c -> d\n    w -> x\n    x -> y\n    n -> o\n    `cdxyo` (Correct)\n\n    c -> d\n    d -> e\n    x -> y\n    y -> z\n    o -> p\n    `deyzp` (Correct)\n\n    d -> e\n    e -> f\n    y -> z\n    z -> a\n    p -> q\n    `efzaq` (Correct)\n\n    e -> f\n    f -> g\n    z -> a\n    a -> b\n    q -> r\n    `fgabr` (Correct)\n\n    f -> g\n    g -> h\n    a -> b\n    b -> c\n    r -> s\n    `ghbcs` (Correct)\n\n    g -> h\n    h -> i\n    b -> c\n    c -> d\n    s -> t\n    `hicdt` (Correct)\n\n    h -> i\n    i -> j\n    c -> d\n    d -> e\n    t -> u\n    `ijdue` (Correct)\n\n    i -> j\n    j -> k\n    d -> e\n    u -> v\n    e -> f\n    `jkevf` (Correct)\n\n    j -> k\n    k -> l\n    e -> f\n    v -> w\n    f -> g\n    `klfwg` (Correct)\n\n    k -> l\n    l -> m\n    f -> g\n    w -> x\n    g -> h\n    `lmghx` (Correct)\n\n    l -> m\n    m -> n\n    g -> h\n    h -> i\n    x -> y\n    `mnhiy` (Correct)\n\n    m -> n\n    n -> o\n    h -> i\n    i -> j\n    y -> z\n    `noijz` (Correct)\n\n    n -> o\n    o -> p\n    i -> j\n    j -> k\n    z -> a\n    `opjka` (Correct)\n\n    o -> p\n    p -> q\n    j -> k\n    k -> l\n    a -> b\n    `pqklb` (Correct)\n\n    p -> q\n    q -> r\n    k -> l\n    l -> m\n    b -> c\n    `qrlmc` (Correct)\n\n    Check condition: `qrlmc` starts with `q`. Stop.\n    The results array should contain all strings from Op 1 to Op 24.\n\n    Wait, I need to check the instruction \"Return the complete current text after each application\".\n    \"Do not include the initial state as a result.\"\n    \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`\".\n\n    So the JSON structure is:\n    `{\"results\": [\"tupof\", \"uvqpg\", ..., \"qrlmc\"]}`\n\n    Let's double check the letter count.\n    `stone` has 5 letters.\n    `tupof` (5)\n    `uvqpg` (5)\n    ...\n    `qrlmc` (5)\n\n    Let's verify the alphabet shift logic one more time to be absolutely sure.\n    s(19) -> t(20)\n    t(20) -> u(21)\n    o(15) -> p(16)\n    n(14) -> o(15)\n    e(5) -> f(6)\n    `tupof`\n\n    t(20) -> u(21)\n    u(21) -> v(22)\n    p(16) -> q(17)\n    o(15) -> p(16)\n    f(6) -> g(7)\n    `uvqpg`\n\n    u(21) -> v(22)\n    v(22) -> w(23)\n    q(17) -> r(18)\n    p(16) -> q(17)\n    g(7) -> h(8)\n    `vwrqh`\n\n    v(22) -> w(23)\n    w(23) -> x(24)\n    r(18) -> s(19)\n    q(17) -> r(18)\n    h(8) -> i(9)\n    `wxrsi`\n\n    w(23) -> x(24)\n    x(24) -> y(25)\n    r(18) -> s(19)\n    s(19) -> t(20)\n    i(9) -> j(10)\n    `xystj`\n\n    x(24) -> y(25)\n    y(25) -> z(26)\n    s(19) -> t(20)\n    t(20) -> u(21)\n    j(10) -> k(11)\n    `yztuk`\n\n    y(25) -> z(26)\n    z(26) -> a(1)\n    t(20) -> u(21)\n    u(21) -> v(22)\n    k(11) -> l(12)\n    `zauvl`\n\n    z(26) -> a(1)\n    a(1) -> b(2)\n    u(21) -> v(22)\n    v(22) -> w(23)\n    l(12) -> m(13)\n    `abvwm`\n\n    a(1) -> b(2)\n    b(2) -> c(3)\n    v(22) -> w(23)\n    w(23) -> x(24)\n    m(13) -> n(14)\n    `bcwxn`\n\n    b(2) -> c(3)\n    c(3) -> d(4)\n    w(23) -> x(24)\n    x(24) -> y(25)\n    n(14) -> o(15)\n    `cdxyo`\n\n    c(3) -> d(4)\n    d(4) -> e(5)\n    x(24) -> y(25)\n    y(25) -> z(26)\n    o(15) -> p(16)\n    `deyzp`\n\n    d(4) -> e(5)\n    e(5) -> f(6)\n    y(25) -> z(26)\n    z(26) -> a(1)\n    p(16) -> q(17)\n    `efzaq`\n\n    e(5) -> f(6)\n    f(6) -> g(7)\n    z(26) -> a(1)\n    a(1) -> b(2)\n    q(17) -> r(18)\n    `fgabr`\n\n    f(6) -> g(7)\n    g(7) -> h(8)\n    a(1) -> b(2)\n    b(2) -> c(3)\n    r(18) -> s(19)\n    `ghbcs`\n\n    g(7) -> h(8)\n    h(8) -> i(9)\n    b(2) -> c(3)\n    c(3) -> d(4)\n    s(19) -> t(20)\n    `hicdt`\n\n    h(8) -> i(9)\n    i(9) -> j(10)\n    c(3) -> d(4)\n    d(4) -> e(5)\n    t(20) -> u(21)\n    `ijdue`\n\n    i(9) -> j(10)\n    j(10) -> k(11)\n    d(4) -> e(5)\n    u(21) -> v(22)\n    e(5) -> f(6)\n    `jkevf`\n\n    j(10) -> k(11)\n    k(11) -> l(12)\n    e(5) -> f(6)\n    v(22) -> w(23)\n    f(6) -> g(7)\n    `klfwg`\n\n    k(11) -> l(12)\n    l(12) -> m(13)\n    f(6) -> g(7)\n    w(23) -> x(24)\n    g(7) -> h(8)\n    `lmghx`\n\n    l(12) -> m(13)\n    m(13) -> n(14)\n    g(7) -> h(8)\n    h(8) -> i(9)\n    x(24) -> y(25)\n    `mnhiy`\n\n    m(13) -> n(14)\n    n(14) -> o(15)\n    h(8) -> i(9)\n    i(9) -> j(10)\n    y(25) -> z(26)\n    `noijz`\n\n    n(14) -> o(15)\n    o(15) -> p(16)\n    i(9) -> j(10)\n    j(10) -> k(11)\n    z(26) -> a(1)\n    `opjka`\n\n    o(15) -> p(16)\n    p(16) -> q(17)\n    j(10) -> k(11)\n    k(11) -> l(12)\n    a(1) -> b(2)\n    `pqklb`\n\n    p(16) -> q(17)\n    q(17) -> r(18)\n    k(11) -> l(12)\n    l(12) -> m(13)\n    b(2) -> c(3)\n    `qrlmc`\n\n    Starts with `q`. Stop.\n    Total 24 steps.\n\n    Wait, I should check the instruction \"Begin with the exact text `stone`\".\n    \"Apply this rule repeatedly: replace every letter with the next letter of the alphabet, with z becoming a.\"\n    \"After each application, check whether the text begins with the letter q, and stop as soon as it is true.\"\n    \"Return the complete current text after each application, not the starting text.\"\n    \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has one entry per operation, in task order.\"\n\n    Okay, so I need to output the JSON string.\n    The prompt asks to \"Solve the entire objective in one response.\"\n    \"Preserve the result after every successive operation, not just the final answer.\"\n    \"Do not include the initial state as a result.\"\n    \"Each entry must be the complete result after that operation: a JSON number for numeric work, the requested JSON value for structured work, or a JSON string for text (use `\\n` inside multiline strings).\"\n    \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`\".\n\n    Wait, there is a potential ambiguity. \"End with `FINAL_JSON: ` followed by exactly one valid JSON object...\".\n    Does it mean the *entire* response should be `FINAL_JSON: {...}`?\n    Or does it mean I can have text before, but the response must end with that?\n    \"Do not put text after the object.\"\n    \"Solve the entire objective in one response.\"\n    Usually, this implies the output\n</think>\n\nFINAL_JSON: {\"results\":[\"tupof\",\"uvqpg\",\"vwrqh\",\"wxrsi\",\"xystj\",\"yztuk\",\"zauvl\",\"abvwm\",\"bcwxn\",\"cdxyo\",\"deyzp\",\"efzaq\",\"fgabr\",\"ghbcs\",\"hicdt\",\"ijdue\",\"jkevf\",\"klfwg\",\"lmghx\",\"mnhiy\",\"noijz\",\"opjka\",\"pqklb\",\"qrlmc\"]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "FINAL_JSON: {\"results\":[\"tupof\",\"uvqpg\",\"vwrqh\",\"wxrsi\",\"xystj\",\"yztuk\",\"zauvl\",\"abvwm\",\"bcwxn\",\"cdxyo\",\"deyzp\",\"efzaq\",\"fgabr\",\"ghbcs\",\"hicdt\",\"ijdue\",\"jkevf\",\"klfwg\",\"lmghx\",\"mnhiy\",\"noijz\",\"opjka\",\"pqklb\",\"qrlmc\"]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 6744,
+    "answer_tokens": 101,
+    "model_tokens": 6845,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 641.6664145411924
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    "tupof",
+    "uvqpg",
+    "vwrqh",
+    "wxrsi",
+    "xystj",
+    "yztuk",
+    "zauvl",
+    "abvwm",
+    "bcwxn",
+    "cdxyo",
+    "deyzp",
+    "efzaq",
+    "fgabr",
+    "ghbcs",
+    "hicdt",
+    "ijdue",
+    "jkevf",
+    "klfwg",
+    "lmghx",
+    "mnhiy",
+    "noijz",
+    "opjka",
+    "pqklb",
+    "qrlmc"
+  ],
+  "score": {
+    "item_id": "v4-b-caesar-shift-24",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": "tupof",
+        "actual": "tupof"
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": "uvqpg",
+        "actual": "uvqpg"
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": "vwrqh",
+        "actual": "vwrqh"
+      },
+      {
+        "name": "cycle:4",
+        "pass": false,
+        "expected": "wxsri",
+        "actual": "wxrsi"
+      },
+      {
+        "name": "cycle:5",
+        "pass": false,
+        "expected": "xytsj",
+        "actual": "xystj"
+      },
+      {
+        "name": "cycle:6",
+        "pass": false,
+        "expected": "yzutk",
+        "actual": "yztuk"
+      },
+      {
+        "name": "cycle:7",
+        "pass": false,
+        "expected": "zavul",
+        "actual": "zauvl"
+      },
+      {
+        "name": "cycle:8",
+        "pass": false,
+        "expected": "abwvm",
+        "actual": "abvwm"
+      },
+      {
+        "name": "cycle:9",
+        "pass": false,
+        "expected": "bcxwn",
+        "actual": "bcwxn"
+      },
+      {
+        "name": "cycle:10",
+        "pass": false,
+        "expected": "cdyxo",
+        "actual": "cdxyo"
+      },
+      {
+        "name": "cycle:11",
+        "pass": false,
+        "expected": "dezyp",
+        "actual": "deyzp"
+      },
+      {
+        "name": "cycle:12",
+        "pass": false,
+        "expected": "efazq",
+        "actual": "efzaq"
+      },
+      {
+        "name": "cycle:13",
+        "pass": false,
+        "expected": "fgbar",
+        "actual": "fgabr"
+      },
+      {
+        "name": "cycle:14",
+        "pass": false,
+        "expected": "ghcbs",
+        "actual": "ghbcs"
+      },
+      {
+        "name": "cycle:15",
+        "pass": false,
+        "expected": "hidct",
+        "actual": "hicdt"
+      },
+      {
+        "name": "cycle:16",
+        "pass": false,
+        "expected": "ijedu",
+        "actual": "ijdue"
+      },
+      {
+        "name": "cycle:17",
+        "pass": false,
+        "expected": "jkfev",
+        "actual": "jkevf"
+      },
+      {
+        "name": "cycle:18",
+        "pass": false,
+        "expected": "klgfw",
+        "actual": "klfwg"
+      },
+      {
+        "name": "cycle:19",
+        "pass": false,
+        "expected": "lmhgx",
+        "actual": "lmghx"
+      },
+      {
+        "name": "cycle:20",
+        "pass": false,
+        "expected": "mnihy",
+        "actual": "mnhiy"
+      },
+      {
+        "name": "cycle:21",
+        "pass": false,
+        "expected": "nojiz",
+        "actual": "noijz"
+      },
+      {
+        "name": "cycle:22",
+        "pass": false,
+        "expected": "opkja",
+        "actual": "opjka"
+      },
+      {
+        "name": "cycle:23",
+        "pass": false,
+        "expected": "pqlkb",
+        "actual": "pqklb"
+      },
+      {
+        "name": "cycle:24",
+        "pass": false,
+        "expected": "qrmlc",
+        "actual": "qrlmc"
+      }
+    ],
+    "automated_pass": false,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": false
+  },
+  "first_failed_step": 4,
+  "failure_kind": "wrong",
+  "stop_outcome": "exact"
+}

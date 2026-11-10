@@ -13,7 +13,7 @@ import time
 
 import torch
 
-from qfs import circuit as F
+from qfs import circuit as F, disk, monitor
 
 TC, LT, FUNCTION, EQ, WRITE, EQREAD, FILE, PARAMETER = 248058, 27, 1628, 28, 4775, 86779, 2378, 15704
 SKIP = {F.EQNAME, F.EQTEXT}
@@ -188,6 +188,17 @@ def check_prefill(model, s, dev):
 
 
 @torch.no_grad()
+def check_monitor(model, s, dev):
+    """The filesystem read back from the model's state (qfs.monitor) is the one written."""
+    cache = disk.FSCache(model.config)
+    model(input_ids=torch.tensor([s.toks], device=dev), past_key_values=cache, use_cache=True)
+    st = monitor.read(cache)
+    files = {i: (nm, v) for nm, (i, v) in s.index.items()}
+    links = {(s.index[a][0], s.index[b][0]) for a, b in s.links}
+    return st["count"] == len(files) and st["files"] == files and st["links"] == links
+
+
+@torch.no_grad()
 def check_generate(model, s, dev):
     ok = 0
     for start, want in s.reads:
@@ -219,6 +230,8 @@ def main():
     ap.add_argument("--maxlen", type=int, default=300)
     ap.add_argument("--model", help="a merged checkpoint instead of the standalone circuit")
     ap.add_argument("--no-generate", action="store_true")
+    ap.add_argument("--value-heads", type=int, default=16,
+                    help="DeltaNet value heads for the standalone circuit (32: Qwen3.5-4B's layout)")
     a = ap.parse_args()
     dev = "cuda" if torch.cuda.is_available() else "mps"
     t0 = time.time()
@@ -226,7 +239,7 @@ def main():
         from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5ForCausalLM
         model = Qwen3_5ForCausalLM.from_pretrained(a.model, dtype=torch.bfloat16).to(dev).eval()
     else:
-        model = F.build(dev, F.calibrate(dev))
+        model = F.build(dev, F.calibrate(dev), value_heads=a.value_heads)
     print(f"model ready in {time.time() - t0:.0f}s")
     s = make(a.seed, a.files, a.maxlen)
     print(f"session: {len(s.toks)} tokens, {len(s.reads)} reads, {len(s.forced)} forced tokens")
@@ -235,6 +248,8 @@ def main():
     if bad:
         p = bad[0]
         print("   context:", s.toks[max(0, p - 6):p + 1], "want", s.forced[p])
+    print(f"monitor:  filesystem read back from state "
+          f"{'matches' if check_monitor(model, s, dev) else 'DIFFERS'}")
     if not a.no_generate:
         t0 = time.time()
         ok, n = check_generate(model, s, dev)

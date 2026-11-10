@@ -1,5 +1,9 @@
-"""Cheap invariants for the two verified compiled-agent residual layouts."""
+"""Cheap invariants for the compiled-agent residual layouts and the DeltaNet head map."""
+import torch
+from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5GatedDeltaNet
+
 from qfs import circuit as F
+from qfs import merge as M
 from qfs.agent import Layout, phase_prompts, program
 
 
@@ -120,6 +124,13 @@ def check():
     long_chain = program(tok, 8, "babyagi_ledger_pointer", think_tokens=256)
     assert len(long_chain) == 24
     assert max(Layout(long_chain, F.H, 4096).dims) < 4096
+    # Qwen3.5-4B (native width 2560) continues above qwenFS; the controller takes the rest.
+    assert M.native_dims(F.OFF) == slice(0, F.OFF)
+    native = M.native_dims(2560)
+    assert len(set(native)) == 2560 and M.native_stop(2560) == max(native) + 1 == 3584
+    assert set(native).isdisjoint(range(F.OFF, F.H))
+    four_b = Layout(long_chain, M.native_stop(2560), 4096)
+    assert set(four_b.dims).isdisjoint(native) and max(four_b.dims) < 4096
     assert len(program(tok, 4, "generative")) == 26
     for cycles, protocol in ((6, "babyagi"), (6, "babyagi_json"),
                              (7, "babyagi_typed"), (9, "babyagi_pointer"),
@@ -133,8 +144,47 @@ def check():
             raise AssertionError(f"{protocol} unexpectedly accepted {cycles} cycles")
     print({"0.8b_scratch": [min(small.dims), max(small.dims) + 1],
            "2b_scratch": [min(two_b.dims), max(two_b.dims) + 1],
+           "4b_scratch": [min(four_b.dims), max(four_b.dims) + 1],
            "qwenfs": [F.OFF, F.H]})
 
 
+@torch.no_grad()
+def check_value_heads():
+    """Every qwenFS DeltaNet layer computes the same with 32 value heads as with 16.
+
+    Qwen3.5-4B has 16 key and 32 value heads, so circuit head h writes value head 2h
+    (circuit.Delta). Outputs agree to float32 rounding (batched kernels round differently
+    at different head counts); writing value head h instead, as for 16/16, is far off.
+    """
+    writers = [F.layer_p, F.layer1, F.layer2, F.layer4, F.layer5, F.layer_pair]
+    torch.manual_seed(0)
+    x = torch.randn(1, 12, F.H)
+    x[..., F.B_] = F.BAL
+    x[..., [F.ONE, F.ONE2]] = 1.0
+
+    def run(write, value_heads, mapped=True):
+        cfg = F.config()
+        cfg.linear_num_value_heads = value_heads
+        net = Qwen3_5GatedDeltaNet(cfg, layer_idx=0)
+        for p in net.parameters():
+            p.zero_()
+        F.common(net)
+        if not mapped:
+            net.num_v_heads = net.num_k_heads      # Delta then writes value head h
+        write(net)
+        net.num_v_heads = value_heads
+        return net(x)
+
+    worst = 0.0
+    for write in writers:
+        ref, wide = run(write, 16), run(write, 32)
+        assert torch.allclose(ref, wide, rtol=1e-5, atol=1e-5), write.__name__
+        worst = max(worst, (ref - wide).abs().max().item())
+    unmapped = (run(F.layer4, 16) - run(F.layer4, 32, mapped=False)).abs().max().item()
+    assert unmapped > 0.1, unmapped
+    print({"value_head_map": f"{len(writers)} layers agree at 16 and 32 value heads",
+           "max_abs_diff": worst, "unmapped_max_abs_diff": unmapped})
+
 if __name__ == "__main__":
     check()
+    check_value_heads()

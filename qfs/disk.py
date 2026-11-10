@@ -175,6 +175,8 @@ class FSCache(DynamicCache):
 
     def __init__(self, config):
         super().__init__(config=config)
+        # DeltaNet state is indexed by value head: circuit head h is value head h * ratio.
+        self.value_ratio = config.linear_num_value_heads // config.linear_num_key_heads
         types = config.layer_types
         self.pos = next((i for i in range(len(F.LAYERS), len(types))
                          if types[i] == "full_attention"), None)
@@ -227,21 +229,22 @@ def mount(model, path, dev):
     conv = torch.zeros(1, net.conv_dim, net.conv_kernel_size, dtype=torch.bfloat16, device=dev)
     state = {li: torch.zeros(1, net.num_v_heads, F.DK, F.DK, dtype=torch.float32, device=dev)
              for li, kind in enumerate(F.LAYERS) if kind == "linear_attention"}
+    ratio = cache.value_ratio                      # circuit head h is value head h * ratio
     for r in recs:
         i = int(r["i"])
         row = dual(F.bits(int(r["v"]), F.VB))                     # version table
         state[TABLE][0, 0, i, :len(row)] = torch.tensor(row)
         for j, c in enumerate(slot_codes(r)):                     # name table: a head per slot
             vals = dual([(b + 1) // 2 for b in c])
-            state[TABLE][0, 1 + j, i, :len(vals)] = torch.tensor(vals)
+            state[TABLE][0, (1 + j) * ratio, i, :len(vals)] = torch.tensor(vals)
     links = np.fromfile(path / "links.bin", dtype=np.uint8).reshape(-1, 2)
     for s_, d_ in links.tolist():                                  # link bits
         r = (s_ % 4) * F.NFILE + d_
-        state[PAIR][0, s_ // 4, r, d_] = 20.0                      # the target's column
-        state[PAIR][0, 8 + s_ // 4, r, s_] = 20.0                  # the source's column
+        state[PAIR][0, (s_ // 4) * ratio, r, d_] = 20.0            # the target's column
+        state[PAIR][0, (8 + s_ // 4) * ratio, r, s_] = 20.0        # the source's column
     if recs.size:                                                  # file count
         row = dual(F.bits(len(recs), F.IB))
-        state[COUNTL][0, F.NSLOT + 1, 0, :len(row)] = torch.tensor(row)
+        state[COUNTL][0, (F.NSLOT + 1) * ratio, 0, :len(row)] = torch.tensor(row)
     for li, rec in state.items():
         layer = cache.layers[li]
         layer.lazy_initialization(conv_states=conv, recurrent_states=rec, state_idx=0)
