@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BabyAGI Inside</title>
-<meta name="description" content="A bounded agent loop compiled into the weights of Qwen3.5-2B. No training. The host only samples tokens until the model halts itself.">
+<meta name="description" content="A bounded agent loop compiled into the weights of Qwen3.5-4B. No training. The host only samples tokens until the model halts itself.">
 <meta property="og:title" content="BabyAGI Inside">
-<meta property="og:description" content="A bounded agent loop compiled into the weights of Qwen3.5-2B. No training. The host only samples tokens until the model halts itself.">
-<meta property="og:image" content="https://babyagi.yohei.me/og.png">
+<meta property="og:description" content="A bounded agent loop compiled into the weights of Qwen3.5-4B. No training. The host only samples tokens until the model halts itself.">
+<meta property="og:image" content="https://babyagi.yohei.me/og-4b.png">
 <meta property="og:url" content="https://babyagi.yohei.me">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://babyagi.yohei.me/og.png">
+<meta name="twitter:image" content="https://babyagi.yohei.me/og-4b.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,6 +89,8 @@ nav.links a:hover{color:var(--ink)}
 .btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .btn:hover{border-color:var(--ink)}
 .note-pending{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.news{margin-top:18px;max-width:62ch;font-size:16px;color:var(--muted);border-left:3px solid var(--accent);padding-left:14px}
+.news b{color:var(--ink);font-weight:600}
 
 /* Player */
 .player{margin-top:36px;background:var(--panel);border:1px solid var(--rule);border-radius:0;overflow:hidden}
@@ -191,6 +193,10 @@ tr.us .drive{background:var(--ink);color:var(--bg)}
 .tile{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:18px}
 .tile .n{font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .tile .l{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.4}
+td.bar{width:34%;min-width:120px}
+.bar i{display:block;height:10px;background:var(--qwen)}
+.bar i.c{background:var(--fs)}
+tr.grp td{font-weight:600;padding-top:18px}
 .isnt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .isnt ul{margin:0;padding-left:18px;display:grid;gap:10px;font-size:15px}
 pre.bib{background:var(--panel);border:1px solid var(--rule);border-radius:0;padding:16px;font-size:13px;overflow-x:auto;margin:0}
@@ -212,12 +218,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .stack .lbls span{display:flex;align-items:center}
 .lyr{flex:1;display:flex;flex-direction:column;gap:3px;min-width:3px}
 .lyr i{display:block}
-.r-q{flex:2048}.r-f{flex:1024}.r-s{flex:137}.r-p{flex:887}
-.lyr .r-q{background:var(--qwen-tint)}.lyr .r-f{background:var(--fs-tint)}.lyr .r-s{background:var(--off)}.lyr .r-p{background:transparent;outline:1px dashed var(--rule);outline-offset:-1px}
+.r-q{flex:2048}.r-f{flex:1024}.r-q2{flex:512}.r-s{flex:476}.r-p{flex:36}
+.lyr .r-q,.lyr .r-q2{background:var(--qwen-tint)}.lyr .r-f{background:var(--fs-tint)}.lyr .r-s{background:var(--off)}.lyr .r-p{background:transparent;outline:1px dashed var(--rule);outline-offset:-1px}
 .lyr.c .r-f{background:var(--fs)}.lyr.c .r-s{background:var(--circuit-ink)}
-.lyr.n .r-q{background:var(--qwen-soft)}
+.lyr.n .r-q,.lyr.n .r-q2{background:var(--qwen-soft)}
 .lyr.on.c .r-f,.lyr.on.c .r-s{opacity:.55}
-.lyr.on.n .r-q{background:var(--qwen)}
+.lyr.on.n .r-q,.lyr.on.n .r-q2{background:var(--qwen)}
 .stack-foot{display:flex;font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-left:95px;gap:8px}
 .gate{position:relative;height:250px;margin:6px 0 10px;border-bottom:1px solid var(--rule);display:flex;align-items:flex-end;gap:6px}
 .gb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
@@ -245,6 +251,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .tr .who{border-right:none;border-left:3px solid var(--circuit);padding-bottom:4px}
   .tr.q .who,.tr.t .who{border-left-color:var(--qwen)}.tr.s .who{border-left-color:var(--fs)}.tr.x .who{border-left-color:var(--halt)}
   .tiles{grid-template-columns:minmax(0,1fr)}
+  td.bar,th.bar{display:none}
 }
 @media (prefers-reduced-motion: reduce){
   .hero h1 .cursor{animation:none}
@@ -271,7 +278,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <div class="wrap hero">
   <div class="kicker">research prototype · nov 2026 · yohei nakajima</div>
   <h1>BabyAGI Inside<span class="cursor" aria-hidden="true"></span></h1>
-  <p class="lead">A bounded agent loop, compiled into the weights of <b>Qwen3.5-2B</b>. No training. After one prompt, the host only samples tokens until the model halts itself.</p>
+  <p class="lead">A bounded agent loop, compiled into the weights of <b>Qwen3.5-4B</b>. No training. After one prompt, the host only samples tokens until the model halts itself.</p>
+  <p class="news"><b>Now on Qwen3.5-4B.</b> Every run executes exactly as built, and the loop solves 28 of 32 tasks. Plain Qwen given the same token budget solves 29. <a href="#results">Results</a></p>
   <div class="cta">
     <a class="btn primary" href="#paper">Read the paper</a>
     <a class="btn" href="https://github.com/yoheinakajima/babyagi-inside">Code</a>
@@ -280,7 +288,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   <div class="player" id="replay" aria-label="Replay of a live compiled run">
     <div class="player-bar">
-      <span class="title">run/multiply-first-5 · live compiled · replay</span>
+      <span class="title">run/multiply-first-5 · qwen3.5-4b · live compiled · replay</span>
       <div class="controls">
         <button type="button" id="btn-play" aria-pressed="false">Pause</button>
         <button type="button" id="btn-restart">Restart</button>
@@ -299,7 +307,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <div class="lanes" id="lanes" aria-hidden="true"></div>
         <div class="decides">
           <div id="d-comp"><span>Compiled layers</span><span class="tag" id="d-comp-tag">decides</span></div>
-          <div id="d-qwen"><span>Qwen's 24 layers</span><span class="tag" id="d-qwen-tag">runs</span></div>
+          <div id="d-qwen"><span>Qwen's 32 layers</span><span class="tag" id="d-qwen-tag">runs</span></div>
         </div>
       </div>
       <div class="col">
@@ -307,7 +315,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <div class="chips" id="chips"></div>
         <div class="results" id="results"></div>
         <div class="count">
-          <div><span class="big" id="c-tok">0</span> <span class="mono" style="color:var(--muted)">/ 3,448 tokens</span></div>
+          <div><span class="big" id="c-tok">0</span> <span class="mono" style="color:var(--muted)">/ 3,340 tokens</span></div>
           <div>written by Qwen: <b class="q mono" id="c-q">0</b> <span style="color:var(--muted)">(<span class="mono" id="c-t">0</span> thinking)</span></div>
         </div>
         <div class="tape" id="tape" aria-hidden="true"></div>
@@ -321,7 +329,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <span><i style="background:var(--qwen)"></i>Qwen writing</span>
         <span><i style="background:var(--halt)"></i>HALT</span>
       </div>
-      <span>Totals and results are exact. Order within each phase is reconstructed; compiled tokens play fast-forward.</span>
+      <span>Token counts per stage and results are exact. Order within each stage is reconstructed; compiled tokens play fast-forward.</span>
     </div>
   </div>
 </div>
@@ -357,7 +365,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
             <tr><td><a href="https://github.com/vixhal-baraiya/qwenGPU">qwenGPU</a></td><td class="num">2B</td><td>SIMT GPU running CUDA</td><td><span class="drive">Qwen → GPU</span></td></tr>
             <tr><td><a href="https://github.com/Bobliuuu/qwentpu">qwenTPU</a></td><td class="num">0.8–4B</td><td>Matrix-multiply array</td><td><span class="drive">Qwen → TPU</span></td></tr>
             <tr><td><a href="https://github.com/itsrealranky/linuxformer">linuxformer</a></td><td class="num">4B</td><td>CPU that boots Linux</td><td><span class="drive">Qwen → shell</span></td></tr>
-            <tr class="us"><td>BabyAGI Inside</td><td class="num">2B</td><td>Agent loop, task ledger, halt, on qwenFS</td><td><span class="drive">loop → Qwen</span></td></tr>
+            <tr class="us"><td>BabyAGI Inside</td><td class="num">4B, 2B</td><td>Agent loop, task ledger, halt, on qwenFS</td><td><span class="drive">loop → Qwen</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -446,15 +454,15 @@ while ids[-1] != HALT:
     </div>
     <div class="s-body hood">
       <div class="card">
-        <h3>residual stream · 4,096 dims × 32 layers</h3>
-        <div class="stack" id="stack" aria-label="Residual stream lanes across 8 compiled and 24 Qwen layers">
-          <div class="lbls"><span class="r-q" style="color:var(--qwen)">Qwen 0–2047</span><span class="r-f" style="color:var(--fs)">qwenFS</span><span class="r-s">loop</span><span class="r-p" style="color:var(--muted)">pad</span></div>
+        <h3>residual stream · 4,096 dims × 40 layers</h3>
+        <div class="stack" id="stack" aria-label="Residual stream lanes across 8 compiled and 32 Qwen layers">
+          <div class="lbls"><span class="r-q" style="color:var(--qwen)">Qwen 0–2047</span><span class="r-f" style="color:var(--fs)">qwenFS</span><span class="r-q2" style="color:var(--qwen)">Qwen</span><span class="r-s">loop</span><span class="r-p"></span></div>
         </div>
-        <div class="stack-foot"><span style="flex:8">8 compiled</span><span style="flex:24">Qwen's 24 layers, weights unchanged</span></div>
-        <p>Each part writes only to its own lanes. With the loop inactive, the merged model matches stock Qwen on tested prefixes (top-1 4/4, KL ≤ 0.002).</p>
+        <div class="stack-foot"><span style="flex:8;white-space:nowrap">8 compiled</span><span style="flex:32;text-align:right">32 Qwen layers, unchanged</span></div>
+        <p>Qwen3.5-4B's 2,560 native dimensions continue above qwenFS, and each part writes only to its own lanes. With the loop inactive, the merged model matches stock Qwen on tested prefixes (top-1 4/4, maximum KL 3.8e-5 nats).</p>
       </div>
       <div class="card">
-        <h3>typed choice gate · v17 protocol</h3>
+        <h3>typed choice gate · v17 protocol, 2B</h3>
         <div class="gate" id="gate" aria-label="Next-token scores before and after the gate"></div>
         <div class="gate-ctl"><span id="gate-cap">Qwen's raw next-token scores</span><button type="button" class="btn" id="gate-btn" style="min-height:36px">Gate on</button></div>
         <p>One residual coordinate adds the same boost to "1" and "2". Qwen's own scores still decide between them; every other token loses by at least 1,893 logits. Bars not to scale.</p>
@@ -469,18 +477,20 @@ while ids[-1] != HALT:
       <div class="s-num">§04 inside a run</div>
       <div>
         <h2>One cycle, token by token</h2>
-        <p>Abridged excerpt of cycle 2 of the five-cycle multiply-first run. Each row is labeled by who emitted it. Token text is shown schematically; full traces are in the repository.</p>
+        <p>Abridged excerpt of cycle 2 of the five-cycle multiply-first run on Qwen3.5-4B. Each row is labeled by who emitted it. Markup is abridged; full traces are in the repository.</p>
       </div>
     </div>
     <div class="s-body">
       <div class="trace">
-        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; read_file result.txt &lt;/tool_call&gt;</div></div>
-        <div class="tr s"><div class="who">qwenFS</div><div class="txt">&lt;tool_response&gt; 30 &lt;/tool_response&gt;   <em>cycle 1's result, read back exactly</em></div></div>
-        <div class="tr f"><div class="who">circuit</div><div class="txt">Cycle 2/5. Next task from the ledger: …   <em>the pointer advances</em></div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; read_file result.json &lt;/tool_call&gt;</div></div>
+        <div class="tr s"><div class="who">qwenFS</div><div class="txt">&lt;tool_response&gt; {"result": 30} &lt;/tool_response&gt;   <em>cycle 1's result, read back exactly</em></div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; read_file ledger.json &lt;/tool_call&gt;</div></div>
+        <div class="tr s"><div class="who">qwenFS</div><div class="txt">&lt;tool_response&gt; {"initial": 10, "tasks": ["multiply the result by 3", "add 7", …]} &lt;/tool_response&gt;   <em>the ledger Qwen wrote in cycle 1</em></div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">EXECUTE LEDGER TASK 2/5. … Use exactly array entry 1 …   <em>the pointer advances</em></div></div>
         <div class="tr t"><div class="who">Qwen · think</div><div class="txt">&lt;think&gt; … 256 tokens of Qwen's own reasoning … &lt;/think&gt;   <em>closed by the circuit at 256</em></div></div>
-        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; write_file result.txt   <em>the circuit opens the write</em></div></div>
-        <div class="tr q"><div class="who">Qwen · write</div><div class="txt">37 &lt;/tool_call&gt;   <em>Qwen writes the result and closes the call</em></div></div>
-        <div class="tr s"><div class="who">qwenFS</div><div class="txt">saved result.txt</div></div>
+        <div class="tr f"><div class="who">circuit</div><div class="txt">&lt;tool_call&gt; write_file result.json {"result":   <em>the circuit opens the write</em></div></div>
+        <div class="tr q"><div class="who">Qwen · write</div><div class="txt">37} &lt;/tool_call&gt;   <em>Qwen writes the new state and closes the call</em></div></div>
+        <div class="tr s"><div class="who">qwenFS</div><div class="txt">saved result.json</div></div>
         <div class="tr x"><div class="who">circuit</div><div class="txt">… three more cycles … HALT   <em>after cycle 5: 30, 37, 33, 66, 73</em></div></div>
       </div>
     </div>
@@ -490,32 +500,33 @@ while ids[-1] != HALT:
 <section class="s" id="wrong-plan">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-num">§05 a revealing failure</div>
+      <div class="s-num">§05 what a bigger model fixed</div>
       <div>
-        <h2>A wrong plan, executed faithfully</h2>
-        <p>On two eight-cycle structured tasks, the loop did everything it was built to do. The plan Qwen wrote was wrong, and Qwen then executed every step of it correctly. Because orchestration is fixed, the failure is visible at the point where it happens.</p>
+        <h2>The failure moved from the plan to the details</h2>
+        <p>Because orchestration is fixed, every failure shows up at the point where it happens. On Qwen3.5-2B the loop ran the structured tasks perfectly and the plan Qwen wrote was wrong. On Qwen3.5-4B, with the same loop and the same tasks, Qwen plans and solves every structured task; the four failures left are exact-string slips, such as casing or punctuation, inside runs where the loop did everything right.</p>
       </div>
     </div>
     <div class="s-body">
       <div class="grid2">
         <div class="card">
-          <h3>what the loop did</h3>
+          <h3>qwen3.5-2b · structured, eight cycles</h3>
           <ul class="checks">
-            <li><span class="mark ok">✓</span>24 of 24 phases, in order</li>
-            <li><span class="mark ok">✓</span>Every file write and exact read-back</li>
-            <li><span class="mark ok">✓</span>Eight cycles, then HALT</li>
-            <li><span class="mark ok">✓</span>Every token accounted to its owner</li>
-            <li><span class="mark ok">✓</span>Every result correctly executed Qwen's own task (8/8)</li>
+            <li><span class="mark ok">✓</span>24 of 24 phases in order, every read exact, then HALT</li>
+            <li><span class="mark ok">✓</span>Every result executed Qwen's own task (8/8)</li>
+            <li><span class="mark no">✗</span>The plan: task 1 added the combined amount, tasks 2 to 8 each added one</li>
+            <li><span class="mark no">✗</span>0 of 8 transitions correct; 0 of 24 non-arithmetic chains solved</li>
           </ul>
+          <p>A wrong plan, executed faithfully. Arithmetic chains, where the plan is easy, came out right every time.</p>
         </div>
         <div class="card">
-          <h3>what qwen planned</h3>
+          <h3>qwen3.5-4b · same loop, same 32 tasks</h3>
           <ul class="checks">
-            <li><span class="mark no">✗</span>Task 1 added the combined amount</li>
-            <li><span class="mark no">✗</span>Tasks 2 to 8 each added one</li>
-            <li><span class="mark no">✗</span>0 of 8 transitions correct</li>
+            <li><span class="mark ok">✓</span>32 of 32 runs pass every system check</li>
+            <li><span class="mark ok">✓</span>Structured chains 8/8, often with the steps paraphrased</li>
+            <li><span class="mark no">✗</span><span>"Uppercase only the word lanterns" gave <span class="mono">Lanterns</span>, not <span class="mono">LANTERNS</span></span></li>
+            <li><span class="mark no">✗</span><span>A final <span class="mono">!</span> placed inside the bracket</span></li>
           </ul>
-          <p>The same pattern in both structured traces. Arithmetic chains, where the plan is easy, came out right every time.</p>
+          <p>All four 4B failures are exact-string slips like these, at five and eight cycles.</p>
         </div>
       </div>
     </div>
@@ -527,35 +538,34 @@ while ids[-1] != HALT:
     <div class="s-head">
       <div class="s-num">§06 results</div>
       <div>
-        <h2>It runs as built</h2>
-        <p>A frozen 32-item live evaluation on the compiled checkpoints: four task families, two to eight cycles, Apple M5 (MPS, bf16), greedy decoding.</p>
+        <h2>Exact control, not extra capability</h2>
+        <p>A frozen, preregistered 32-task live evaluation of the compiled Qwen3.5-4B checkpoints: four task families, two to eight cycles, Apple M5 (MPS, bf16), greedy decoding.</p>
       </div>
     </div>
     <div class="s-body">
       <div class="tiles">
-        <div class="tile"><div class="n">32/32</div><div class="l">runs ran every phase in order and halted (432/432 phases)</div></div>
-        <div class="tile"><div class="n">1,716</div><div class="l">of 1,716 forced tokens matched the reference</div></div>
-        <div class="tile"><div class="n">8/8</div><div class="l">arithmetic chains solved; 0/24 in other task families</div></div>
-        <div class="tile"><div class="n">30/32</div><div class="l">runs with every file read exact; two hit a parser bug inherited from qwenFS</div></div>
+        <div class="tile"><div class="n">32/32</div><div class="l">runs passed every system check: phases in order (432/432), file reads exact (256/256), HALT, token accounting</div></div>
+        <div class="tile"><div class="n">6,280</div><div class="l">of 6,280 forced tokens matched the reference, across the four checkpoints</div></div>
+        <div class="tile"><div class="n">28/32</div><div class="l">tasks solved by the compiled loop, up from 8/32 on Qwen3.5-2B</div></div>
+        <div class="tile"><div class="n">29/32</div><div class="l">solved by plain Qwen3.5-4B given the same token budget</div></div>
       </div>
       <div class="table-box">
         <table>
-          <caption class="small" style="caption-side:top;text-align:left;margin:0 0 10px">Ten of the 32 runs, inspected before the full evaluation</caption><thead><tr><th>Trace</th><th>Cycles</th><th>Loop</th><th>Task</th><th>Results</th></tr></thead>
+          <caption class="small" style="caption-side:top;text-align:left;margin:0 0 10px">The compiled loop against plain Qwen at the loop's token budget: thinking closed at a cap, then an answer. All 32 tasks, one Apple M5.</caption>
+          <thead><tr><th>Arm</th><th>Solved of 32</th><th class="bar"></th><th>Tokens generated</th><th>Wall time</th></tr></thead>
           <tbody>
-            <tr><td>arithmetic-add-2</td><td class="num">2</td><td>ran</td><td>pass</td><td class="num">9, 18</td></tr>
-            <tr><td>arithmetic-add-3</td><td class="num">3</td><td>ran</td><td>pass</td><td class="num">11, 22, 19</td></tr>
-            <tr><td>arithmetic-add-5</td><td class="num">5</td><td>ran</td><td>pass</td><td class="num">15, 30, 27, 32, 96</td></tr>
-            <tr><td>arithmetic-add-8</td><td class="num">8</td><td>ran</td><td>pass</td><td class="num">21, 42, 39, 44, 132, 124, 248, 257</td></tr>
-            <tr><td>arithmetic-multiply-2</td><td class="num">2</td><td>ran</td><td>pass</td><td class="num">21, 25</td></tr>
-            <tr><td>arithmetic-multiply-3</td><td class="num">3</td><td>ran</td><td>pass</td><td class="num">24, 29, 25</td></tr>
-            <tr><td>arithmetic-multiply-5</td><td class="num">5</td><td>ran</td><td>pass</td><td class="num">30, 37, 33, 66, 73</td></tr>
-            <tr><td>arithmetic-multiply-8</td><td class="num">8</td><td>ran</td><td>pass</td><td class="num">39, 49, 45, 90, 97, 194, 185, 196</td></tr>
-            <tr><td>structured-even-8</td><td class="num">8</td><td>ran</td><td>fail</td><td>wrong plan, 0/8</td></tr>
-            <tr><td>structured-odd-8</td><td class="num">8</td><td>ran</td><td>fail</td><td>wrong plan, 0/8</td></tr>
+            <tr class="grp"><td colspan="5">Qwen3.5-4B</td></tr>
+            <tr><td>Compiled loop</td><td class="num">28</td><td class="bar"><i class="c" style="width:87.5%"></i></td><td class="num">100,545</td><td class="num">4.6 h</td></tr>
+            <tr><td>Plain Qwen</td><td class="num">29</td><td class="bar"><i style="width:90.6%"></i></td><td class="num">46,800</td><td class="num">1.2 h</td></tr>
+            <tr class="grp"><td colspan="5">Qwen3.5-2B</td></tr>
+            <tr><td>Compiled loop</td><td class="num">8</td><td class="bar"><i class="c" style="width:25%"></i></td><td class="num">104,586</td><td class="num">about 3.5 h</td></tr>
+            <tr><td>Plain Qwen</td><td class="num">12</td><td class="bar"><i style="width:37.5%"></i></td><td class="num">52,256</td><td class="num">0.6 h</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small">Across all 32 runs the loop solved 8 chains, plain Qwen 5, every one of them arithmetic. In two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode and appended text to a stored file; the controller still ran every phase and halted. With the loop inactive, the merged checkpoint matches stock Qwen on 4/4 test prefixes (maximum KL 0.0019).</p>
+      <p class="small">On 4B the two arms reach the same verdict on 31 of 32 tasks (compiled minus plain −3.1 points, 95% CI [−9.4, 0.0]); on 2B plain Qwen wins four tasks and loses none. The compiled loop never solves a task plain Qwen misses. An earlier one-turn plain baseline (15 and 5 of 32) stopped every run before Qwen finished thinking, so it measured truncation, not capability. <a href="https://github.com/yoheinakajima/babyagi-inside/blob/main/docs/plain-forced-v3-results.md">Budget-forced results</a></p>
+      <p class="small"><b>Longer tasks.</b> On 48 held-out tasks of 4 to 32 steps, an adaptive version of the loop, run as host code around stock Qwen3.5-4B, solved 20, or 25 when stopped at the true length, against plain Qwen's 38 at the same budget. The preregistered decision was not to compile it. <a href="https://github.com/yoheinakajima/babyagi-inside/blob/main/docs/long-tasks-results.md">Longer-task screen</a></p>
+      <p class="small">On 2B, in two runs, tool-call markup inside Qwen's reasoning switched qwenFS into write mode, a parser behavior inherited from qwenFS. It did not occur in the 4B sweep, though the parser is unchanged.</p>
     </div>
   </div>
 </section>
@@ -578,8 +588,8 @@ while ids[-1] != HALT:
       <div class="card">
         <h3>it isn't</h3>
         <ul>
-          <li>A smarter Qwen. Capability is still a 2B model's.</li>
-          <li>Unbounded. The cycle count is fixed when the checkpoint is built.</li>
+          <li>A smarter Qwen. Plain Qwen3.5-4B at the same token budget solves as many of these tasks, in about a quarter of the time.</li>
+          <li>Unbounded. The cycle count is fixed when the checkpoint is built, and on longer tasks a host-run adaptive version lost to plain Qwen.</li>
           <li>Proven for every possible output. Validation covers the tested traces on Apple MPS, bf16.</li>
         </ul>
       </div>
@@ -598,16 +608,17 @@ while ids[-1] != HALT:
     </div>
     <div class="s-body">
       <div class="cta" style="margin-top:0;margin-bottom:24px">
-        <a class="btn primary" href="https://doi.org/10.5281/zenodo.23966217">Paper</a>
-        <a class="btn" href="paper.pdf">PDF</a>
+        <a class="btn primary" href="https://doi.org/10.5281/zenodo.23966216">Paper</a>
+        <a class="btn" href="paper-v2.pdf">PDF</a>
         <a class="btn" href="https://github.com/yoheinakajima/babyagi-inside">Code and traces</a>
+        <a class="btn" href="paper.pdf">Version 1 (Qwen3.5-2B)</a>
       </div>
       <div class="copy-row"><span class="cap" style="margin:0">cite</span><button type="button" class="btn" id="btn-copy" style="min-height:36px">Copy BibTeX</button></div>
 <pre class="bib mono" id="bib">@misc{nakajima2026babyagiinside,
   author = {Nakajima, Yohei},
   title  = {BabyAGI Inside: Compiling a Bounded Agent Loop into Qwen Weights},
   year   = {2026},
-  doi    = {10.5281/zenodo.23966217},
+  doi    = {10.5281/zenodo.23966216},
   url    = {https://babyagi.yohei.me}
 }</pre>
     </div>
@@ -624,17 +635,19 @@ while ids[-1] != HALT:
 
 <script>
 (function(){
-  // Five-cycle multiply-first trace. Totals are exact: 3,448 tokens, 2,020 forced, 1,428 by Qwen (1,280 thinking).
-  // Per-phase split is reconstructed from those totals until per-stage accounting is published.
+  // Five-cycle multiply-first run on Qwen3.5-4B (traces/qwen3.5-4b/v3-arithmetic-multiply-5.json).
+  // Per-stage counts are the run's token account: 3,340 tokens, 1,362 circuit, 568 qwenFS,
+  // 1,410 by Qwen (1,280 thinking). Within a stage, the order and the circuit split
+  // between the think and write prompts are reconstructed.
   var RESULTS = [30, 37, 33, 66, 73];
   var phases = [];
-  phases.push({ph:'create', segs:[['f',279],['q',63],['s',20]]});
+  phases.push({ph:'create', segs:[['f',284],['q',60],['s',22]]});
   for (var c = 1; c <= 5; c++) {
-    phases.push({ph:'read', cyc:c, segs:[['f',20],['s',60]]});
-    phases.push({ph:'point', cyc:c, segs:[['f',64]]});
+    if (c > 1) phases.push({ph:'read', cyc:c, segs:[['f',26],['s',24]]});
+    phases.push({ph:'point', cyc:c, segs:[['f',26],['s',68]]});
     phases.push({ph:'think', cyc:c, segs:[['f',40],['t',256]]});
-    phases.push({ph:'write', cyc:c, segs:[['f',100],['q',17]]});
-    phases.push({ph:'persist', cyc:c, segs:[['s',60]]});
+    phases.push({ph:'write', cyc:c, segs:[['f',(c === 1 || c === 5) ? 128 : 129],['q',14]]});
+    phases.push({ph:'persist', cyc:c, segs:[['s',22]]});
   }
   phases.push({ph:'halt', cyc:5, segs:[['x',1]]});
   var RATE = {f:420, s:320, t:120, q:12, x:2};
@@ -651,9 +664,9 @@ while ids[-1] != HALT:
 
   var codeDefs = [
     ['create', 'ledger = qwen.write(plan)', ''],
-    ['', 'for cycle in 1..5:', ''],
+    ['', 'for c in 1..5:', ''],
     ['read', '  state  = fs.read(result)', ''],
-    ['point', '  task   = ledger.next()', '   # circuit'],
+    ['point', '  task   = fs.read(ledger)[c]', '  # circuit'],
     ['think', '  think  = qwen.think(256)', ''],
     ['write', '  result = qwen.write(task)', ''],
     ['persist', '  fs.save(result)', ''],
@@ -770,11 +783,11 @@ while ids[-1] != HALT:
   (function(){
     var st=document.getElementById('stack');
     var cols=[];
-    for(var i=0;i<32;i++){var d=document.createElement('div');d.className='lyr '+(i<8?'c':'n');
-      ['r-q','r-f','r-s','r-p'].forEach(function(c){var x=document.createElement('i');x.className=c;d.appendChild(x);});
+    for(var i=0;i<40;i++){var d=document.createElement('div');d.className='lyr '+(i<8?'c':'n');
+      ['r-q','r-f','r-q2','r-s','r-p'].forEach(function(c){var x=document.createElement('i');x.className=c;d.appendChild(x);});
       st.appendChild(d);cols.push(d);}
     var reduce2=false;try{reduce2=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-    if(!reduce2){var k=0;setInterval(function(){cols.forEach(function(c,j){c.classList.toggle('on',j===k);});k=(k+1)%40;},140);}
+    if(!reduce2){var k=0;setInterval(function(){cols.forEach(function(c,j){c.classList.toggle('on',j===k);});k=(k+1)%48;},140);}
     var toks=[['Task',119],['The',98],['↵',84],['{',63],['1',77],['2',56],['Append',70],['I',49],['Let',46],['"',32],['3',28]];
     var g=document.getElementById('gate');
     toks.forEach(function(t){var b=document.createElement('div');b.className='gb'+((t[0]==='1'||t[0]==='2')?' l':'');
