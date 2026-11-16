@@ -1,12 +1,12 @@
 # BabyAGI Inside
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966217.svg)](https://doi.org/10.5281/zenodo.23966217)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966216.svg)](https://doi.org/10.5281/zenodo.23966216)
 
 BabyAGI Inside compiles a bounded BabyAGI-style agent loop into the weights of a widened Qwen3.5-4B checkpoint, with no training: the host supplies one objective and then only samples until HALT, while compiled controller state advances a fixed task pointer, qwenFS persists the ledger and results, and Qwen writes the plan, reasoning, and payloads. The result is a systems demonstration—not a claim of general agency.
 
 On the frozen 32-task v3 suite, all 32 live Qwen3.5-4B runs pass every system check (controller sequence, qwenFS reads, HALT, and token accounting), and the compiled loop completes 28 of the 32 objectives. Plain Qwen3.5-4B, given the same token budget and made to answer, completes 29, with less than half the tokens and about a quarter of the time: on this suite the loop adds exact control, not measured capability ([budget-forced results](docs/plain-forced-v3-results.md)). On 48 longer held-out tasks (4 to 32 steps), a preregistered screen of an adaptive version of the loop, run as host code, completes 20, or 25 when stopped at the true length, against plain Qwen3.5-4B's 38 at the same budget ([longer-task screen](docs/long-tasks-results.md)).
 
-The first release compiled the same loop into Qwen3.5-2B, and the archived preprint at the DOI above reports it. The current code still builds its checkpoints byte-identically, and the commands to rebuild them and replay its ten archived live traces are [below](#reproduce-the-qwen35-2b-release). Its plain comparison is superseded: the one-turn plain arm stopped every run before Qwen closed its thinking, and at the loop's token budget plain Qwen3.5-2B completes 12 chains to the loop's 8.
+The first release compiled the same loop into Qwen3.5-2B, and version 1 of the preprint ([10.5281/zenodo.23966217](https://doi.org/10.5281/zenodo.23966217)) reports it; version 2 ([10.5281/zenodo.24287467](https://doi.org/10.5281/zenodo.24287467)) reports the Qwen3.5-4B results above and lists every correction to version 1. The current code still builds its checkpoints byte-identically, and the commands to rebuild them and replay its ten archived live traces are [below](#reproduce-the-qwen35-2b-release). Its plain comparison is superseded: the one-turn plain arm stopped every run before Qwen closed its thinking, and at the loop's token budget plain Qwen3.5-2B completes 12 chains to the loop's 8.
 
 Repository: <https://github.com/yoheinakajima/babyagi-inside>
 
