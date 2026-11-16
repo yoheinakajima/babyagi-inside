@@ -40,11 +40,12 @@ def read(cache):
         r = getattr(cache.layers[li], "recurrent_states", None)
         return r[0][0] if r is not None and len(r) and r[0] is not None else None
     rec = {li: x for li in (TABLE, PAIR, COUNTL) if (x := state(li)) is not None}
+    r = getattr(cache, "value_ratio", 1)      # circuit head h is value head h * r
     if TABLE not in rec:
         return {"count": 0, "files": {}, "links": set(), "rows": 0, "lookup": 0,
                 "vbits": [[0] * F.VB for _ in range(F.NFILE)]}
-    table = rec[TABLE][:, :F.NFILE, :2 * F.IDB].float().cpu()
-    count = value(bits01(rec[COUNTL][F.NSLOT + 1, 0, :2 * F.IB].float().cpu(), F.IB))
+    table = rec[TABLE][::r, :F.NFILE, :2 * F.IDB].float().cpu()
+    count = value(bits01(rec[COUNTL][(F.NSLOT + 1) * r, 0, :2 * F.IB].float().cpu(), F.IB))
     if table[0].abs().sum() and not count:     # 32 files wrap the 5-bit count to 0
         count = F.NFILE
     files = {}
@@ -61,7 +62,7 @@ def read(cache):
     if PAIR in rec:
         pair = rec[PAIR].float().cpu()
         for s in range(count):
-            rows = pair[s // 4, (s % 4) * F.NFILE:(s % 4 + 1) * F.NFILE]
+            rows = pair[(s // 4) * r, (s % 4) * F.NFILE:(s % 4 + 1) * F.NFILE]
             for d in range(count):
                 if rows[d, d] > 10:
                     links.add((s, d))

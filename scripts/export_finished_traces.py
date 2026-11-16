@@ -2,6 +2,9 @@
 
 This is a CPU-only transformation over completed JSON artifacts. It does not
 load a checkpoint, import a model framework, decode tokens, or rerun scoring.
+With --sweep, the same ten items are read from a qfs.compiled_sweep output
+directory (items/<id>/) instead of the archived result layout; --all exports
+every suite item from the sweep.
 """
 from __future__ import annotations
 
@@ -51,18 +54,34 @@ def emitter(stage):
     return "controller"
 
 
-def export_trace(trace_id, source_root, benchmark_items):
-    directory = Path(source_root) / TRACE_LOCATIONS[trace_id]
-    prefix = directory / trace_id
-    run = load(f"{prefix}-run.json")
-    evaluation = load(f"{prefix}-evaluation.json")
-    accounting = load(f"{prefix}-account.json")
+def artifact_paths(trace_id, source_root, sweep=False):
+    if sweep:
+        directory = Path(source_root) / "items" / trace_id
+        return (directory / "run.json", directory / "evaluation.json",
+                directory / "account.json")
+    prefix = Path(source_root) / TRACE_LOCATIONS[trace_id] / trace_id
+    return (Path(f"{prefix}-run.json"), Path(f"{prefix}-evaluation.json"),
+            Path(f"{prefix}-account.json"))
+
+
+def export_trace(trace_id, source_root, benchmark_items, sweep=False):
+    paths = artifact_paths(trace_id, source_root, sweep)
+    run, evaluation, accounting = map(load, paths)
     item = benchmark_items[trace_id]
+    for path, value in zip(paths[1:], (evaluation, accounting)):
+        if "error" in value:
+            raise SystemExit(f"{trace_id}: {path} records an error: {value['error']}")
 
     ledger_text = evaluation["latest_files"]["ledger.json"]["text"]
     ledger = json.loads(ledger_text)
-    results = result_values(evaluation)
     expected = item["rubric"]["expected_results"]
+    if sweep:
+        # The sweep's own scored results and verdict (qfs.benchmark normalizes values).
+        score = load(paths[0].parent / "score.json")
+        results, passed = score["actual_results"], score["automated_pass"]
+    else:
+        results = result_values(evaluation)
+        passed = len(results) == len(expected) and results == expected
     totals = accounting["totals"]
     stages = [{
         "cycle": stage["cycle"],
@@ -79,7 +98,7 @@ def export_trace(trace_id, source_root, benchmark_items):
         "ledger": ledger,
         "results": results,
         "expected": expected,
-        "pass": len(results) == len(expected) and results == expected,
+        "pass": passed,
         "tokens": {
             "total": totals["emitted_tokens"],
             "forced": totals["forced_total"],
@@ -94,16 +113,23 @@ def export_trace(trace_id, source_root, benchmark_items):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source_root", type=Path,
-                        help="finished end-to-end-v3-b256 result root")
+                        help="finished end-to-end-v3-b256 result root, or a sweep "
+                             "directory with --sweep")
     parser.add_argument("benchmark", type=Path)
     parser.add_argument("output_dir", type=Path)
+    parser.add_argument("--sweep", action="store_true",
+                        help="source_root is a qfs.compiled_sweep output directory")
+    parser.add_argument("--all", action="store_true",
+                        help="with --sweep, export every suite item, not only the ten")
     args = parser.parse_args()
+    if args.all and not args.sweep:
+        parser.error("--all needs --sweep")
 
     benchmark = load(args.benchmark)
     items = {item["id"]: item for item in benchmark["items"]}
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    for trace_id in TRACE_LOCATIONS:
-        value = export_trace(trace_id, args.source_root, items)
+    for trace_id in (items if args.all else TRACE_LOCATIONS):
+        value = export_trace(trace_id, args.source_root, items, args.sweep)
         output = args.output_dir / f"{trace_id}.json"
         output.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
         print(f"{trace_id}: {'pass' if value['pass'] else 'fail'}")

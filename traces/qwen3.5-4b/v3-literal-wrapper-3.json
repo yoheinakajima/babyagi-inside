@@ -1,0 +1,96 @@
+{
+  "trace_id": "v3-literal-wrapper-3",
+  "cycles": 3,
+  "objective": "Begin with the exact text cedar. First append -a3; next wrap the complete text in parentheses; finally uppercase only its letters. Apply exactly one text transformation per task in order and return the complete current text each time.",
+  "ledger": {
+    "initial": "cedar",
+    "tasks": [
+      "First append -a3",
+      "Next wrap the complete text in parentheses",
+      "Finally uppercase only its letters"
+    ]
+  },
+  "results": [
+    "cedar-a3",
+    "(cedar-a3)",
+    "(CEDAR-A3)"
+  ],
+  "expected": [
+    "cedar-a3",
+    "(cedar-a3)",
+    "(CEDAR-A3)"
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 2115,
+    "forced": 1244,
+    "qwenfs": 324,
+    "qwen_reasoning": 768,
+    "qwen_payload": 103
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

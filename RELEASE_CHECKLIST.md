@@ -16,10 +16,11 @@
 
 ## Waits on the frozen sweep
 
-- [ ] `TODO(sweep)`: validate all 32 checksum-bound live records and final systems/accounting totals.
-- [ ] `TODO(sweep)`: add exact compiled accuracy, transition accuracy, category/length breakdowns, paired plain-Qwen result, effect size, and confidence intervals.
-- [ ] `TODO(sweep)`: disclose any controller, filesystem, accounting, bound, or process exception.
-- [ ] `TODO(sweep)`: update the site and README headline only from the frozen final summary; do not tune prompts, checkpoints, settings, or scorers.
+- [x] `TODO(sweep)`: validate all 32 checksum-bound live records and final systems/accounting totals.
+- [x] `TODO(sweep)`: add exact compiled accuracy, transition accuracy, category/length breakdowns, paired plain-Qwen result, effect size, and confidence intervals.
+- [x] `TODO(sweep)`: disclose any controller, filesystem, accounting, bound, or process exception.
+- [x] `TODO(sweep)`: update the site and README headline only from the frozen final summary; do not tune prompts, checkpoints, settings, or scorers.
+- [x] Done: the 2B sweep (8/32 chains, 30/32 system pass, two qwenFS write-mode exceptions) is on the site since v1.3 and in the README since the 4B port.
 - [ ] `TODO(sweep)`: choose any additional public representative traces using a documented rule, rather than cherry-picking.
 
 ## After sweep
@@ -43,3 +44,22 @@
 - [ ] CUDA circuit-oracle check.
 - [ ] Reproducible timing measurements.
 - [ ] Larger frozen capability suite if a capability claim beyond the systems result is desired.
+
+## Qwen3.5-4B port (branch `qwen35-4b-port`)
+
+Held to the bar the 2B release met before it shipped.
+
+- [x] Qwen3.5-4B contents pinned in `provenance/qwen3.5-4b.sha256` (Hugging Face revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`); NOTICE covers the 4B weights.
+- [x] `scripts/build_checkpoints.sh 4b` builds the 2, 3, 5, and 8-cycle checkpoints with the same `qfs.agent` command the preregistered builds used; each rebuild had the same tree SHA-256 as the first build.
+- [x] 2B unchanged: all four 2B checkpoints rebuild byte-identically to the preregistered 2B digests at the branch head.
+- [x] Forced-token oracle at 100% on all four 4B checkpoints (840, 1,132, 1,716, 2,592 tokens).
+- [x] Agent-inactive parity against stock Qwen3.5-4B: max KL 3.8e-5 nats, top-1 4/4, on all four.
+- [x] Frozen 32-item live compiled sweep preregistered before the first item (`docs/qwen35-4b-full-live-compiled-preregistration.md`).
+- [x] All 32 checksum-bound records: 32/32 pass every system check; 28/32 exact chains (Wilson 95% [71.9, 95.0]); +40.6 points over plain Qwen3.5-4B (95% CI [+25.0, +59.4], 13 improved, 0 regressed); four exact-string failures, each listed in the results document.
+- [x] Results document (`docs/qwen35-4b-full-live-compiled-results.md`), README results, and all 32 sweep runs exported to `traces/qwen3.5-4b/` (every item, so none is selected).
+
+Decisions for Yohei (not done here):
+
+- [ ] Whether the site and paper describe 4B, and with which numbers.
+- [ ] Whether to host 4B checkpoints (about 15 GB each) or ship rebuild scripts and digests only.
+- [ ] Whether the 4B results warrant a new Zenodo version.

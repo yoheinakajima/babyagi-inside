@@ -618,7 +618,8 @@ def compile_into(model, stages, xs, native_width=1024, scratch_start=1024,
             E[PHASE0 + i, a.anchor] = 1
             E[PHASE0 + i, a.phase_in[i]] = 1
         # Control symbols look like a newline to the pretrained language stack.
-        E[PHASE0:HALT + 1, :native_width] = 0.25 * E[F.NL, :native_width]
+        native = M.native_dims(native_width)
+        E[PHASE0:HALT + 1, native] = 0.25 * E[F.NL, native]
         decisions = [stage["decision"] for stage in stages if "decision" in stage]
         if decisions:
             allowed_sets = {tuple(decision["allowed_token_ids"]) for decision in decisions}
@@ -737,6 +738,10 @@ def build(src, dst, cycles=3, device="mps", protocol="baseline", think_tokens=No
         # Qwen3.5-2B occupies 0..2047 and qwenFS occupies 2048..3071.
         # Give the controller a new tail rather than corrupting either one.
         target_hidden, scratch_start, scratch_stop = 4096, F.H, 4096
+    elif native_width == 2560:
+        # Qwen3.5-4B keeps 0..2047 below qwenFS (2048..3071) and continues at 3072..3583
+        # (merge.native_dims). The controller takes the rest of the tail, 3584..4095.
+        target_hidden, scratch_start, scratch_stop = 4096, M.native_stop(native_width), 4096
     else:
         raise ValueError(f"No verified agent layout for native width {native_width}")
     xs = F.calibrate(device)

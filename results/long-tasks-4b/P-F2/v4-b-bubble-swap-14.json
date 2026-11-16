@@ -1,0 +1,541 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-b-bubble-swap-14",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 4184,
+    "answer_cap": 3374
+  },
+  "item_id": "v4-b-bubble-swap-14",
+  "horizon": "rule_until",
+  "category": "structured_operation",
+  "cycles": 14,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to perform a specific operation on a JSON array of numbers.\nThe initial array is `[7, 47, 36, 27, 50, 25, 60, 5]`.\nThe rule is: \"swap the first pair of neighbouring numbers in which the left number is larger than the right number.\"\nAfter each swap, I need to check if the array is in ascending order.\nIf it is, I stop.\nI need to return the state of the array *after* each operation.\nThe output format must be a JSON object `{\"results\": [...]}` where `results` contains the array state after each step.\nI should not include the initial state.\n\nLet's trace the process.\n\nInitial Array: `[7, 47, 36, 27, 50, 25, 60, 5]`\n\n**Step 1:**\nFind the first pair of neighbouring numbers where `left > right`.\nIndices: 0, 1, 2, 3, 4, 5, 6, 7\nValues: 7, 47, 36, 27, 50, 25, 60, 5\n\nPairs:\n(7, 47): 7 < 47 (No)\n(47, 36): 47 > 36 (Yes) -> Swap these.\n\nSwap 47 and 36.\nNew Array: `[7, 36, 47, 27, 50, 25, 60, 5]`\nCheck if ascending: 7 < 36 < 47 > 27 (No).\n\n**Step 2:**\nCurrent Array: `[7, 36, 47, 27, 50, 25, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 36): 7 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 27): 47 > 27 (Yes) -> Swap these.\n\nSwap 47 and 27.\nNew Array: `[7, 36, 27, 47, 50, 25, 60, 5]`\nCheck if ascending: 7 < 36 > 27 (No).\n\n**Step 3:**\nCurrent Array: `[7, 36, 27, 47, 50, 25, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 36): 7 < 36 (No)\n(36, 27): 36 > 27 (Yes) -> Swap these.\n\nSwap 36 and 27.\nNew Array: `[7, 27, 36, 47, 50, 25, 60, 5]`\nCheck if ascending: 7 < 27 < 36 < 47 < 50 > 25 (No).\n\n**Step 4:**\nCurrent Array: `[7, 27, 36, 47, 50, 25, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 27): 7 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 50): 47 < 50 (No)\n(50, 25): 50 > 25 (Yes) -> Swap these.\n\nSwap 50 and 25.\nNew Array: `[7, 27, 36, 47, 25, 50, 60, 5]`\nCheck if ascending: 7 < 27 < 36 < 47 > 25 (No).\n\n**Step 5:**\nCurrent Array: `[7, 27, 36, 47, 25, 50, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 27): 7 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 25): 47 > 25 (Yes) -> Swap these.\n\nSwap 47 and 25.\nNew Array: `[7, 27, 36, 25, 47, 50, 60, 5]`\nCheck if ascending: 7 < 27 < 36 > 25 (No).\n\n**Step 6:**\nCurrent Array: `[7, 27, 36, 25, 47, 50, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 27): 7 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 25): 36 > 25 (Yes) -> Swap these.\n\nSwap 36 and 25.\nNew Array: `[7, 27, 25, 36, 47, 50, 60, 5]`\nCheck if ascending: 7 < 27 > 25 (No).\n\n**Step 7:**\nCurrent Array: `[7, 27, 25, 36, 47, 50, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 27): 7 < 27 (No)\n(27, 25): 27 > 25 (Yes) -> Swap these.\n\nSwap 27 and 25.\nNew Array: `[7, 25, 27, 36, 47, 50, 60, 5]`\nCheck if ascending: 7 < 25 < 27 < 36 < 47 < 50 < 60 > 5 (No).\n\n**Step 8:**\nCurrent Array: `[7, 25, 27, 36, 47, 50, 60, 5]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 27): 25 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 50): 47 < 50 (No)\n(50, 60): 50 < 60 (No)\n(60, 5): 60 > 5 (Yes) -> Swap these.\n\nSwap 60 and 5.\nNew Array: `[7, 25, 27, 36, 47, 50, 5, 60]`\nCheck if ascending: 7 < 25 < 27 < 36 < 47 < 50 > 5 (No).\n\n**Step 9:**\nCurrent Array: `[7, 25, 27, 36, 47, 50, 5, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 27): 25 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 50): 47 < 50 (No)\n(50, 5): 50 > 5 (Yes) -> Swap these.\n\nSwap 50 and 5.\nNew Array: `[7, 25, 27, 36, 47, 5, 50, 60]`\nCheck if ascending: 7 < 25 < 27 < 36 < 47 > 5 (No).\n\n**Step 10:**\nCurrent Array: `[7, 25, 27, 36, 47, 5, 50, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 27): 25 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 47): 36 < 47 (No)\n(47, 5): 47 > 5 (Yes) -> Swap these.\n\nSwap 47 and 5.\nNew Array: `[7, 25, 27, 36, 5, 47, 50, 60]`\nCheck if ascending: 7 < 25 < 27 < 36 > 5 (No).\n\n**Step 11:**\nCurrent Array: `[7, 25, 27, 36, 5, 47, 50, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 27): 25 < 27 (No)\n(27, 36): 27 < 36 (No)\n(36, 5): 36 > 5 (Yes) -> Swap these.\n\nSwap 36 and 5.\nNew Array: `[7, 25, 27, 5, 36, 47, 50, 60]`\nCheck if ascending: 7 < 25 < 27 > 5 (No).\n\n**Step 12:**\nCurrent Array: `[7, 25, 27, 5, 36, 47, 50, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 27): 25 < 27 (No)\n(27, 5): 27 > 5 (Yes) -> Swap these.\n\nSwap 27 and 5.\nNew Array: `[7, 25, 5, 27, 36, 47, 50, 60]`\nCheck if ascending: 7 < 25 > 5 (No).\n\n**Step 13:**\nCurrent Array: `[7, 25, 5, 27, 36, 47, 50, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 25): 7 < 25 (No)\n(25, 5): 25 > 5 (Yes) -> Swap these.\n\nSwap 25 and 5.\nNew Array: `[7, 5, 25, 27, 36, 47, 50, 60]`\nCheck if ascending: 7 < 5 (No).\n\n**Step 14:**\nCurrent Array: `[7, 5, 25, 27, 36, 47, 50, 60]`\nFind first pair where `left > right`.\nPairs:\n(7, 5): 7 > 5 (Yes) -> Swap these.\n\nSwap 7 and 5.\nNew Array: `[5, 7, 25, 27, 36, 47, 50, 60]`\nCheck if ascending: 5 < 7 < 25 < 27 < 36 < 47 < 50 < 60 (Yes).\n\nStop.\n\nThe results array should contain the arrays after steps 1 through 13. Wait, let me double check the stopping condition. \"stop as soon as it is true\".\nStep 14 resulted in `[5, 7, 25, 27, 36, 47, 50, 60]`. This is sorted.\nSo I stop *after* Step 14.\nThe results array should contain the state *after* each application.\nSo I need to list the states after Step 1, Step 2, ..., Step 14.\nWait, \"Do not put text after the object.\" and \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`\".\nThe prompt says: \"Return the complete valid JSON array after each application, not the starting array.\"\nAnd \"Preserve the result after every successive operation, not just the final answer.\"\nSo the `results` array in the final JSON should contain the arrays resulting from the operations.\nLet's list them:\n1. `[7, 36, 47, 27, 50, 25, 60, 5]`\n2. `[7, 36, 27, 47, 50, 25, 60, 5]`\n3. `[7, 27, 36, 47, 50, 25, 60, 5]`\n4. `[7, 27, 36, 47, 25, 50, 60, 5]`\n5. `[7, 27, 36, 25, 47, 50, 60, 5]`\n6. `[7, 27, 25, 36, 47, 50, 60, 5]`\n7. `[7, 25, 27, 36, 47, 50, 60, 5]`\n8. `[7, 25, 27, 36, 47, 50, 5, 60]`\n9. `[7, 25, 27, 36, 47, 5, 50, 60]`\n10. `[7, 25, 27, 36, 5, 47, 50, 60]`\n11. `[7, 25, 27, 5, 36, 47, 50, 60]`\n12. `[7, 25, 5, 27, 36, 47, 50, 60]`\n13. `[7, 5, 25, 27, 36, 47, 50, 60]`\n14. `[5, 7, 25, 27, 36, 47, 50, 60]`\n\nWait, I need to check the instruction \"Return the complete valid JSON array after each application\".\nDoes it mean I should output the JSON array for each step in the response text, or just the final JSON object containing the history?\n\"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has one entry per operation, in task order.\"\nThis implies I should output the intermediate steps in the text (maybe) but the final output must be the specific JSON object.\nHowever, the prompt says \"Solve the entire objective in one response.\" and \"Preserve the result after every successive operation, not just the final answer.\"\nUsually, this means I should show the work. But the constraint \"End with `FINAL_JSON: ` followed by exactly one valid JSON object...\" suggests the final block is the most important part.\nI will write out the steps clearly in the text, then provide the final JSON.\nWait, \"Do not put text after the object.\"\nSo the text before `FINAL_JSON:` is allowed.\nLet's re-read carefully: \"Return the complete valid JSON array after each application, not the starting array.\"\nThis might mean the output of the *task* is the list of arrays.\nBut the instruction \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`\" defines the structure of the final output.\nI will provide the step-by-step trace in the text, then the final JSON.\n\nLet's double check the logic.\nInitial: `[7, 47, 36, 27, 50, 25, 60, 5]`\n\nOp 1:\nScan: 7<47, 47>36. Swap 47, 36.\nResult: `[7, 36, 47, 27, 50, 25, 60, 5]`\nSorted? No.\n\nOp 2:\nScan: 7<36, 36<47, 47>27. Swap 47, 27.\nResult: `[7, 36, 27, 47, 50, 25, 60, 5]`\nSorted? No.\n\nOp 3:\nScan: 7<36, 36>27. Swap 36, 27.\nResult: `[7, 27, 36, 47, 50, 25, 60, 5]`\nSorted\n</think>\n\nThe process involves repeatedly finding the first adjacent pair where the left number is greater than the right number and swapping them, until the array is sorted in ascending order.\n\n**Initial Array:** `[7, 47, 36, 27, 50, 25, 60, 5]`\n\n**Operation 1:**\n- Check pairs: (7, 47) -> 7 < 47 (No), (47, 36) -> 47 > 36 (Yes).\n- Swap 47 and 36.\n- **Result:** `[7, 36, 47, 27, 50, 25, 60, 5]`\n- Check sorted: No (47 > 27).\n\n**Operation 2:**\n- Check pairs: (7, 36) -> No, (36, 47) -> No, (47, 27) -> Yes.\n- Swap 47 and 27.\n- **Result:** `[7, 36, 27, 47, 50, 25, 60, 5]`\n- Check sorted: No (36 > 27).\n\n**Operation 3:**\n- Check pairs: (7, 36) -> No, (36, 27) -> Yes.\n- Swap 36 and 27.\n- **Result:** `[7, 27, 36, 47, 50, 25, 60, 5]`\n- Check sorted: No (50 > 25).\n\n**Operation 4:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 25) -> Yes.\n- Swap 50 and 25.\n- **Result:** `[7, 27, 36, 47, 25, 50, 60, 5]`\n- Check sorted: No (47 > 25).\n\n**Operation 5:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 25) -> Yes.\n- Swap 47 and 25.\n- **Result:** `[7, 27, 36, 25, 47, 50, 60, 5]`\n- Check sorted: No (36 > 25).\n\n**Operation 6:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 25) -> Yes.\n- Swap 36 and 25.\n- **Result:** `[7, 27, 25, 36, 47, 50, 60, 5]`\n- Check sorted: No (27 > 25).\n\n**Operation 7:**\n- Check pairs: (7, 27) -> No, (27, 25) -> Yes.\n- Swap 27 and 25.\n- **Result:** `[7, 25, 27, 36, 47, 50, 60, 5]`\n- Check sorted: No (60 > 5).\n\n**Operation 8:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 60) -> No, (60, 5) -> Yes.\n- Swap 60 and 5.\n- **Result:** `[7, 25, 27, 36, 47, 50, 5, 60]`\n- Check sorted: No (50 > 5).\n\n**Operation 9:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 5) -> Yes.\n- Swap 50 and 5.\n- **Result:** `[7, 25, 27, 36, 47, 5, 50, 60]`\n- Check sorted: No (47 > 5).\n\n**Operation 10:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 5) -> Yes.\n- Swap 47 and 5.\n- **Result:** `[7, 25, 27, 36, 5, 47, 50, 60]`\n- Check sorted: No (36 > 5).\n\n**Operation 11:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 5) -> Yes.\n- Swap 36 and 5.\n- **Result:** `[7, 25, 27, 5, 36, 47, 50, 60]`\n- Check sorted: No (27 > 5).\n\n**Operation 12:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 5) -> Yes.\n- Swap 27 and 5.\n- **Result:** `[7, 25, 5, 27, 36, 47, 50, 60]`\n- Check sorted: No (25 > 5).\n\n**Operation 13:**\n- Check pairs: (7, 25) -> No, (25, 5) -> Yes.\n- Swap 25 and 5.\n- **Result:** `[7, 5, 25, 27, 36, 47, 50, 60]`\n- Check sorted: No (7 > 5).\n\n**Operation 14:**\n- Check pairs: (7, 5) -> Yes.\n- Swap 7 and 5.\n- **Result:** `[5, 7, 25, 27, 36, 47, 50, 60]`\n- Check sorted: Yes (5 < 7 < 25 < 27 < 36 < 47 < 50 < 60).\n- Stop.\n\nFINAL_JSON: {\"results\":[[7, 36, 47, 27, 50, 25, 60, 5], [7, 36, 27, 47, 50, 25, 60, 5], [7, 27, 36, 47, 50, 25, 60, 5], [7, 27, 36, 47, 25, 50, 60, 5], [7, 27, 36, 25, 47, 50, 60, 5], [7, 27, 25, 36, 47, 50, 60, 5], [7, 25, 27, 36, 47, 50, 60, 5], [7, 25, 27, 36, 47, 50, 5, 60], [7, 25, 27, 36, 47, 5, 50, 60], [7, 25, 27, 36, 5, 47, 50, 60], [7, 25, 27, 5, 36, 47, 50, 60], [7, 25, 5, 27, 36, 47, 50, 60], [7, 5, 25, 27, 36, 47, 50, 60], [5, 7, 25, 27, 36, 47, 50, 60]]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "The process involves repeatedly finding the first adjacent pair where the left number is greater than the right number and swapping them, until the array is sorted in ascending order.\n\n**Initial Array:** `[7, 47, 36, 27, 50, 25, 60, 5]`\n\n**Operation 1:**\n- Check pairs: (7, 47) -> 7 < 47 (No), (47, 36) -> 47 > 36 (Yes).\n- Swap 47 and 36.\n- **Result:** `[7, 36, 47, 27, 50, 25, 60, 5]`\n- Check sorted: No (47 > 27).\n\n**Operation 2:**\n- Check pairs: (7, 36) -> No, (36, 47) -> No, (47, 27) -> Yes.\n- Swap 47 and 27.\n- **Result:** `[7, 36, 27, 47, 50, 25, 60, 5]`\n- Check sorted: No (36 > 27).\n\n**Operation 3:**\n- Check pairs: (7, 36) -> No, (36, 27) -> Yes.\n- Swap 36 and 27.\n- **Result:** `[7, 27, 36, 47, 50, 25, 60, 5]`\n- Check sorted: No (50 > 25).\n\n**Operation 4:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 25) -> Yes.\n- Swap 50 and 25.\n- **Result:** `[7, 27, 36, 47, 25, 50, 60, 5]`\n- Check sorted: No (47 > 25).\n\n**Operation 5:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 25) -> Yes.\n- Swap 47 and 25.\n- **Result:** `[7, 27, 36, 25, 47, 50, 60, 5]`\n- Check sorted: No (36 > 25).\n\n**Operation 6:**\n- Check pairs: (7, 27) -> No, (27, 36) -> No, (36, 25) -> Yes.\n- Swap 36 and 25.\n- **Result:** `[7, 27, 25, 36, 47, 50, 60, 5]`\n- Check sorted: No (27 > 25).\n\n**Operation 7:**\n- Check pairs: (7, 27) -> No, (27, 25) -> Yes.\n- Swap 27 and 25.\n- **Result:** `[7, 25, 27, 36, 47, 50, 60, 5]`\n- Check sorted: No (60 > 5).\n\n**Operation 8:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 60) -> No, (60, 5) -> Yes.\n- Swap 60 and 5.\n- **Result:** `[7, 25, 27, 36, 47, 50, 5, 60]`\n- Check sorted: No (50 > 5).\n\n**Operation 9:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 50) -> No, (50, 5) -> Yes.\n- Swap 50 and 5.\n- **Result:** `[7, 25, 27, 36, 47, 5, 50, 60]`\n- Check sorted: No (47 > 5).\n\n**Operation 10:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 47) -> No, (47, 5) -> Yes.\n- Swap 47 and 5.\n- **Result:** `[7, 25, 27, 36, 5, 47, 50, 60]`\n- Check sorted: No (36 > 5).\n\n**Operation 11:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 36) -> No, (36, 5) -> Yes.\n- Swap 36 and 5.\n- **Result:** `[7, 25, 27, 5, 36, 47, 50, 60]`\n- Check sorted: No (27 > 5).\n\n**Operation 12:**\n- Check pairs: (7, 25) -> No, (25, 27) -> No, (27, 5) -> Yes.\n- Swap 27 and 5.\n- **Result:** `[7, 25, 5, 27, 36, 47, 50, 60]`\n- Check sorted: No (25 > 5).\n\n**Operation 13:**\n- Check pairs: (7, 25) -> No, (25, 5) -> Yes.\n- Swap 25 and 5.\n- **Result:** `[7, 5, 25, 27, 36, 47, 50, 60]`\n- Check sorted: No (7 > 5).\n\n**Operation 14:**\n- Check pairs: (7, 5) -> Yes.\n- Swap 7 and 5.\n- **Result:** `[5, 7, 25, 27, 36, 47, 50, 60]`\n- Check sorted: Yes (5 < 7 < 25 < 27 < 36 < 47 < 50 < 60).\n- Stop.\n\nFINAL_JSON: {\"results\":[[7, 36, 47, 27, 50, 25, 60, 5], [7, 36, 27, 47, 50, 25, 60, 5], [7, 27, 36, 47, 50, 25, 60, 5], [7, 27, 36, 47, 25, 50, 60, 5], [7, 27, 36, 25, 47, 50, 60, 5], [7, 27, 25, 36, 47, 50, 60, 5], [7, 25, 27, 36, 47, 50, 60, 5], [7, 25, 27, 36, 47, 50, 5, 60], [7, 25, 27, 36, 47, 5, 50, 60], [7, 25, 27, 36, 5, 47, 50, 60], [7, 25, 27, 5, 36, 47, 50, 60], [7, 25, 5, 27, 36, 47, 50, 60], [7, 5, 25, 27, 36, 47, 50, 60], [5, 7, 25, 27, 36, 47, 50, 60]]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 4184,
+    "answer_tokens": 2055,
+    "model_tokens": 6239,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 575.871841000393
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    [
+      7,
+      36,
+      47,
+      27,
+      50,
+      25,
+      60,
+      5
+    ],
+    [
+      7,
+      36,
+      27,
+      47,
+      50,
+      25,
+      60,
+      5
+    ],
+    [
+      7,
+      27,
+      36,
+      47,
+      50,
+      25,
+      60,
+      5
+    ],
+    [
+      7,
+      27,
+      36,
+      47,
+      25,
+      50,
+      60,
+      5
+    ],
+    [
+      7,
+      27,
+      36,
+      25,
+      47,
+      50,
+      60,
+      5
+    ],
+    [
+      7,
+      27,
+      25,
+      36,
+      47,
+      50,
+      60,
+      5
+    ],
+    [
+      7,
+      25,
+      27,
+      36,
+      47,
+      50,
+      60,
+      5
+    ],
+    [
+      7,
+      25,
+      27,
+      36,
+      47,
+      50,
+      5,
+      60
+    ],
+    [
+      7,
+      25,
+      27,
+      36,
+      47,
+      5,
+      50,
+      60
+    ],
+    [
+      7,
+      25,
+      27,
+      36,
+      5,
+      47,
+      50,
+      60
+    ],
+    [
+      7,
+      25,
+      27,
+      5,
+      36,
+      47,
+      50,
+      60
+    ],
+    [
+      7,
+      25,
+      5,
+      27,
+      36,
+      47,
+      50,
+      60
+    ],
+    [
+      7,
+      5,
+      25,
+      27,
+      36,
+      47,
+      50,
+      60
+    ],
+    [
+      5,
+      7,
+      25,
+      27,
+      36,
+      47,
+      50,
+      60
+    ]
+  ],
+  "score": {
+    "item_id": "v4-b-bubble-swap-14",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": [
+          7,
+          36,
+          47,
+          27,
+          50,
+          25,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          36,
+          47,
+          27,
+          50,
+          25,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": [
+          7,
+          36,
+          27,
+          47,
+          50,
+          25,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          36,
+          27,
+          47,
+          50,
+          25,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": [
+          7,
+          27,
+          36,
+          47,
+          50,
+          25,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          27,
+          36,
+          47,
+          50,
+          25,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": [
+          7,
+          27,
+          36,
+          47,
+          25,
+          50,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          27,
+          36,
+          47,
+          25,
+          50,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": [
+          7,
+          27,
+          36,
+          25,
+          47,
+          50,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          27,
+          36,
+          25,
+          47,
+          50,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": [
+          7,
+          27,
+          25,
+          36,
+          47,
+          50,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          27,
+          25,
+          36,
+          47,
+          50,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60,
+          5
+        ],
+        "actual": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60,
+          5
+        ]
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          5,
+          60
+        ],
+        "actual": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          5,
+          60
+        ]
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          5,
+          50,
+          60
+        ],
+        "actual": [
+          7,
+          25,
+          27,
+          36,
+          47,
+          5,
+          50,
+          60
+        ]
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          27,
+          36,
+          5,
+          47,
+          50,
+          60
+        ],
+        "actual": [
+          7,
+          25,
+          27,
+          36,
+          5,
+          47,
+          50,
+          60
+        ]
+      },
+      {
+        "name": "cycle:11",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          27,
+          5,
+          36,
+          47,
+          50,
+          60
+        ],
+        "actual": [
+          7,
+          25,
+          27,
+          5,
+          36,
+          47,
+          50,
+          60
+        ]
+      },
+      {
+        "name": "cycle:12",
+        "pass": true,
+        "expected": [
+          7,
+          25,
+          5,
+          27,
+          36,
+          47,
+          50,
+          60
+        ],
+        "actual": [
+          7,
+          25,
+          5,
+          27,
+          36,
+          47,
+          50,
+          60
+        ]
+      },
+      {
+        "name": "cycle:13",
+        "pass": true,
+        "expected": [
+          7,
+          5,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60
+        ],
+        "actual": [
+          7,
+          5,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60
+        ]
+      },
+      {
+        "name": "cycle:14",
+        "pass": true,
+        "expected": [
+          5,
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60
+        ],
+        "actual": [
+          5,
+          7,
+          25,
+          27,
+          36,
+          47,
+          50,
+          60
+        ]
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}

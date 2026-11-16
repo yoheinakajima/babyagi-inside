@@ -1,0 +1,72 @@
+{
+  "trace_id": "v3-literal-route-2",
+  "cycles": 2,
+  "objective": "Begin with the exact text quartz. First append -n2; finally uppercase only its letters. Apply exactly one text transformation per task in order and return the complete current text each time.",
+  "ledger": {
+    "initial": "quartz",
+    "tasks": [
+      "append -n2",
+      "uppercase only its letters"
+    ]
+  },
+  "results": [
+    "quartz-n2",
+    "QUARTZ-N2"
+  ],
+  "expected": [
+    "quartz-n2",
+    "QUARTZ-N2"
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 1475,
+    "forced": 889,
+    "qwenfs": 190,
+    "qwen_reasoning": 512,
+    "qwen_payload": 74
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "trace_id": "v3-literal-route-3",
+  "cycles": 3,
+  "objective": "Begin with the exact text willow. First append -n3; next uppercase only its letters; finally prefix R3:. Apply exactly one text transformation per task in order and return the complete current text each time.",
+  "ledger": {
+    "initial": "willow",
+    "tasks": [
+      "append -n3",
+      "uppercase only its letters",
+      "prefix R3:"
+    ]
+  },
+  "results": [
+    "willow-n3",
+    "WILLOW-N3",
+    "R3:WILLOW-N3"
+  ],
+  "expected": [
+    "willow-n3",
+    "WILLOW-N3",
+    "R3:WILLOW-N3"
+  ],
+  "pass": true,
+  "tokens": {
+    "total": 2094,
+    "forced": 1226,
+    "qwenfs": 306,
+    "qwen_reasoning": 768,
+    "qwen_payload": 100
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

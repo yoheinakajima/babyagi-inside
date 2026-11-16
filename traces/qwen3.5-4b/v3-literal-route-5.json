@@ -1,0 +1,144 @@
+{
+  "trace_id": "v3-literal-route-5",
+  "cycles": 5,
+  "objective": "Begin with the exact text cobalt. First append -n5; next uppercase only its letters; then prefix R5:; then append ?; finally replace every hyphen with an underscore. Apply exactly one text transformation per task in order and return the complete current text each time.",
+  "ledger": {
+    "initial": "cobalt",
+    "tasks": [
+      "cobalt-n5",
+      "COBALT-N5",
+      "R5:COBALT-N5?",
+      "R5:COBALT-N5?-",
+      "R5:COBALT-N5?_"
+    ]
+  },
+  "results": [
+    "cobalt-n5",
+    "COBALT-N5",
+    "R5:COBALT-N5?",
+    "R5:COBALT-N5?-",
+    "R5:COBALT_N5?-"
+  ],
+  "expected": [
+    "cobalt-n5",
+    "COBALT-N5",
+    "R5:COBALT-N5",
+    "R5:COBALT-N5?",
+    "R5:COBALT_N5?"
+  ],
+  "pass": false,
+  "tokens": {
+    "total": 3481,
+    "forced": 2029,
+    "qwenfs": 667,
+    "qwen_reasoning": 1280,
+    "qwen_payload": 172
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E14",
+    "model": "2b",
+    "arm": "F2",
+    "item_id": "v3-literal-wrapper-8",
+    "think_cap": 2304,
+    "answer_cap": 2048,
+    "suite_sha256": "e880e043f7ac412aaab938036cccd5f79305aed4cd0c13a7204e09fe07c1dff4",
+    "runner_sha256": "8e191ee062dc2d4ba1c35546cb8bd6036c5eda4200f00c3e7a3cf6f24e19f7b1"
+  },
+  "item_id": "v3-literal-wrapper-8",
+  "category": "ordered_literal",
+  "cycles": 8,
+  "generation": {
+    "text": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: \"mariner\"\n    *   Task: Apply a sequence of text transformations in order to the input string.\n    *   Constraint 1: Begin with the exact text \"mariner\".\n    *   Constraint 2: First append \"-a8\".\n    *   Constraint 3: Next wrap the complete text in parentheses.\n    *   Constraint 4: Then uppercase only its letters.\n    *   Constraint 5: Then prefix \"K8=\".\n    *   Constraint 6: Then append \"#\".\n    *   Constraint 7: Then replace every hyphen with a slash. (Note: There are no hyphens in the current text yet, but I need to check the state after previous steps).\n    *   Constraint 8: Then lowercase only its letters.\n    *   Constraint 9: Finally append a period.\n    *   Constraint 10: Apply exactly one text transformation per task in order and return the complete current text each time.\n    *   Constraint 11: Preserve the result after every successive operation.\n    *   Constraint 12: Do not include the initial state as a result.\n    *   Constraint 13: Each entry must be the complete result after that operation.\n    *   Constraint 14: End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 8 entries in task order.\n    *   Constraint 15: Do not put text after the object.\n\n2.  **Step-by-Step Execution:**\n\n    *   **Initial State:** \"mariner\"\n\n    *   **Task 1:** Begin with the exact text mariner. (Done, this is the starting point).\n    *   **Task 2:** First append \"-a8\".\n        *   Current: \"mariner-a8\"\n    *   **Task 3:** Next wrap the complete text in parentheses.\n        *   Current: \"(mariner-a8)\"\n    *   **Task 4:** Then uppercase only its letters.\n        *   Current: \"(MARINER-A8)\"\n    *   **Task 5:** Then prefix \"K8=\".\n        *   Current: \"K8=(MARINER-A8)\"\n    *   **Task 6:** Then append \"#\".\n        *   Current: \"K8=(MARINER-A8)#\"\n    *   **Task 7:** Then replace every hyphen with a slash.\n        *   Current: \"K8=(MARINER-A8)#\" -> \"K8=(MARINER/8)#\" (Wait, \"MARINER-A8\" has a hyphen between R and A? No, \"MARINER\" is one word, \"A8\" is another. The hyphen is in the original \"mariner-a8\". Wait, let's re-read carefully.)\n        *   Let's trace the string carefully.\n        *   Start: \"mariner\"\n        *   Op 1: Append \"-a8\" -> \"mariner-a8\"\n        *   Op 2: Wrap in parentheses -> \"(mariner-a8)\"\n        *   Op 3: Uppercase letters -> \"(MARINER-A8)\" (Note: \"A8\" contains digits, so only letters are uppercased. \"A\" becomes \"A\", \"8\" stays \"8\". Wait, \"A\" is a letter. \"8\" is not. So \"MARINER-A8\" becomes \"MARINER-A8\".)\n        *   Op 4: Prefix \"K8=\" -> \"K8=(MARINER-A8)\"\n        *   Op 5: Append \"#\" -> \"K8=(MARINER-A8)#\"\n        *   Op 6: Replace every hyphen with a slash.\n            *   Current string: \"K8=(MARINER-A8)#\"\n            *   Hyphen location: Between R and A in \"MARINER-A8\".\n            *   Result: \"K8=(MARINER/8)#\"\n        *   Op 7: Lowercase only its letters.\n            *   Current string: \"K8=(MARINER/8)#\"\n            *   Letters: K, 8, =, (, M, A, R, I, N, E, R, /, 8, #\n            *   Wait, \"K8=\" has letters K. \"MARINER\" has letters M, A, R, I, N, E, R. \"/\" is not a letter. \"8\" is not a letter. \"#\" is not a letter.\n            *   So \"K8=(MARINER/8)#\" -> \"k8=(mariner/8)#\"\n        *   Op 8: Append a period.\n            *   Current string: \"k8=(mariner/8)#\"\n            *   Result: \"k8=(mariner/8)#.\"\n\n    *   **Wait, I need to check the instruction \"Apply exactly one text transformation per task in order and return the complete current text each time.\"**\n    *   The prompt asks me to \"Begin with the exact text mariner. First append -a8; next wrap the complete text in parentheses; then uppercase only its letters; then prefix K8=; then append #; then replace every hyphen with a slash; then lowercase only its letters; finally append a period.\"\n    *   This looks like a single chain of transformations applied to the initial text \"mariner\".\n    *   However, the prompt also says \"Each entry must be the complete result after that operation... End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 8 entries in task order.\"\n    *   This implies I need to output the intermediate results as well? Or does it mean I need to generate 8 entries corresponding to 8 tasks?\n    *   Let's re-read: \"Begin with the exact text mariner. First append -a8; next wrap the complete text in parentheses; then uppercase only its letters; then prefix K8=; then append #; then replace every hyphen with a slash; then lowercase only its letters; finally append a period.\"\n    *   This describes a sequence of 8 steps (including the initial state).\n    *   Step 1: mariner\n    *   Step 2: mariner-a8\n    *   Step 3: (mariner-a8)\n    *   Step 4: (MARINER-A8)\n    *   Step 5: K8=(MARINER-A8)\n    *   Step 6: K8=(MARINER-A8)#\n    *   Step 7: K8=(MARINER/8)#\n    *   Step 8: k8=(mariner/8)#.\n    *   Wait, the prompt says \"Each entry must be the complete result after that operation... End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has exactly 8 entries in task order.\"\n    *   This suggests I need to output the final JSON object containing the results of the 8 tasks.\n    *   But the instruction \"Begin with the exact text mariner... return the complete current text each time\" implies I should show the intermediate states?\n    *   Actually, usually, when prompts ask for \"Each entry must be the complete result after that operation... End with `FINAL_JSON: `...\", it means the output should contain the final JSON object at the end, but the prompt also says \"Do not put text after the object.\"\n    *   However, the instruction \"Each entry must be the complete result after that operation\" suggests I might need to list the intermediate states in the JSON?\n    *   Let's look at the constraint: \"whose `results` array has exactly 8 entries in task order.\"\n    *   The task description lists 8 specific operations:\n        1. Begin with exact text mariner (Initial state)\n        2. First append -a8\n        3. Next wrap the complete text in parentheses\n        4. Then uppercase only its letters\n        5. Then prefix K8=\n        6. Then append #\n        7. Then replace every hyphen with a slash\n        8. Then lowercase only its letters\n        9. Finally append a period\n    *   Wait, counting the operations:\n        1. Begin with exact text mariner (This is the starting point, not really a transformation step in the list of 8).\n        2. First append -a8\n        3. Next wrap the complete text in parentheses\n        4. Then uppercase only its letters\n        5. Then prefix K8=\n        6. Then append #\n        7. Then replace every hyphen with a slash\n        8. Then lowercase only its letters\n        9. Finally append a period\n    *   That's 8 transformations.\n    *   So I need to generate 8 entries in the JSON array.\n    *   Entry 1: \"mariner\" (Initial state? Or is \"Begin with the exact text mariner\" the first task?)\n    *   Let's assume the tasks are the transformations described.\n    *   Task 1: mariner -> mariner-a8\n    *   Task 2: mariner-a8 -> (mariner-a8)\n    *   Task 3: (mariner-a8) -> (MARINER-A8)\n    *   Task 4: (MARINER-A8) -> K8=(MARINER-A8)\n    *   Task 5: K8=(MARINER-A8) -> K8=(MARINER-A8)#\n    *   Task 6: K8=(MARINER-A8)# -> K8=(MARINER/8)#\n    *   Task 7: K8=(MARINER/8)# -> k8=(mariner/8)#\n    *   Task 8: k8=(mariner/8)# -> k8=(mariner/8)#.\n    *   Wait, the prompt says \"Begin with the exact text mariner. First append -a8; next wrap the complete text in parentheses; then uppercase only its letters; then prefix K8=; then append #; then replace every hyphen with a slash; then lowercase only its letters; finally append a period.\"\n   \n</think>\n\n(\n\"mariner\"\n)\n\"K8=(MARINER-A8)#\"\n\"K8=(MARINER/8)#\"\n\"k8=(mariner/8)#\"\n\"FINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",",
+    "answer_text": "(\n\"mariner\"\n)\n\"K8=(MARINER-A8)#\"\n\"K8=(MARINER/8)#\"\n\"k8=(mariner/8)#\"\n\"FINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",\n\"K8=(MARINER-A8)\",\n\"K8=(MARINER-A8)#\",\n\"K8=(MARINER/8)#\",\n\"k8=(mariner/8)#\",\n\"k8=(mariner/8)#.\"\n]}\n}\nFINAL_JSON: {\"results\":[\n\"mariner\",\n\"(mariner-a8)\",\n\"(MARINER-A8)\",",
+    "thinking_tokens": 2304,
+    "answer_tokens": 2048,
+    "model_tokens": 4352,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": true,
+    "answer_ended": false,
+    "seconds": 185.50417645834386
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "actual_results": [
+    "mariner",
+    "(mariner-a8)",
+    "(MARINER-A8)",
+    "K8=(MARINER-A8)",
+    "K8=(MARINER-A8)#",
+    "K8=(MARINER/8)#",
+    "k8=(mariner/8)#",
+    "k8=(mariner/8)#."
+  ],
+  "score": {
+    "item_id": "v3-literal-wrapper-8",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": false,
+        "expected": "mariner-a8",
+        "actual": "mariner"
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": "(mariner-a8)",
+        "actual": "(mariner-a8)"
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": "(MARINER-A8)",
+        "actual": "(MARINER-A8)"
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": "K8=(MARINER-A8)",
+        "actual": "K8=(MARINER-A8)"
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": "K8=(MARINER-A8)#",
+        "actual": "K8=(MARINER-A8)#"
+      },
+      {
+        "name": "cycle:6",
+        "pass": false,
+        "expected": "K8=(MARINER/A8)#",
+        "actual": "K8=(MARINER/8)#"
+      },
+      {
+        "name": "cycle:7",
+        "pass": false,
+        "expected": "k8=(mariner/a8)#",
+        "actual": "k8=(mariner/8)#"
+      },
+      {
+        "name": "cycle:8",
+        "pass": false,
+        "expected": "k8=(mariner/a8)#.",
+        "actual": "k8=(mariner/8)#."
+      }
+    ],
+    "automated_pass": false,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": false
+  }
+}

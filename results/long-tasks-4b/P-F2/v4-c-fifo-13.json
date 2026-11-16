@@ -1,0 +1,750 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-c-fifo-13",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 3928,
+    "answer_cap": 3133
+  },
+  "item_id": "v4-c-fifo-13",
+  "horizon": "worklist",
+  "category": "structured_operation",
+  "cycles": 13,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to simulate a job queue processing system based on a specific set of rules and a starting state.\n\n**Initial State:**\n`{\"done\":[],\"queue\":[\"olive\"]}`\n\n**Rules:**\n1.  **Job Table (Dependencies/Follow-ups):**\n    *   `aster` -> nothing\n    *   `bramble` -> `walnut`, `indigo`, `mango`\n    *   `dahlia` -> `quince`\n    *   `ginger` -> `mango`, `oak`\n    *   `indigo` -> `olive`\n    *   `kestrel` -> `lilac`\n    *   `larch` -> nothing\n    *   `lemon` -> `aster`\n    *   `lilac` -> nothing\n    *   `mango` -> `aster`, `kestrel`, `thyme`\n    *   `nutmeg` -> `indigo`\n    *   `oak` -> `walnut`\n    *   `olive` -> `bramble`, `walnut`\n    *   `quince` -> `bramble`, `dahlia`\n    *   `thyme` -> nothing\n    *   `tulip` -> nothing\n    *   `walnut` -> `tulip`, `ginger`, `larch`\n\n2.  **Process:**\n    *   Repeat until queue is empty.\n    *   Step 1: Remove job from front of queue.\n    *   Step 2: Append it to the `done` list.\n    *   Step 3: Add follow-up jobs to the end of the queue.\n    *   Constraint: Skip follow-ups if they are already in `done` or `queue`.\n    *   Constraint: Follow-ups must be added in the listed order.\n    *   Output: Return the complete JSON state after *every* step.\n    *   Final Output: `FINAL_JSON: ` followed by `{\"results\":[...]}` where `results` contains the JSON state after each operation.\n\n**Execution Trace:**\n\n**Start:**\nState: `{\"done\":[],\"queue\":[\"olive\"]}`\n\n**Step 1:**\n*   Job: `olive`\n*   `done` becomes `[\"olive\"]`\n*   `queue` becomes `[]`\n*   Follow-ups for `olive`: `bramble`, `walnut`\n*   Check `bramble`: Not in `done` (`[\"olive\"]`), not in `queue` (`[]`). Add to `queue`.\n*   Check `walnut`: Not in `done` (`[\"olive\"]`), not in `queue` (`[\"bramble\"]`). Add to `queue`.\n*   New State: `{\"done\":[\"olive\"],\"queue\":[\"bramble\",\"walnut\"]}`\n\n**Step 2:**\n*   Job: `bramble`\n*   `done` becomes `[\"olive\", \"bramble\"]`\n*   `queue` becomes `[\"walnut\"]`\n*   Follow-ups for `bramble`: `walnut`, `indigo`, `mango`\n*   Check `walnut`: In `queue` (`[\"walnut\"]`). Skip.\n*   Check `indigo`: Not in `done`, not in `queue`. Add to `queue`.\n*   Check `mango`: Not in `done`, not in `queue`. Add to `queue`.\n*   New State: `{\"done\":[\"olive\",\"bramble\"],\"queue\":[\"walnut\",\"indigo\",\"mango\"]}`\n\n**Step 3:**\n*   Job: `walnut`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\"]`\n*   `queue` becomes `[\"indigo\", \"mango\"]`\n*   Follow-ups for `walnut`: `tulip`, `ginger`, `larch`\n*   Check `tulip`: Not in `done`, not in `queue`. Add.\n*   Check `ginger`: Not in `done`, not in `queue`. Add.\n*   Check `larch`: Not in `done`, not in `queue`. Add.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\"],\"queue\":[\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"]}`\n\n**Step 4:**\n*   Job: `indigo`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\"]`\n*   `queue` becomes `[\"mango\", \"tulip\", \"ginger\", \"larch\"]`\n*   Follow-ups for `indigo`: `olive`\n*   Check `olive`: In `done`. Skip.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\"],\"queue\":[\"mango\",\"tulip\",\"ginger\",\"larch\"]}`\n\n**Step 5:**\n*   Job: `mango`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\"]`\n*   `queue` becomes `[\"tulip\", \"ginger\", \"larch\"]`\n*   Follow-ups for `mango`: `aster`, `kestrel`, `thyme`\n*   Check `aster`: Not in `done`, not in `queue`. Add.\n*   Check `kestrel`: Not in `done`, not in `queue`. Add.\n*   Check `thyme`: Not in `done`, not in `queue`. Add.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\"],\"queue\":[\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]}`\n\n**Step 6:**\n*   Job: `tulip`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\"]`\n*   `queue` becomes `[\"ginger\", \"larch\", \"aster\", \"kestrel\", \"thyme\"]`\n*   Follow-ups for `tulip`: nothing\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\"],\"queue\":[\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]}`\n\n**Step 7:**\n*   Job: `ginger`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\"]`\n*   `queue` becomes `[\"larch\", \"aster\", \"kestrel\", \"thyme\"]`\n*   Follow-ups for `ginger`: `mango`, `oak`\n*   Check `mango`: In `done`. Skip.\n*   Check `oak`: Not in `done`, not in `queue`. Add.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\"],\"queue\":[\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"]}`\n\n**Step 8:**\n*   Job: `larch`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\"]`\n*   `queue` becomes `[\"aster\", \"kestrel\", \"thyme\", \"oak\"]`\n*   Follow-ups for `larch`: nothing\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"],\"queue\":[\"aster\",\"kestrel\",\"thyme\",\"oak\"]}`\n\n**Step 9:**\n*   Job: `aster`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\", \"aster\"]`\n*   `queue` becomes `[\"kestrel\", \"thyme\", \"oak\"]`\n*   Follow-ups for `aster`: nothing\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\"],\"queue\":[\"kestrel\",\"thyme\",\"oak\"]}`\n\n**Step 10:**\n*   Job: `kestrel`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\", \"aster\", \"kestrel\"]`\n*   `queue` becomes `[\"thyme\", \"oak\"]`\n*   Follow-ups for `kestrel`: `lilac`\n*   Check `lilac`: Not in `done`, not in `queue`. Add.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\"],\"queue\":[\"thyme\",\"oak\",\"lilac\"]}`\n\n**Step 11:**\n*   Job: `thyme`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\", \"aster\", \"kestrel\", \"thyme\"]`\n*   `queue` becomes `[\"oak\", \"lilac\"]`\n*   Follow-ups for `thyme`: nothing\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"],\"queue\":[\"oak\",\"lilac\"]}`\n\n**Step 12:**\n*   Job: `oak`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\", \"aster\", \"kestrel\", \"thyme\", \"oak\"]`\n*   `queue` becomes `[\"lilac\"]`\n*   Follow-ups for `oak`: `walnut`\n*   Check `walnut`: In `done`. Skip.\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"],\"queue\":[\"lilac\"]}`\n\n**Step 13:**\n*   Job: `lilac`\n*   `done` becomes `[\"olive\", \"bramble\", \"walnut\", \"indigo\", \"mango\", \"tulip\", \"ginger\", \"larch\", \"aster\", \"kestrel\", \"thyme\", \"oak\", \"lilac\"]`\n*   `queue` becomes `[]`\n*   Follow-ups for `lilac`: nothing\n*   New State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\",\"lilac\"],\"queue\":[]}`\n\nQueue is empty. Stop.\n\n**Formatting the Output:**\nI need to output the JSON state after every step.\nThe prompt asks for: \"Return the complete JSON state after every step, not the starting state.\"\nAnd \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has one entry per operation, in task order.\"\n\nSo I need to construct a list of JSON strings representing the state after each step.\n\nLet's double check the logic.\nInitial: `{\"done\":[],\"queue\":[\"olive\"]}`\n\n1. Pop `olive`. Done: `[\"olive\"]`. Queue: `[]`. Add `bramble`, `walnut`.\n   State: `{\"done\":[\"olive\"],\"queue\":[\"bramble\",\"walnut\"]}`\n2. Pop `bramble`. Done: `[\"olive\",\"bramble\"]`. Queue: `[\"walnut\"]`. Add `walnut` (skip, in queue), `indigo`, `mango`.\n   State: `{\"done\":[\"olive\",\"bramble\"],\"queue\":[\"walnut\",\"indigo\",\"mango\"]}`\n3. Pop `walnut`. Done: `[\"olive\",\"bramble\",\"walnut\"]`. Queue: `[\"indigo\",\"mango\"]`. Add `tulip`, `ginger`, `larch`.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\"],\"queue\":[\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"]}`\n4. Pop `indigo`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\"]`. Queue: `[\"mango\",\"tulip\",\"ginger\",\"larch\"]`. Add `olive` (skip, in done).\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\"],\"queue\":[\"mango\",\"tulip\",\"ginger\",\"larch\"]}`\n5. Pop `mango`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\"]`. Queue: `[\"tulip\",\"ginger\",\"larch\"]`. Add `aster`, `kestrel`, `thyme`.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\"],\"queue\":[\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]}`\n6. Pop `tulip`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\"]`. Queue: `[\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]`. Add nothing.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\"],\"queue\":[\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]}`\n7. Pop `ginger`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\"]`. Queue: `[\"larch\",\"aster\",\"kestrel\",\"thyme\"]`. Add `mango` (skip, in done), `oak`.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\"],\"queue\":[\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"]}`\n8. Pop `larch`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"]`. Queue: `[\"aster\",\"kestrel\",\"thyme\",\"oak\"]`. Add nothing.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"],\"queue\":[\"aster\",\"kestrel\",\"thyme\",\"oak\"]}`\n9. Pop `aster`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\"]`. Queue: `[\"kestrel\",\"thyme\",\"oak\"]`. Add nothing.\n   State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\"],\"queue\":[\"kestrel\",\"thyme\",\"oak\"]}`\n10. Pop `kestrel`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\"]`. Queue: `[\"thyme\",\"oak\"]`. Add `lilac`.\n    State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\"],\"queue\":[\"thyme\",\"oak\",\"lilac\"]}`\n11. Pop `thyme`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]`. Queue: `[\"oak\",\"lilac\"]`. Add nothing.\n    State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"],\"queue\":[\"oak\",\"lilac\"]}`\n12. Pop `oak`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"]`. Queue: `[\"lilac\"]`. Add `walnut` (skip, in done).\n    State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"],\"queue\":[\"lilac\"]}`\n13. Pop `lilac`. Done: `[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\",\"lilac\"]`. Queue: `[]`. Add nothing.\n    State: `{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\",\"lilac\"],\"queue\":[]}`\n\nWait, I need to check the instruction \"Return the complete JSON state after every step, not the starting state.\"\nAnd \"End with `FINAL_JSON: ` followed by exactly one valid JSON object shaped `{\"results\":[...]}`, whose `results` array has one entry per operation, in task order.\"\n\nSo the `results` array should contain the JSON strings of the states.\nExample: `{\"results\": [\"{...}\", \"{...}\", ...]}`\n\nLet's verify the \"skip\" logic again.\n\"skipping any job that is already in the done\n</think>\n\nFINAL_JSON: {\"results\":[{\"done\":[\"olive\"],\"queue\":[\"bramble\",\"walnut\"]},{\"done\":[\"olive\",\"bramble\"],\"queue\":[\"walnut\",\"indigo\",\"mango\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\"],\"queue\":[\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\"],\"queue\":[\"mango\",\"tulip\",\"ginger\",\"larch\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\"],\"queue\":[\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\"],\"queue\":[\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\"],\"queue\":[\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"],\"queue\":[\"aster\",\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\"],\"queue\":[\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\"],\"queue\":[\"thyme\",\"oak\",\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"],\"queue\":[\"oak\",\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"],\"queue\":[\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\",\"lilac\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "answer_text": "FINAL_JSON: {\"results\":[{\"done\":[\"olive\"],\"queue\":[\"bramble\",\"walnut\"]},{\"done\":[\"olive\",\"bramble\"],\"queue\":[\"walnut\",\"indigo\",\"mango\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\"],\"queue\":[\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\"],\"queue\":[\"mango\",\"tulip\",\"ginger\",\"larch\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\"],\"queue\":[\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\"],\"queue\":[\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\"],\"queue\":[\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\"],\"queue\":[\"aster\",\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\"],\"queue\":[\"kestrel\",\"thyme\",\"oak\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\"],\"queue\":[\"thyme\",\"oak\",\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\"],\"queue\":[\"oak\",\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\"],\"queue\":[\"lilac\"]},{\"done\":[\"olive\",\"bramble\",\"walnut\",\"indigo\",\"mango\",\"tulip\",\"ginger\",\"larch\",\"aster\",\"kestrel\",\"thyme\",\"oak\",\"lilac\"],\"queue\":[]}]}<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 3928,
+    "answer_tokens": 459,
+    "model_tokens": 4387,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 400.4643982499838
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    {
+      "done": [
+        "olive"
+      ],
+      "queue": [
+        "bramble",
+        "walnut"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble"
+      ],
+      "queue": [
+        "walnut",
+        "indigo",
+        "mango"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut"
+      ],
+      "queue": [
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo"
+      ],
+      "queue": [
+        "mango",
+        "tulip",
+        "ginger",
+        "larch"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango"
+      ],
+      "queue": [
+        "tulip",
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip"
+      ],
+      "queue": [
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger"
+      ],
+      "queue": [
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme",
+        "oak"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch"
+      ],
+      "queue": [
+        "aster",
+        "kestrel",
+        "thyme",
+        "oak"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch",
+        "aster"
+      ],
+      "queue": [
+        "kestrel",
+        "thyme",
+        "oak"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel"
+      ],
+      "queue": [
+        "thyme",
+        "oak",
+        "lilac"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme"
+      ],
+      "queue": [
+        "oak",
+        "lilac"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme",
+        "oak"
+      ],
+      "queue": [
+        "lilac"
+      ]
+    },
+    {
+      "done": [
+        "olive",
+        "bramble",
+        "walnut",
+        "indigo",
+        "mango",
+        "tulip",
+        "ginger",
+        "larch",
+        "aster",
+        "kestrel",
+        "thyme",
+        "oak",
+        "lilac"
+      ],
+      "queue": []
+    }
+  ],
+  "score": {
+    "item_id": "v4-c-fifo-13",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive"
+          ],
+          "queue": [
+            "bramble",
+            "walnut"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive"
+          ],
+          "queue": [
+            "bramble",
+            "walnut"
+          ]
+        }
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble"
+          ],
+          "queue": [
+            "walnut",
+            "indigo",
+            "mango"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble"
+          ],
+          "queue": [
+            "walnut",
+            "indigo",
+            "mango"
+          ]
+        }
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut"
+          ],
+          "queue": [
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut"
+          ],
+          "queue": [
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ]
+        }
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo"
+          ],
+          "queue": [
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo"
+          ],
+          "queue": [
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ]
+        }
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango"
+          ],
+          "queue": [
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango"
+          ],
+          "queue": [
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ]
+        }
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip"
+          ],
+          "queue": [
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip"
+          ],
+          "queue": [
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ]
+        }
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger"
+          ],
+          "queue": [
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger"
+          ],
+          "queue": [
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        }
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ],
+          "queue": [
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch"
+          ],
+          "queue": [
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        }
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster"
+          ],
+          "queue": [
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster"
+          ],
+          "queue": [
+            "kestrel",
+            "thyme",
+            "oak"
+          ]
+        }
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel"
+          ],
+          "queue": [
+            "thyme",
+            "oak",
+            "lilac"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel"
+          ],
+          "queue": [
+            "thyme",
+            "oak",
+            "lilac"
+          ]
+        }
+      },
+      {
+        "name": "cycle:11",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ],
+          "queue": [
+            "oak",
+            "lilac"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme"
+          ],
+          "queue": [
+            "oak",
+            "lilac"
+          ]
+        }
+      },
+      {
+        "name": "cycle:12",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ],
+          "queue": [
+            "lilac"
+          ]
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak"
+          ],
+          "queue": [
+            "lilac"
+          ]
+        }
+      },
+      {
+        "name": "cycle:13",
+        "pass": true,
+        "expected": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak",
+            "lilac"
+          ],
+          "queue": []
+        },
+        "actual": {
+          "done": [
+            "olive",
+            "bramble",
+            "walnut",
+            "indigo",
+            "mango",
+            "tulip",
+            "ginger",
+            "larch",
+            "aster",
+            "kestrel",
+            "thyme",
+            "oak",
+            "lilac"
+          ],
+          "queue": []
+        }
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}

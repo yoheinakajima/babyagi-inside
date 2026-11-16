@@ -1,0 +1,216 @@
+{
+  "trace_id": "v3-language-lantern-8",
+  "cycles": 8,
+  "objective": "Begin with the exact sentence `quiet lanterns guide boats`. First capitalize its first character; next replace Quiet with Gentle; then append a period; then prefix Field note: ; then replace boats with travelers; then uppercase only the word lanterns; then append the sentence Stars appear.; finally replace guide with welcome. This is constrained language editing: perform only the named edit and return the complete current text after every task, preserving all other wording and punctuation exactly.",
+  "ledger": {
+    "initial": "quiet lanterns guide boats",
+    "tasks": [
+      "First capitalize its first character",
+      "Next replace Quiet with Gentle",
+      "Then append a period",
+      "Then prefix Field note: ",
+      "Then replace boats with travelers",
+      "Then uppercase only the word lanterns",
+      "Then append the sentence Stars appear.",
+      "Finally replace guide with welcome"
+    ]
+  },
+  "results": [
+    "Quiet lanterns guide boats",
+    "Gentle lanterns guide boats",
+    "Gentle lanterns guide boats.",
+    "Field note: Gentle lanterns guide boats.",
+    "Field note: Gentle lanterns guide travelers.",
+    "Field note: Gentle Lanterns guide travelers.",
+    "Field note: Gentle Lanterns guide travelers. Stars appear.",
+    "Field note: Gentle Lanterns welcome travelers. Stars appear."
+  ],
+  "expected": [
+    "Quiet lanterns guide boats",
+    "Gentle lanterns guide boats",
+    "Gentle lanterns guide boats.",
+    "Field note: Gentle lanterns guide boats.",
+    "Field note: Gentle lanterns guide travelers.",
+    "Field note: Gentle LANTERNS guide travelers.",
+    "Field note: Gentle LANTERNS guide travelers. Stars appear.",
+    "Field note: Gentle LANTERNS welcome travelers. Stars appear."
+  ],
+  "pass": false,
+  "tokens": {
+    "total": 5579,
+    "forced": 3268,
+    "qwenfs": 1243,
+    "qwen_reasoning": 2048,
+    "qwen_payload": 263
+  },
+  "stages": [
+    {
+      "cycle": 1,
+      "phase": "create",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 1,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 2,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 3,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 4,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 5,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 6,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 7,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "create",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "prioritize",
+      "emitter": "controller+qwenFS",
+      "start": null,
+      "end": null
+    },
+    {
+      "cycle": 8,
+      "phase": "execute",
+      "emitter": "mixed:controller+qwen+qwenFS",
+      "start": null,
+      "end": null
+    }
+  ]
+}

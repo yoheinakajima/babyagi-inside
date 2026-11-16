@@ -1,0 +1,1142 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "experiment": "E15",
+    "arm": "P-F2",
+    "split": "test",
+    "item_id": "v4-c-lifo-18",
+    "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+    "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+    "runner_sha256": "d55cd616f28ee6f3c279302ec94d959f2c15b9f5fd029da6df6dca83f8e2eaf9",
+    "settings": {
+      "model": "models/Qwen3.5-4B",
+      "device": "mps",
+      "dtype": "bfloat16",
+      "temperature": 0.0,
+      "think_tokens": 256,
+      "write_limit": 240,
+      "ledger_write_limit": 600,
+      "cap": 40,
+      "control_surrogate_scale": 0.25,
+      "choice_tokens": [
+        "1",
+        "2"
+      ]
+    },
+    "think_cap": 5208,
+    "answer_cap": 4338
+  },
+  "item_id": "v4-c-lifo-18",
+  "horizon": "worklist",
+  "category": "structured_operation",
+  "cycles": 18,
+  "prompt_suffix_sha256": "5c13eb89d2e6c4047f8230623bd3060b0293a49d91c2ad7948bd0a9fc761f937",
+  "generation": {
+    "text": "The user wants me to simulate a job queue processing system based on a set of rules and a dependency graph.\n\n**Initial State:**\n`{\"done\": [], \"queue\": [\"iris\", \"violet\"]}`\n\n**Rules:**\n1.  **Queue Processing:**\n    *   Pop the job from the *end* of the queue (LIFO - Last In First Out).\n    *   Append this job to the `done` list.\n    *   Identify the follow-up jobs for this job.\n    *   Add these follow-up jobs to the *end* of the queue.\n    *   **Constraint:** Do not add a job if it is already in `done` or already in `queue`.\n    *   **Order:** Follow-up jobs are added in the order listed in the job table.\n\n**Job Dependencies (Job -> Follow-ups):**\n*   almond -> [sage, fern]\n*   aster -> [iris, fern]\n*   bramble -> []\n*   coral -> [maple, robin]\n*   dove -> [iris, sage]\n*   fern -> [spruce]\n*   garnet -> [bramble, almond, gull]\n*   gull -> [robin]\n*   holly -> [garnet, almond, gull]\n*   iris -> [walnut]\n*   maple -> [holly]\n*   nutmeg -> []\n*   pepper -> [nutmeg]\n*   pine -> []\n*   robin -> [pine]\n*   sage -> []\n*   sorrel -> [tulip, pepper]\n*   spruce -> []\n*   tulip -> []\n*   violet -> [sorrel, maple]\n*   walnut -> []\n\n**Execution Steps:**\n\n**Step 1:**\n*   **Current State:** `{\"done\": [], \"queue\": [\"iris\", \"violet\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"violet\"\n*   **Update:** `done` becomes `[\"violet\"]`.\n*   **Follow-ups for violet:** `[\"sorrel\", \"maple\"]`\n*   **Check Queue:** `queue` is `[\"iris\"]`. Neither \"sorrel\" nor \"maple\" are in `done` or `queue`.\n*   **Update Queue:** Append \"sorrel\", then \"maple\". `queue` becomes `[\"iris\", \"sorrel\", \"maple\"]`.\n*   **Result:** `{\"done\": [\"violet\"], \"queue\": [\"iris\", \"sorrel\", \"maple\"]}`\n\n**Step 2:**\n*   **Current State:** `{\"done\": [\"violet\"], \"queue\": [\"iris\", \"sorrel\", \"maple\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"maple\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\"]`.\n*   **Follow-ups for maple:** `[\"holly\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\"]`. \"holly\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"holly\". `queue` becomes `[\"iris\", \"sorrel\", \"holly\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\"], \"queue\": [\"iris\", \"sorrel\", \"holly\"]}`\n\n**Step 3:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\"], \"queue\": [\"iris\", \"sorrel\", \"holly\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"holly\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\"]`.\n*   **Follow-ups for holly:** `[\"garnet\", \"almond\", \"gull\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\"]`. None are in `done`.\n*   **Update Queue:** Append \"garnet\", \"almond\", \"gull\". `queue` becomes `[\"iris\", \"sorrel\", \"garnet\", \"almond\", \"gull\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"gull\"]}`\n\n**Step 4:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"gull\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"gull\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\"]`.\n*   **Follow-ups for gull:** `[\"robin\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\", \"almond\"]`. \"robin\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"robin\". `queue` becomes `[\"iris\", \"sorrel\", \"garnet\", \"almond\", \"robin\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"robin\"]}`\n\n**Step 5:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"robin\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"robin\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\"]`.\n*   **Follow-ups for robin:** `[\"pine\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\", \"almond\"]`. \"pine\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"pine\". `queue` becomes `[\"iris\", \"sorrel\", \"garnet\", \"almond\", \"pine\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"pine\"]}`\n\n**Step 6:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\", \"pine\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"pine\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\"]`.\n*   **Follow-ups for pine:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\", \"almond\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\", \"sorrel\", \"garnet\", \"almond\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\"]}`\n\n**Step 7:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"almond\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"almond\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\"]`.\n*   **Follow-ups for almond:** `[\"sage\", \"fern\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\"]`. Neither \"sage\" nor \"fern\" are in `done` or `queue`.\n*   **Update Queue:** Append \"sage\", \"fern\". `queue` becomes `[\"iris\", \"sorrel\", \"garnet\", \"sage\", \"fern\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\", \"fern\"]}`\n\n**Step 8:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\", \"fern\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"fern\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\"]`.\n*   **Follow-ups for fern:** `[\"spruce\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\", \"sage\"]`. \"spruce\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"spruce\". `queue` becomes `[\"iris\", \"sorrel\", \"garnet\", \"sage\", \"spruce\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\", \"spruce\"]}`\n\n**Step 9:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\", \"spruce\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"spruce\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\"]`.\n*   **Follow-ups for spruce:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\", \"sage\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\", \"sorrel\", \"garnet\", \"sage\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\"]}`\n\n**Step 10:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\", \"sage\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"sage\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\"]`.\n*   **Follow-ups for sage:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\", \"garnet\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\", \"sorrel\", \"garnet\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\"]}`\n\n**Step 11:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\"], \"queue\": [\"iris\", \"sorrel\", \"garnet\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"garnet\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\"]`.\n*   **Follow-ups for garnet:** `[\"bramble\", \"almond\", \"gull\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\"]`.\n    *   \"bramble\": Not in `done` or `queue`. Add.\n    *   \"almond\": Already in `done`. Skip.\n    *   \"gull\": Already in `done`. Skip.\n*   **Update Queue:** Append \"bramble\". `queue` becomes `[\"iris\", \"sorrel\", \"bramble\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\"], \"queue\": [\"iris\", \"sorrel\", \"bramble\"]}`\n\n**Step 12:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\"], \"queue\": [\"iris\", \"sorrel\", \"bramble\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"bramble\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\"]`.\n*   **Follow-ups for bramble:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\", \"sorrel\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\", \"sorrel\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\"], \"queue\": [\"iris\", \"sorrel\"]}`\n\n**Step 13:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\"], \"queue\": [\"iris\", \"sorrel\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"sorrel\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\"]`.\n*   **Follow-ups for sorrel:** `[\"tulip\", \"pepper\"]`\n*   **Check Queue:** `queue` is `[\"iris\"]`. Neither \"tulip\" nor \"pepper\" are in `done` or `queue`.\n*   **Update Queue:** Append \"tulip\", \"pepper\". `queue` becomes `[\"iris\", \"tulip\", \"pepper\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\"], \"queue\": [\"iris\", \"tulip\", \"pepper\"]}`\n\n**Step 14:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\"], \"queue\": [\"iris\", \"tulip\", \"pepper\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"pepper\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\"]`.\n*   **Follow-ups for pepper:** `[\"nutmeg\"]`\n*   **Check Queue:** `queue` is `[\"iris\", \"tulip\"]`. \"nutmeg\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"nutmeg\". `queue` becomes `[\"iris\", \"tulip\", \"nutmeg\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\"], \"queue\": [\"iris\", \"tulip\", \"nutmeg\"]}`\n\n**Step 15:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\"], \"queue\": [\"iris\", \"tulip\", \"nutmeg\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"nutmeg\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\"]`.\n*   **Follow-ups for nutmeg:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\", \"tulip\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\", \"tulip\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\"], \"queue\": [\"iris\", \"tulip\"]}`\n\n**Step 16:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\"], \"queue\": [\"iris\", \"tulip\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"tulip\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\"]`.\n*   **Follow-ups for tulip:** `[]`\n*   **Check Queue:** `queue` is `[\"iris\"]`.\n*   **Update Queue:** No changes. `queue` remains `[\"iris\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\"], \"queue\": [\"iris\"]}`\n\n**Step 17:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\"], \"queue\": [\"iris\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job:** \"iris\"\n*   **Update:** `done` becomes `[\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\", \"iris\"]`.\n*   **Follow-ups for iris:** `[\"walnut\"]`\n*   **Check Queue:** `queue` is `[]`. \"walnut\" is not in `done` or `queue`.\n*   **Update Queue:** Append \"walnut\". `queue` becomes `[\"walnut\"]`.\n*   **Result:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\", \"iris\"], \"queue\": [\"walnut\"]}`\n\n**Step 18:**\n*   **Current State:** `{\"done\": [\"violet\", \"maple\", \"holly\", \"gull\", \"robin\", \"pine\", \"almond\", \"fern\", \"spruce\", \"sage\", \"garnet\", \"bramble\", \"sorrel\", \"pepper\", \"nutmeg\", \"tulip\", \"iris\"], \"queue\": [\"walnut\"]}`\n*   **Action:** Pop from end of queue.\n*   **Job\n</think>\n\nFINAL_JSON: {\"results\":[{\"done\":[\"violet\"],\"queue\":[\"iris\",\"sorrel\",\"maple\"]},{\"done\":[\"violet\",\"maple\"],\"queue\":[\"iris\",\"sorrel\",\"holly\"]},{\"done\":[\"violet\",\"maple\",\"holly\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"gull\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"robin\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"pine\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\",\"fern\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\",\"spruce\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\"],\"queue\":[\"iris\",\"sorrel\",\"bramble\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\"],\"queue\":[\"iris\",\"sorrel\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\"],\"queue\":[\"iris\",\"tulip\",\"pepper\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\"],\"queue\":[\"iris\",\"tulip\",\"nutmeg\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\"],\"queue\":[\"iris\",\"tulip\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\"],\"queue\":[\"iris\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\",\"iris\"],\"queue\":[\"walnut\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\",\"iris\",\"walnut\"],\"queue\":[]}]}`<|im_end|>\n<|endoftext|>",
+    "answer_text": "FINAL_JSON: {\"results\":[{\"done\":[\"violet\"],\"queue\":[\"iris\",\"sorrel\",\"maple\"]},{\"done\":[\"violet\",\"maple\"],\"queue\":[\"iris\",\"sorrel\",\"holly\"]},{\"done\":[\"violet\",\"maple\",\"holly\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"gull\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"robin\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\",\"pine\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"almond\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\",\"fern\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\",\"spruce\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\",\"sage\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\"],\"queue\":[\"iris\",\"sorrel\",\"garnet\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\"],\"queue\":[\"iris\",\"sorrel\",\"bramble\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\"],\"queue\":[\"iris\",\"sorrel\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\"],\"queue\":[\"iris\",\"tulip\",\"pepper\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\"],\"queue\":[\"iris\",\"tulip\",\"nutmeg\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\"],\"queue\":[\"iris\",\"tulip\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\"],\"queue\":[\"iris\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\",\"iris\"],\"queue\":[\"walnut\"]},{\"done\":[\"violet\",\"maple\",\"holly\",\"gull\",\"robin\",\"pine\",\"almond\",\"fern\",\"spruce\",\"sage\",\"garnet\",\"bramble\",\"sorrel\",\"pepper\",\"nutmeg\",\"tulip\",\"iris\",\"walnut\"],\"queue\":[]}]}`<|im_end|>\n<|endoftext|>",
+    "thinking_tokens": 5208,
+    "answer_tokens": 757,
+    "model_tokens": 5965,
+    "closed_naturally": false,
+    "forced_close": true,
+    "ended_in_thinking": false,
+    "answer_hit_limit": false,
+    "answer_ended": true,
+    "seconds": 552.7954179998487
+  },
+  "parse_ok": true,
+  "answer_parse_ok": true,
+  "gold_length_parse_ok": true,
+  "actual_results": [
+    {
+      "done": [
+        "violet"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "maple"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "holly"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "almond",
+        "gull"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "almond",
+        "robin"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "almond",
+        "pine"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "almond"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "sage",
+        "fern"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "sage",
+        "spruce"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet",
+        "sage"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "garnet"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet"
+      ],
+      "queue": [
+        "iris",
+        "sorrel",
+        "bramble"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble"
+      ],
+      "queue": [
+        "iris",
+        "sorrel"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel"
+      ],
+      "queue": [
+        "iris",
+        "tulip",
+        "pepper"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel",
+        "pepper"
+      ],
+      "queue": [
+        "iris",
+        "tulip",
+        "nutmeg"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel",
+        "pepper",
+        "nutmeg"
+      ],
+      "queue": [
+        "iris",
+        "tulip"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel",
+        "pepper",
+        "nutmeg",
+        "tulip"
+      ],
+      "queue": [
+        "iris"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel",
+        "pepper",
+        "nutmeg",
+        "tulip",
+        "iris"
+      ],
+      "queue": [
+        "walnut"
+      ]
+    },
+    {
+      "done": [
+        "violet",
+        "maple",
+        "holly",
+        "gull",
+        "robin",
+        "pine",
+        "almond",
+        "fern",
+        "spruce",
+        "sage",
+        "garnet",
+        "bramble",
+        "sorrel",
+        "pepper",
+        "nutmeg",
+        "tulip",
+        "iris",
+        "walnut"
+      ],
+      "queue": []
+    }
+  ],
+  "score": {
+    "item_id": "v4-c-lifo-18",
+    "cycle_count_ok": true,
+    "automated_checks": [
+      {
+        "name": "cycle:1",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "maple"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "maple"
+          ]
+        }
+      },
+      {
+        "name": "cycle:2",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "holly"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "holly"
+          ]
+        }
+      },
+      {
+        "name": "cycle:3",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "gull"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "gull"
+          ]
+        }
+      },
+      {
+        "name": "cycle:4",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "robin"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "robin"
+          ]
+        }
+      },
+      {
+        "name": "cycle:5",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "pine"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond",
+            "pine"
+          ]
+        }
+      },
+      {
+        "name": "cycle:6",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "almond"
+          ]
+        }
+      },
+      {
+        "name": "cycle:7",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage",
+            "fern"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage",
+            "fern"
+          ]
+        }
+      },
+      {
+        "name": "cycle:8",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage",
+            "spruce"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage",
+            "spruce"
+          ]
+        }
+      },
+      {
+        "name": "cycle:9",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet",
+            "sage"
+          ]
+        }
+      },
+      {
+        "name": "cycle:10",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "garnet"
+          ]
+        }
+      },
+      {
+        "name": "cycle:11",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "bramble"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet"
+          ],
+          "queue": [
+            "iris",
+            "sorrel",
+            "bramble"
+          ]
+        }
+      },
+      {
+        "name": "cycle:12",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble"
+          ],
+          "queue": [
+            "iris",
+            "sorrel"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble"
+          ],
+          "queue": [
+            "iris",
+            "sorrel"
+          ]
+        }
+      },
+      {
+        "name": "cycle:13",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel"
+          ],
+          "queue": [
+            "iris",
+            "tulip",
+            "pepper"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel"
+          ],
+          "queue": [
+            "iris",
+            "tulip",
+            "pepper"
+          ]
+        }
+      },
+      {
+        "name": "cycle:14",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper"
+          ],
+          "queue": [
+            "iris",
+            "tulip",
+            "nutmeg"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper"
+          ],
+          "queue": [
+            "iris",
+            "tulip",
+            "nutmeg"
+          ]
+        }
+      },
+      {
+        "name": "cycle:15",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg"
+          ],
+          "queue": [
+            "iris",
+            "tulip"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg"
+          ],
+          "queue": [
+            "iris",
+            "tulip"
+          ]
+        }
+      },
+      {
+        "name": "cycle:16",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip"
+          ],
+          "queue": [
+            "iris"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip"
+          ],
+          "queue": [
+            "iris"
+          ]
+        }
+      },
+      {
+        "name": "cycle:17",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip",
+            "iris"
+          ],
+          "queue": [
+            "walnut"
+          ]
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip",
+            "iris"
+          ],
+          "queue": [
+            "walnut"
+          ]
+        }
+      },
+      {
+        "name": "cycle:18",
+        "pass": true,
+        "expected": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip",
+            "iris",
+            "walnut"
+          ],
+          "queue": []
+        },
+        "actual": {
+          "done": [
+            "violet",
+            "maple",
+            "holly",
+            "gull",
+            "robin",
+            "pine",
+            "almond",
+            "fern",
+            "spruce",
+            "sage",
+            "garnet",
+            "bramble",
+            "sorrel",
+            "pepper",
+            "nutmeg",
+            "tulip",
+            "iris",
+            "walnut"
+          ],
+          "queue": []
+        }
+      }
+    ],
+    "automated_pass": true,
+    "manual_required": false,
+    "manual_pass": null,
+    "pass": true
+  },
+  "first_failed_step": null,
+  "failure_kind": null,
+  "stop_outcome": "exact"
+}

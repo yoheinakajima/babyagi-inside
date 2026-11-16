@@ -1,0 +1,1875 @@
+{
+  "items": 48,
+  "suite_sha256": "ab3e35d766b4d03ff70fc26c4f407b573462f3435a29e40644cc5fda01365b49",
+  "rom_sha256": "571d2f5dffef3d824255cd270a43c67627c49685867c0988324607e625c91d85",
+  "complete": true,
+  "problems": [],
+  "arms": {
+    "H-adapt": {
+      "items": 48,
+      "chain_pass": 20,
+      "exact_steps": 391,
+      "steps": 738,
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "chain_pass": 9,
+          "exact_steps": 220,
+          "steps": 320
+        },
+        "rule_until": {
+          "items": 16,
+          "chain_pass": 6,
+          "exact_steps": 114,
+          "steps": 233
+        },
+        "worklist": {
+          "items": 16,
+          "chain_pass": 5,
+          "exact_steps": 57,
+          "steps": 185
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "chain_pass": 8,
+          "exact_steps": 57,
+          "steps": 92
+        },
+        "17-24": {
+          "items": 11,
+          "chain_pass": 3,
+          "exact_steps": 131,
+          "steps": 235
+        },
+        "25-32": {
+          "items": 6,
+          "chain_pass": 4,
+          "exact_steps": 124,
+          "steps": 182
+        },
+        "9-16": {
+          "items": 17,
+          "chain_pass": 5,
+          "exact_steps": 79,
+          "steps": 229
+        }
+      },
+      "by_domain": {
+        "checkable_language": {
+          "items": 4,
+          "chain_pass": 1,
+          "exact_steps": 59,
+          "steps": 80
+        },
+        "ordered_literal": {
+          "items": 9,
+          "chain_pass": 1,
+          "exact_steps": 9,
+          "steps": 142
+        },
+        "sequential_arithmetic": {
+          "items": 10,
+          "chain_pass": 7,
+          "exact_steps": 150,
+          "steps": 181
+        },
+        "structured_operation": {
+          "items": 25,
+          "chain_pass": 11,
+          "exact_steps": 173,
+          "steps": 335
+        }
+      },
+      "stop_outcomes": {
+        "cap": 4,
+        "early": 17,
+        "exact": 27
+      },
+      "failure_kinds": {
+        "missing": 6,
+        "none": 20,
+        "wrong": 22
+      },
+      "first_failed_step": {
+        "v4-a-language-16": 1,
+        "v4-a-language-24": 24,
+        "v4-a-language-8": 3,
+        "v4-a-literal-16": 1,
+        "v4-a-literal-24": 1,
+        "v4-a-literal-32": 1,
+        "v4-a-literal-8": 1,
+        "v4-b-add-reverse-12": 2,
+        "v4-b-bubble-swap-28": 2,
+        "v4-b-caesar-shift-10": 1,
+        "v4-b-caesar-shift-24": 3,
+        "v4-b-collatz-20": 2,
+        "v4-b-rotate-increment-18": 15,
+        "v4-b-rotate-increment-4": 2,
+        "v4-b-subtract-largest-digit-22": 22,
+        "v4-b-uppercase-first-lowercase-16": 2,
+        "v4-b-uppercase-first-lowercase-7": 1,
+        "v4-c-alphabetical-11": 5,
+        "v4-c-alphabetical-14": 2,
+        "v4-c-alphabetical-17": 3,
+        "v4-c-alphabetical-5": 3,
+        "v4-c-alphabetical-8": 1,
+        "v4-c-fifo-13": 2,
+        "v4-c-fifo-16": 1,
+        "v4-c-lifo-12": 1,
+        "v4-c-lifo-15": 1,
+        "v4-c-lifo-18": 1,
+        "v4-c-lifo-9": 1
+      },
+      "per_step": {
+        "1": {
+          "eligible": 48,
+          "exact": 35,
+          "prefix_exact": 35
+        },
+        "2": {
+          "eligible": 48,
+          "exact": 28,
+          "prefix_exact": 28
+        },
+        "3": {
+          "eligible": 48,
+          "exact": 24,
+          "prefix_exact": 24
+        },
+        "4": {
+          "eligible": 48,
+          "exact": 25,
+          "prefix_exact": 24
+        },
+        "5": {
+          "eligible": 46,
+          "exact": 22,
+          "prefix_exact": 22
+        },
+        "6": {
+          "eligible": 44,
+          "exact": 21,
+          "prefix_exact": 21
+        },
+        "7": {
+          "eligible": 42,
+          "exact": 19,
+          "prefix_exact": 19
+        },
+        "8": {
+          "eligible": 40,
+          "exact": 18,
+          "prefix_exact": 18
+        },
+        "9": {
+          "eligible": 34,
+          "exact": 15,
+          "prefix_exact": 15
+        },
+        "10": {
+          "eligible": 33,
+          "exact": 15,
+          "prefix_exact": 15
+        },
+        "11": {
+          "eligible": 31,
+          "exact": 14,
+          "prefix_exact": 14
+        },
+        "12": {
+          "eligible": 30,
+          "exact": 14,
+          "prefix_exact": 14
+        },
+        "13": {
+          "eligible": 28,
+          "exact": 14,
+          "prefix_exact": 14
+        },
+        "14": {
+          "eligible": 26,
+          "exact": 13,
+          "prefix_exact": 13
+        },
+        "15": {
+          "eligible": 24,
+          "exact": 12,
+          "prefix_exact": 11
+        },
+        "16": {
+          "eligible": 23,
+          "exact": 12,
+          "prefix_exact": 11
+        },
+        "17": {
+          "eligible": 17,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "18": {
+          "eligible": 16,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "19": {
+          "eligible": 14,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "20": {
+          "eligible": 14,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "21": {
+          "eligible": 12,
+          "exact": 8,
+          "prefix_exact": 8
+        },
+        "22": {
+          "eligible": 12,
+          "exact": 7,
+          "prefix_exact": 7
+        },
+        "23": {
+          "eligible": 11,
+          "exact": 7,
+          "prefix_exact": 7
+        },
+        "24": {
+          "eligible": 11,
+          "exact": 6,
+          "prefix_exact": 6
+        },
+        "25": {
+          "eligible": 6,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "26": {
+          "eligible": 6,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "27": {
+          "eligible": 5,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "28": {
+          "eligible": 5,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "29": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "30": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "31": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "32": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        }
+      },
+      "records_sha256": "60600d4abf36ff7ce360fbe96a42650e62fabba72c77e2c3f9c3747cf57a7d64",
+      "stop_eligible": 26,
+      "exact_stops": 20,
+      "exact_stop_rate": 0.769231,
+      "stop_cycles": {
+        "v4-a-arithmetic-16": [
+          16,
+          16
+        ],
+        "v4-a-arithmetic-24": [
+          24,
+          24
+        ],
+        "v4-a-arithmetic-32": [
+          32,
+          32
+        ],
+        "v4-a-arithmetic-8": [
+          8,
+          8
+        ],
+        "v4-a-language-16": [
+          16,
+          16
+        ],
+        "v4-a-language-24": [
+          24,
+          24
+        ],
+        "v4-a-language-32": [
+          32,
+          32
+        ],
+        "v4-a-language-8": [
+          8,
+          8
+        ],
+        "v4-a-literal-16": [
+          16,
+          15
+        ],
+        "v4-a-literal-24": [
+          24,
+          40
+        ],
+        "v4-a-literal-32": [
+          32,
+          40
+        ],
+        "v4-a-literal-8": [
+          8,
+          7
+        ],
+        "v4-a-structured-16": [
+          16,
+          16
+        ],
+        "v4-a-structured-24": [
+          24,
+          24
+        ],
+        "v4-a-structured-32": [
+          32,
+          32
+        ],
+        "v4-a-structured-8": [
+          8,
+          8
+        ],
+        "v4-b-add-reverse-12": [
+          12,
+          1
+        ],
+        "v4-b-bubble-swap-14": [
+          14,
+          14
+        ],
+        "v4-b-bubble-swap-28": [
+          28,
+          1
+        ],
+        "v4-b-caesar-shift-10": [
+          10,
+          10
+        ],
+        "v4-b-caesar-shift-24": [
+          24,
+          12
+        ],
+        "v4-b-collatz-13": [
+          13,
+          13
+        ],
+        "v4-b-collatz-20": [
+          20,
+          1
+        ],
+        "v4-b-decrement-largest-6": [
+          6,
+          6
+        ],
+        "v4-b-digit-sum-26": [
+          26,
+          26
+        ],
+        "v4-b-digit-sum-8": [
+          8,
+          8
+        ],
+        "v4-b-rotate-increment-18": [
+          18,
+          14
+        ],
+        "v4-b-rotate-increment-4": [
+          4,
+          1
+        ],
+        "v4-b-rotate-words-5": [
+          5,
+          5
+        ],
+        "v4-b-subtract-largest-digit-22": [
+          22,
+          21
+        ],
+        "v4-b-uppercase-first-lowercase-16": [
+          16,
+          40
+        ],
+        "v4-b-uppercase-first-lowercase-7": [
+          7,
+          40
+        ],
+        "v4-c-alphabetical-11": [
+          11,
+          10
+        ],
+        "v4-c-alphabetical-14": [
+          14,
+          8
+        ],
+        "v4-c-alphabetical-17": [
+          17,
+          9
+        ],
+        "v4-c-alphabetical-5": [
+          5,
+          4
+        ],
+        "v4-c-alphabetical-8": [
+          8,
+          8
+        ],
+        "v4-c-fifo-10": [
+          10,
+          10
+        ],
+        "v4-c-fifo-13": [
+          13,
+          3
+        ],
+        "v4-c-fifo-16": [
+          16,
+          16
+        ],
+        "v4-c-fifo-20": [
+          20,
+          20
+        ],
+        "v4-c-fifo-4": [
+          4,
+          4
+        ],
+        "v4-c-fifo-7": [
+          7,
+          7
+        ],
+        "v4-c-lifo-12": [
+          12,
+          12
+        ],
+        "v4-c-lifo-15": [
+          15,
+          5
+        ],
+        "v4-c-lifo-18": [
+          18,
+          16
+        ],
+        "v4-c-lifo-6": [
+          6,
+          6
+        ],
+        "v4-c-lifo-9": [
+          9,
+          5
+        ]
+      },
+      "decision_margins": {
+        "continue_due": {
+          "decisions": 330,
+          "median": 8.375,
+          "model_pick_correct": 324
+        },
+        "done_due": {
+          "decisions": 20,
+          "median": -6.4375,
+          "model_pick_correct": 20
+        }
+      },
+      "ledger_shapes": {
+        "long_chain": {
+          "None": 1,
+          "rule": 3,
+          "tasks": 12
+        },
+        "rule_until": {
+          "rule": 16
+        },
+        "worklist": {
+          "None": 1,
+          "rule": 15
+        }
+      },
+      "audit": {
+        "pass": true,
+        "traces_with_violations": [],
+        "violation_checks": {},
+        "unfixed": [],
+        "flags": {},
+        "max_writes_per_file": 40,
+        "max_files": 3,
+        "max_stored_tokens": 457,
+        "max_span": 453,
+        "max_cycles": 40
+      },
+      "model_tokens": 204117,
+      "token_provenance": {
+        "control_surrogates": 2840,
+        "forced_responses": 172662,
+        "forced_rom": 264838,
+        "model_choices": 698,
+        "model_reasoning": 178688,
+        "model_write": 24731,
+        "objective_prefill": 44648
+      },
+      "max_context_tokens": 40117,
+      "forward_seconds": 2376.3,
+      "seconds": 22611.0
+    },
+    "H-oracle": {
+      "items": 48,
+      "chain_pass": 25,
+      "exact_steps": 453,
+      "steps": 738,
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "chain_pass": 9,
+          "exact_steps": 220,
+          "steps": 320
+        },
+        "rule_until": {
+          "items": 16,
+          "chain_pass": 11,
+          "exact_steps": 176,
+          "steps": 233
+        },
+        "worklist": {
+          "items": 16,
+          "chain_pass": 5,
+          "exact_steps": 57,
+          "steps": 185
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "chain_pass": 9,
+          "exact_steps": 60,
+          "steps": 92
+        },
+        "17-24": {
+          "items": 11,
+          "chain_pass": 6,
+          "exact_steps": 155,
+          "steps": 235
+        },
+        "25-32": {
+          "items": 6,
+          "chain_pass": 4,
+          "exact_steps": 148,
+          "steps": 182
+        },
+        "9-16": {
+          "items": 17,
+          "chain_pass": 6,
+          "exact_steps": 90,
+          "steps": 229
+        }
+      },
+      "by_domain": {
+        "checkable_language": {
+          "items": 4,
+          "chain_pass": 1,
+          "exact_steps": 59,
+          "steps": 80
+        },
+        "ordered_literal": {
+          "items": 9,
+          "chain_pass": 1,
+          "exact_steps": 9,
+          "steps": 142
+        },
+        "sequential_arithmetic": {
+          "items": 10,
+          "chain_pass": 10,
+          "exact_steps": 181,
+          "steps": 181
+        },
+        "structured_operation": {
+          "items": 25,
+          "chain_pass": 13,
+          "exact_steps": 204,
+          "steps": 335
+        }
+      },
+      "stop_outcomes": {
+        "exact": 48
+      },
+      "failure_kinds": {
+        "none": 25,
+        "wrong": 23
+      },
+      "first_failed_step": {
+        "v4-a-language-16": 1,
+        "v4-a-language-24": 24,
+        "v4-a-language-8": 3,
+        "v4-a-literal-16": 1,
+        "v4-a-literal-24": 1,
+        "v4-a-literal-32": 1,
+        "v4-a-literal-8": 1,
+        "v4-b-bubble-swap-28": 26,
+        "v4-b-caesar-shift-10": 1,
+        "v4-b-caesar-shift-24": 3,
+        "v4-b-uppercase-first-lowercase-16": 2,
+        "v4-b-uppercase-first-lowercase-7": 1,
+        "v4-c-alphabetical-11": 5,
+        "v4-c-alphabetical-14": 2,
+        "v4-c-alphabetical-17": 3,
+        "v4-c-alphabetical-5": 3,
+        "v4-c-alphabetical-8": 1,
+        "v4-c-fifo-13": 2,
+        "v4-c-fifo-16": 1,
+        "v4-c-lifo-12": 1,
+        "v4-c-lifo-15": 1,
+        "v4-c-lifo-18": 1,
+        "v4-c-lifo-9": 1
+      },
+      "per_step": {
+        "1": {
+          "eligible": 48,
+          "exact": 35,
+          "prefix_exact": 35
+        },
+        "2": {
+          "eligible": 48,
+          "exact": 32,
+          "prefix_exact": 32
+        },
+        "3": {
+          "eligible": 48,
+          "exact": 28,
+          "prefix_exact": 28
+        },
+        "4": {
+          "eligible": 48,
+          "exact": 29,
+          "prefix_exact": 28
+        },
+        "5": {
+          "eligible": 46,
+          "exact": 25,
+          "prefix_exact": 25
+        },
+        "6": {
+          "eligible": 44,
+          "exact": 24,
+          "prefix_exact": 24
+        },
+        "7": {
+          "eligible": 42,
+          "exact": 22,
+          "prefix_exact": 22
+        },
+        "8": {
+          "eligible": 40,
+          "exact": 21,
+          "prefix_exact": 21
+        },
+        "9": {
+          "eligible": 34,
+          "exact": 18,
+          "prefix_exact": 18
+        },
+        "10": {
+          "eligible": 33,
+          "exact": 18,
+          "prefix_exact": 18
+        },
+        "11": {
+          "eligible": 31,
+          "exact": 17,
+          "prefix_exact": 17
+        },
+        "12": {
+          "eligible": 30,
+          "exact": 17,
+          "prefix_exact": 17
+        },
+        "13": {
+          "eligible": 28,
+          "exact": 16,
+          "prefix_exact": 16
+        },
+        "14": {
+          "eligible": 26,
+          "exact": 15,
+          "prefix_exact": 15
+        },
+        "15": {
+          "eligible": 24,
+          "exact": 15,
+          "prefix_exact": 14
+        },
+        "16": {
+          "eligible": 23,
+          "exact": 15,
+          "prefix_exact": 14
+        },
+        "17": {
+          "eligible": 17,
+          "exact": 12,
+          "prefix_exact": 12
+        },
+        "18": {
+          "eligible": 16,
+          "exact": 12,
+          "prefix_exact": 12
+        },
+        "19": {
+          "eligible": 14,
+          "exact": 11,
+          "prefix_exact": 11
+        },
+        "20": {
+          "eligible": 14,
+          "exact": 11,
+          "prefix_exact": 11
+        },
+        "21": {
+          "eligible": 12,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "22": {
+          "eligible": 12,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "23": {
+          "eligible": 11,
+          "exact": 8,
+          "prefix_exact": 8
+        },
+        "24": {
+          "eligible": 11,
+          "exact": 7,
+          "prefix_exact": 7
+        },
+        "25": {
+          "eligible": 6,
+          "exact": 5,
+          "prefix_exact": 5
+        },
+        "26": {
+          "eligible": 6,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "27": {
+          "eligible": 5,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "28": {
+          "eligible": 5,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "29": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "30": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "31": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "32": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        }
+      },
+      "records_sha256": "c177c90e2055b68ec61ffc089c55bc06b58b98172dbb5eb2f7a35c021bc57548",
+      "stop_eligible": 25,
+      "exact_stops": 25,
+      "exact_stop_rate": 1.0,
+      "stop_cycles": {
+        "v4-a-arithmetic-16": [
+          16,
+          16
+        ],
+        "v4-a-arithmetic-24": [
+          24,
+          24
+        ],
+        "v4-a-arithmetic-32": [
+          32,
+          32
+        ],
+        "v4-a-arithmetic-8": [
+          8,
+          8
+        ],
+        "v4-a-language-16": [
+          16,
+          16
+        ],
+        "v4-a-language-24": [
+          24,
+          24
+        ],
+        "v4-a-language-32": [
+          32,
+          32
+        ],
+        "v4-a-language-8": [
+          8,
+          8
+        ],
+        "v4-a-literal-16": [
+          16,
+          16
+        ],
+        "v4-a-literal-24": [
+          24,
+          24
+        ],
+        "v4-a-literal-32": [
+          32,
+          32
+        ],
+        "v4-a-literal-8": [
+          8,
+          8
+        ],
+        "v4-a-structured-16": [
+          16,
+          16
+        ],
+        "v4-a-structured-24": [
+          24,
+          24
+        ],
+        "v4-a-structured-32": [
+          32,
+          32
+        ],
+        "v4-a-structured-8": [
+          8,
+          8
+        ],
+        "v4-b-add-reverse-12": [
+          12,
+          12
+        ],
+        "v4-b-bubble-swap-14": [
+          14,
+          14
+        ],
+        "v4-b-bubble-swap-28": [
+          28,
+          28
+        ],
+        "v4-b-caesar-shift-10": [
+          10,
+          10
+        ],
+        "v4-b-caesar-shift-24": [
+          24,
+          24
+        ],
+        "v4-b-collatz-13": [
+          13,
+          13
+        ],
+        "v4-b-collatz-20": [
+          20,
+          20
+        ],
+        "v4-b-decrement-largest-6": [
+          6,
+          6
+        ],
+        "v4-b-digit-sum-26": [
+          26,
+          26
+        ],
+        "v4-b-digit-sum-8": [
+          8,
+          8
+        ],
+        "v4-b-rotate-increment-18": [
+          18,
+          18
+        ],
+        "v4-b-rotate-increment-4": [
+          4,
+          4
+        ],
+        "v4-b-rotate-words-5": [
+          5,
+          5
+        ],
+        "v4-b-subtract-largest-digit-22": [
+          22,
+          22
+        ],
+        "v4-b-uppercase-first-lowercase-16": [
+          16,
+          16
+        ],
+        "v4-b-uppercase-first-lowercase-7": [
+          7,
+          7
+        ],
+        "v4-c-alphabetical-11": [
+          11,
+          11
+        ],
+        "v4-c-alphabetical-14": [
+          14,
+          14
+        ],
+        "v4-c-alphabetical-17": [
+          17,
+          17
+        ],
+        "v4-c-alphabetical-5": [
+          5,
+          5
+        ],
+        "v4-c-alphabetical-8": [
+          8,
+          8
+        ],
+        "v4-c-fifo-10": [
+          10,
+          10
+        ],
+        "v4-c-fifo-13": [
+          13,
+          13
+        ],
+        "v4-c-fifo-16": [
+          16,
+          16
+        ],
+        "v4-c-fifo-20": [
+          20,
+          20
+        ],
+        "v4-c-fifo-4": [
+          4,
+          4
+        ],
+        "v4-c-fifo-7": [
+          7,
+          7
+        ],
+        "v4-c-lifo-12": [
+          12,
+          12
+        ],
+        "v4-c-lifo-15": [
+          15,
+          15
+        ],
+        "v4-c-lifo-18": [
+          18,
+          18
+        ],
+        "v4-c-lifo-6": [
+          6,
+          6
+        ],
+        "v4-c-lifo-9": [
+          9,
+          9
+        ]
+      },
+      "decision_margins": {
+        "continue_due": {
+          "decisions": 362,
+          "median": 8.25,
+          "model_pick_correct": 355
+        },
+        "done_due": {
+          "decisions": 25,
+          "median": -5.75,
+          "model_pick_correct": 23
+        }
+      },
+      "ledger_shapes": {
+        "long_chain": {
+          "None": 1,
+          "rule": 3,
+          "tasks": 12
+        },
+        "rule_until": {
+          "rule": 16
+        },
+        "worklist": {
+          "None": 1,
+          "rule": 15
+        }
+      },
+      "audit": {
+        "pass": true,
+        "traces_with_violations": [],
+        "violation_checks": {},
+        "unfixed": [],
+        "flags": {},
+        "max_writes_per_file": 32,
+        "max_files": 3,
+        "max_stored_tokens": 457,
+        "max_span": 453,
+        "max_cycles": 32
+      },
+      "model_tokens": 215813,
+      "token_provenance": {
+        "control_surrogates": 3000,
+        "forced_choices": 738,
+        "forced_responses": 178662,
+        "forced_rom": 279198,
+        "model_reasoning": 188928,
+        "model_write": 26885,
+        "objective_prefill": 44648
+      },
+      "max_context_tokens": 39298,
+      "forward_seconds": 2458.1,
+      "seconds": 23360.4
+    },
+    "P-F2": {
+      "items": 48,
+      "chain_pass": 38,
+      "exact_steps": 598,
+      "steps": 738,
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "chain_pass": 10,
+          "exact_steps": 237,
+          "steps": 320
+        },
+        "rule_until": {
+          "items": 16,
+          "chain_pass": 12,
+          "exact_steps": 176,
+          "steps": 233
+        },
+        "worklist": {
+          "items": 16,
+          "chain_pass": 16,
+          "exact_steps": 185,
+          "steps": 185
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "chain_pass": 13,
+          "exact_steps": 86,
+          "steps": 92
+        },
+        "17-24": {
+          "items": 11,
+          "chain_pass": 8,
+          "exact_steps": 183,
+          "steps": 235
+        },
+        "25-32": {
+          "items": 6,
+          "chain_pass": 4,
+          "exact_steps": 144,
+          "steps": 182
+        },
+        "9-16": {
+          "items": 17,
+          "chain_pass": 13,
+          "exact_steps": 185,
+          "steps": 229
+        }
+      },
+      "by_domain": {
+        "checkable_language": {
+          "items": 4,
+          "chain_pass": 1,
+          "exact_steps": 51,
+          "steps": 80
+        },
+        "ordered_literal": {
+          "items": 9,
+          "chain_pass": 3,
+          "exact_steps": 41,
+          "steps": 142
+        },
+        "sequential_arithmetic": {
+          "items": 10,
+          "chain_pass": 10,
+          "exact_steps": 181,
+          "steps": 181
+        },
+        "structured_operation": {
+          "items": 25,
+          "chain_pass": 24,
+          "exact_steps": 325,
+          "steps": 335
+        }
+      },
+      "stop_outcomes": {
+        "early": 1,
+        "exact": 45,
+        "unparsed": 2
+      },
+      "failure_kinds": {
+        "missing": 2,
+        "none": 38,
+        "wrong": 8
+      },
+      "first_failed_step": {
+        "v4-a-language-16": 1,
+        "v4-a-language-24": 14,
+        "v4-a-language-8": 3,
+        "v4-a-literal-16": 9,
+        "v4-a-literal-24": 1,
+        "v4-a-literal-32": 5,
+        "v4-b-bubble-swap-28": 17,
+        "v4-b-caesar-shift-10": 1,
+        "v4-b-caesar-shift-24": 4,
+        "v4-b-uppercase-first-lowercase-16": 1
+      },
+      "per_step": {
+        "1": {
+          "eligible": 48,
+          "exact": 44,
+          "prefix_exact": 44
+        },
+        "2": {
+          "eligible": 48,
+          "exact": 44,
+          "prefix_exact": 44
+        },
+        "3": {
+          "eligible": 48,
+          "exact": 43,
+          "prefix_exact": 43
+        },
+        "4": {
+          "eligible": 48,
+          "exact": 42,
+          "prefix_exact": 42
+        },
+        "5": {
+          "eligible": 46,
+          "exact": 39,
+          "prefix_exact": 39
+        },
+        "6": {
+          "eligible": 44,
+          "exact": 37,
+          "prefix_exact": 37
+        },
+        "7": {
+          "eligible": 42,
+          "exact": 35,
+          "prefix_exact": 35
+        },
+        "8": {
+          "eligible": 40,
+          "exact": 33,
+          "prefix_exact": 33
+        },
+        "9": {
+          "eligible": 34,
+          "exact": 27,
+          "prefix_exact": 27
+        },
+        "10": {
+          "eligible": 33,
+          "exact": 27,
+          "prefix_exact": 26
+        },
+        "11": {
+          "eligible": 31,
+          "exact": 26,
+          "prefix_exact": 25
+        },
+        "12": {
+          "eligible": 30,
+          "exact": 25,
+          "prefix_exact": 24
+        },
+        "13": {
+          "eligible": 28,
+          "exact": 23,
+          "prefix_exact": 22
+        },
+        "14": {
+          "eligible": 26,
+          "exact": 20,
+          "prefix_exact": 19
+        },
+        "15": {
+          "eligible": 24,
+          "exact": 18,
+          "prefix_exact": 17
+        },
+        "16": {
+          "eligible": 23,
+          "exact": 16,
+          "prefix_exact": 16
+        },
+        "17": {
+          "eligible": 17,
+          "exact": 12,
+          "prefix_exact": 12
+        },
+        "18": {
+          "eligible": 16,
+          "exact": 11,
+          "prefix_exact": 11
+        },
+        "19": {
+          "eligible": 14,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "20": {
+          "eligible": 14,
+          "exact": 9,
+          "prefix_exact": 9
+        },
+        "21": {
+          "eligible": 12,
+          "exact": 8,
+          "prefix_exact": 7
+        },
+        "22": {
+          "eligible": 12,
+          "exact": 8,
+          "prefix_exact": 7
+        },
+        "23": {
+          "eligible": 11,
+          "exact": 7,
+          "prefix_exact": 6
+        },
+        "24": {
+          "eligible": 11,
+          "exact": 7,
+          "prefix_exact": 6
+        },
+        "25": {
+          "eligible": 6,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "26": {
+          "eligible": 6,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "27": {
+          "eligible": 5,
+          "exact": 4,
+          "prefix_exact": 3
+        },
+        "28": {
+          "eligible": 5,
+          "exact": 4,
+          "prefix_exact": 3
+        },
+        "29": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "30": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "31": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        },
+        "32": {
+          "eligible": 4,
+          "exact": 3,
+          "prefix_exact": 3
+        }
+      },
+      "records_sha256": "bfaa115369ee5545b513d2329506887984501773389ec0adc7dfbe91496d079b",
+      "parse_ok": 46,
+      "answer_parse_ok": 46,
+      "gold_length_parse_ok": 45,
+      "closed_naturally": 5,
+      "forced_close": 43,
+      "answer_hit_limit": 2,
+      "model_tokens": 236289,
+      "seconds": 21892.8
+    }
+  },
+  "comparisons": {
+    "adapt_minus_plain": {
+      "difference": "H-adapt minus P-F2",
+      "items": 48,
+      "after_rate": 0.416667,
+      "before_rate": 0.791667,
+      "delta": -0.375,
+      "after_only": 0,
+      "before_only": 18,
+      "exact_mcnemar_p": 7.62939453125e-06,
+      "item_bootstrap_delta_95": [
+        -0.520833,
+        -0.229167
+      ],
+      "reading": "CONTRADICTED",
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "after": 9,
+          "before": 10,
+          "delta": -1
+        },
+        "rule_until": {
+          "items": 16,
+          "after": 6,
+          "before": 12,
+          "delta": -6
+        },
+        "worklist": {
+          "items": 16,
+          "after": 5,
+          "before": 16,
+          "delta": -11
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "after": 8,
+          "before": 13,
+          "delta": -5
+        },
+        "17-24": {
+          "items": 11,
+          "after": 3,
+          "before": 8,
+          "delta": -5
+        },
+        "25-32": {
+          "items": 6,
+          "after": 4,
+          "before": 4,
+          "delta": 0
+        },
+        "9-16": {
+          "items": 17,
+          "after": 5,
+          "before": 13,
+          "delta": -8
+        }
+      }
+    },
+    "oracle_minus_plain": {
+      "difference": "H-oracle minus P-F2",
+      "items": 48,
+      "after_rate": 0.520833,
+      "before_rate": 0.791667,
+      "delta": -0.270833,
+      "after_only": 0,
+      "before_only": 13,
+      "exact_mcnemar_p": 0.000244140625,
+      "item_bootstrap_delta_95": [
+        -0.395833,
+        -0.145833
+      ],
+      "reading": "CONTRADICTED",
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "after": 9,
+          "before": 10,
+          "delta": -1
+        },
+        "rule_until": {
+          "items": 16,
+          "after": 11,
+          "before": 12,
+          "delta": -1
+        },
+        "worklist": {
+          "items": 16,
+          "after": 5,
+          "before": 16,
+          "delta": -11
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "after": 9,
+          "before": 13,
+          "delta": -4
+        },
+        "17-24": {
+          "items": 11,
+          "after": 6,
+          "before": 8,
+          "delta": -2
+        },
+        "25-32": {
+          "items": 6,
+          "after": 4,
+          "before": 4,
+          "delta": 0
+        },
+        "9-16": {
+          "items": 17,
+          "after": 6,
+          "before": 13,
+          "delta": -7
+        }
+      }
+    },
+    "adapt_minus_oracle": {
+      "difference": "H-adapt minus H-oracle",
+      "items": 48,
+      "after_rate": 0.416667,
+      "before_rate": 0.520833,
+      "delta": -0.104167,
+      "after_only": 0,
+      "before_only": 5,
+      "exact_mcnemar_p": 0.0625,
+      "item_bootstrap_delta_95": [
+        -0.1875,
+        -0.020833
+      ],
+      "reading": "CONTRADICTED",
+      "by_category": {
+        "long_chain": {
+          "items": 16,
+          "after": 9,
+          "before": 9,
+          "delta": 0
+        },
+        "rule_until": {
+          "items": 16,
+          "after": 6,
+          "before": 11,
+          "delta": -5
+        },
+        "worklist": {
+          "items": 16,
+          "after": 5,
+          "before": 5,
+          "delta": 0
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 14,
+          "after": 8,
+          "before": 9,
+          "delta": -1
+        },
+        "17-24": {
+          "items": 11,
+          "after": 3,
+          "before": 6,
+          "delta": -3
+        },
+        "25-32": {
+          "items": 6,
+          "after": 4,
+          "before": 4,
+          "delta": 0
+        },
+        "9-16": {
+          "items": 17,
+          "after": 5,
+          "before": 6,
+          "delta": -1
+        }
+      }
+    }
+  },
+  "adapt_minus_plain_delta": -0.375,
+  "audit_ok": true,
+  "decision": {
+    "decision": "NO-GO",
+    "conditions": {
+      "adapt_ci_lower_above_0": false,
+      "audit_ok": true,
+      "exact_stop_rate_at_least_0.9": false,
+      "oracle_ci_lower_above_0": false,
+      "oracle_ci_upper_below_0": true,
+      "both_deltas_at_most_0": true
+    },
+    "exact_stop_rate": 0.769231
+  },
+  "H-adapt-v3": {
+    "complete": true,
+    "problems": [],
+    "summary": {
+      "items": 32,
+      "chain_pass": 17,
+      "exact_steps": 96,
+      "steps": 144,
+      "by_category": {
+        "v3": {
+          "items": 32,
+          "chain_pass": 17,
+          "exact_steps": 96,
+          "steps": 144
+        }
+      },
+      "by_length_bucket": {
+        "1-8": {
+          "items": 32,
+          "chain_pass": 17,
+          "exact_steps": 96,
+          "steps": 144
+        }
+      },
+      "by_domain": {
+        "checkable_language": {
+          "items": 8,
+          "chain_pass": 2,
+          "exact_steps": 20,
+          "steps": 36
+        },
+        "ordered_literal": {
+          "items": 8,
+          "chain_pass": 1,
+          "exact_steps": 6,
+          "steps": 36
+        },
+        "sequential_arithmetic": {
+          "items": 8,
+          "chain_pass": 8,
+          "exact_steps": 36,
+          "steps": 36
+        },
+        "structured_operation": {
+          "items": 8,
+          "chain_pass": 6,
+          "exact_steps": 34,
+          "steps": 36
+        }
+      },
+      "stop_outcomes": {
+        "cap": 4,
+        "early": 6,
+        "exact": 22
+      },
+      "failure_kinds": {
+        "missing": 3,
+        "none": 17,
+        "wrong": 12
+      },
+      "first_failed_step": {
+        "v3-language-lantern-2": 1,
+        "v3-language-lantern-3": 1,
+        "v3-language-lantern-8": 6,
+        "v3-language-river-2": 1,
+        "v3-language-river-5": 1,
+        "v3-language-river-8": 6,
+        "v3-literal-route-2": 1,
+        "v3-literal-route-3": 1,
+        "v3-literal-route-5": 1,
+        "v3-literal-route-8": 2,
+        "v3-literal-wrapper-2": 1,
+        "v3-literal-wrapper-5": 2,
+        "v3-literal-wrapper-8": 2,
+        "v3-structured-even-2": 2,
+        "v3-structured-odd-2": 2
+      },
+      "per_step": {
+        "1": {
+          "eligible": 32,
+          "exact": 24,
+          "prefix_exact": 24
+        },
+        "2": {
+          "eligible": 32,
+          "exact": 21,
+          "prefix_exact": 19
+        },
+        "3": {
+          "eligible": 24,
+          "exact": 17,
+          "prefix_exact": 17
+        },
+        "4": {
+          "eligible": 16,
+          "exact": 11,
+          "prefix_exact": 11
+        },
+        "5": {
+          "eligible": 16,
+          "exact": 11,
+          "prefix_exact": 11
+        },
+        "6": {
+          "eligible": 8,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "7": {
+          "eligible": 8,
+          "exact": 4,
+          "prefix_exact": 4
+        },
+        "8": {
+          "eligible": 8,
+          "exact": 4,
+          "prefix_exact": 4
+        }
+      },
+      "records_sha256": "bd464cb53f8565c42236e2b9a2e31b7b3440c519ab4ba1d05c5a391c1505b2fe",
+      "stop_eligible": 20,
+      "exact_stops": 17,
+      "exact_stop_rate": 0.85,
+      "stop_cycles": {
+        "v3-arithmetic-add-2": [
+          2,
+          2
+        ],
+        "v3-arithmetic-add-3": [
+          3,
+          3
+        ],
+        "v3-arithmetic-add-5": [
+          5,
+          5
+        ],
+        "v3-arithmetic-add-8": [
+          8,
+          8
+        ],
+        "v3-arithmetic-multiply-2": [
+          2,
+          2
+        ],
+        "v3-arithmetic-multiply-3": [
+          3,
+          3
+        ],
+        "v3-arithmetic-multiply-5": [
+          5,
+          5
+        ],
+        "v3-arithmetic-multiply-8": [
+          8,
+          8
+        ],
+        "v3-language-lantern-2": [
+          2,
+          2
+        ],
+        "v3-language-lantern-3": [
+          3,
+          2
+        ],
+        "v3-language-lantern-5": [
+          5,
+          5
+        ],
+        "v3-language-lantern-8": [
+          8,
+          8
+        ],
+        "v3-language-river-2": [
+          2,
+          2
+        ],
+        "v3-language-river-3": [
+          3,
+          3
+        ],
+        "v3-language-river-5": [
+          5,
+          40
+        ],
+        "v3-language-river-8": [
+          8,
+          8
+        ],
+        "v3-literal-route-2": [
+          2,
+          2
+        ],
+        "v3-literal-route-3": [
+          3,
+          40
+        ],
+        "v3-literal-route-5": [
+          5,
+          40
+        ],
+        "v3-literal-route-8": [
+          8,
+          2
+        ],
+        "v3-literal-wrapper-2": [
+          2,
+          1
+        ],
+        "v3-literal-wrapper-3": [
+          3,
+          3
+        ],
+        "v3-literal-wrapper-5": [
+          5,
+          1
+        ],
+        "v3-literal-wrapper-8": [
+          8,
+          1
+        ],
+        "v3-structured-even-2": [
+          2,
+          40
+        ],
+        "v3-structured-even-3": [
+          3,
+          3
+        ],
+        "v3-structured-even-5": [
+          5,
+          5
+        ],
+        "v3-structured-even-8": [
+          8,
+          8
+        ],
+        "v3-structured-odd-2": [
+          2,
+          1
+        ],
+        "v3-structured-odd-3": [
+          3,
+          3
+        ],
+        "v3-structured-odd-5": [
+          5,
+          5
+        ],
+        "v3-structured-odd-8": [
+          8,
+          8
+        ]
+      },
+      "decision_margins": {
+        "continue_due": {
+          "decisions": 65,
+          "median": 5.75,
+          "model_pick_correct": 62
+        },
+        "done_due": {
+          "decisions": 17,
+          "median": -6.625,
+          "model_pick_correct": 17
+        }
+      },
+      "ledger_shapes": {
+        "v3": {
+          "None": 7,
+          "rule": 8,
+          "tasks": 17
+        }
+      },
+      "audit": {
+        "pass": true,
+        "traces_with_violations": [],
+        "violation_checks": {},
+        "unfixed": [],
+        "flags": {},
+        "max_writes_per_file": 40,
+        "max_files": 2,
+        "max_stored_tokens": 204,
+        "max_span": 453,
+        "max_cycles": 40
+      },
+      "model_tokens": 84709,
+      "token_provenance": {
+        "control_surrogates": 1108,
+        "forced_responses": 44872,
+        "forced_rom": 106075,
+        "model_choices": 269,
+        "model_reasoning": 68864,
+        "model_write": 15576,
+        "objective_prefill": 26734
+      },
+      "max_context_tokens": 38591,
+      "forward_seconds": 931.2,
+      "seconds": 9456.6
+    },
+    "paired": {
+      "E12 compiled 4B": {
+        "difference": "H-adapt-v3 minus E12 compiled 4B",
+        "items": 32,
+        "after_rate": 0.53125,
+        "before_rate": 0.875,
+        "delta": -0.34375,
+        "after_only": 0,
+        "before_only": 11,
+        "exact_mcnemar_p": 0.0009765625,
+        "item_bootstrap_delta_95": [
+          -0.53125,
+          -0.1875
+        ],
+        "reading": "CONTRADICTED"
+      },
+      "E9 host 4B (fixed-length ledger pointer)": {
+        "difference": "H-adapt-v3 minus E9 host 4B (fixed-length ledger pointer)",
+        "items": 32,
+        "after_rate": 0.53125,
+        "before_rate": 0.84375,
+        "delta": -0.3125,
+        "after_only": 0,
+        "before_only": 10,
+        "exact_mcnemar_p": 0.001953125,
+        "item_bootstrap_delta_95": [
+          -0.46875,
+          -0.15625
+        ],
+        "reading": "CONTRADICTED"
+      },
+      "E14 F2 plain 4B": {
+        "difference": "H-adapt-v3 minus E14 F2 plain 4B",
+        "items": 32,
+        "after_rate": 0.53125,
+        "before_rate": 0.90625,
+        "delta": -0.375,
+        "after_only": 0,
+        "before_only": 12,
+        "exact_mcnemar_p": 0.00048828125,
+        "item_bootstrap_delta_95": [
+          -0.5625,
+          -0.21875
+        ],
+        "reading": "CONTRADICTED"
+      }
+    }
+  }
+}

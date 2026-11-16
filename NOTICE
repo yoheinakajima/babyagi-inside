@@ -19,14 +19,18 @@ This credit does not assert that Qwenputer source code is redistributed here.
 
 MODEL AND CHECKPOINT WEIGHTS
 
-Qwen3.5-2B is distributed by the Qwen team under Apache License 2.0:
+Qwen3.5-2B and Qwen3.5-4B are distributed by the Qwen team under Apache
+License 2.0:
   https://huggingface.co/Qwen/Qwen3.5-2B
+  https://huggingface.co/Qwen/Qwen3.5-4B
 
 The MIT license for this repository's code does not relicense Qwen model
 weights or checkpoints derived from them. If modified Qwen-derived weights are
 distributed, the distributor must comply with Apache License 2.0, including
 providing a copy of that license, retaining applicable notices, and stating
 that the files were modified. At the time of this audit, the official
-Qwen3.5-2B repository listed no separate upstream NOTICE file.
+Qwen3.5-2B repository listed no separate upstream NOTICE file, and the
+Qwen3.5-4B revision used here (851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a)
+contains a LICENSE file and no NOTICE file.
 
 No checkpoint weights are included in this Git repository.

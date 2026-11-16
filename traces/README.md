@@ -51,3 +51,25 @@ python3 scripts/export_finished_traces.py \
   /path/to/results/end-to-end-v3-b256 \
   benchmarks/babyagi-v3.json traces
 ```
+
+The same ten files also come out byte for byte from the 2B full live-compiled sweep:
+
+```sh
+python3 scripts/export_finished_traces.py --sweep \
+  /path/to/results/babyagi-v3-full-live-compiled benchmarks/babyagi-v3.json traces
+```
+
+## Qwen3.5-4B traces
+
+[`qwen3.5-4b/`](qwen3.5-4b/) holds all 32 items of the frozen Qwen3.5-4B live-compiled
+sweep ([preregistration](../docs/qwen35-4b-full-live-compiled-preregistration.md),
+[results](../docs/qwen35-4b-full-live-compiled-results.md)) in the same schema: 28 exact
+chains and 4 preserved failures. Every item is exported, so nothing is selected. The `pass`
+field is the sweep's own scored verdict (`score.json`), and `results` are its scored
+values. Regenerate them without loading a model:
+
+```sh
+python3 scripts/export_finished_traces.py --sweep --all \
+  /path/to/results/qwen35-4b-full-live-compiled benchmarks/babyagi-v3.json \
+  traces/qwen3.5-4b
+```
